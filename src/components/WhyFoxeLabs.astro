@@ -1,0 +1,43 @@
+---
+const items = [
+  {
+    n: '01',
+    title: 'Built by a real trader',
+    body:
+      'Every product is built and traded live by the same person who wrote the code. No theory — only what survives the market.',
+  },
+  {
+    n: '02',
+    title: 'Prop firm ready',
+    body:
+      'Engineered for The5ers, FTMO, and similar challenge accounts. Risk controls, drawdown limits, and session filters baked in.',
+  },
+  {
+    n: '03',
+    title: 'No black boxes',
+    body:
+      'Documented logic, configurable parameters, and clear strategy explanations. You understand exactly what you\'re running.',
+  },
+];
+---
+<section id="why" class="py-20 md:py-28" data-reveal>
+  <div class="container-x">
+    <p class="font-mono text-[10px] mb-10" style="color: var(--color-hint); letter-spacing: 2px;">
+      — why foxe labs
+    </p>
+
+    <div class="grid md:grid-cols-3 gap-10 md:gap-8">
+      {items.map((item) => (
+        <div>
+          <p class="font-mono text-[12px] mb-4" style="color: var(--color-gold); letter-spacing: 1px;">
+            {item.n}
+          </p>
+          <h4 class="font-display font-semibold text-base mb-2" style="letter-spacing: -0.3px;">
+            {item.title}
+          </h4>
+          <p class="text-sm" style="color: var(--color-muted);">{item.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

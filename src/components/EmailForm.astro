@@ -1,0 +1,111 @@
+---
+interface Props {
+  id?: string;
+  buttonLabel?: string;
+}
+const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
+---
+<form data-email-form id={id} class="w-full max-w-md" novalidate>
+  <div data-fields class="flex flex-col sm:flex-row gap-2">
+    <input
+      type="email"
+      name="email"
+      required
+      placeholder="you@domain.com"
+      aria-label="Email address"
+      class="flex-1 min-w-0 px-3 py-2.5 text-sm bg-transparent border rounded-md outline-none focus:border-[var(--color-gold)] transition-colors disabled:opacity-60"
+      style="border-color: var(--color-border); color: var(--color-text);"
+    />
+    <button
+      type="submit"
+      data-submit
+      data-label={buttonLabel}
+      class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+      style="background: var(--color-gold); color: #0B0F1A;"
+    >
+      <span data-label-text>{buttonLabel}</span>
+      <svg data-spinner class="hidden animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-opacity="0.25" />
+        <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+  <p data-success class="hidden mt-3 text-sm font-mono" style="color: var(--color-gold);">
+    You're on the list!
+  </p>
+  <p data-error class="hidden mt-3 text-sm font-mono" style="color: var(--color-red);">
+    Something went wrong. Try again.
+  </p>
+</form>
+
+<script is:inline>
+  (function () {
+    if (window.__waitlistFormBound) return;
+    window.__waitlistFormBound = true;
+
+    function bind(form) {
+      if (form.dataset.bound === '1') return;
+      form.dataset.bound = '1';
+
+      const input = form.querySelector('input[name="email"]');
+      const success = form.querySelector('[data-success]');
+      const errorEl = form.querySelector('[data-error]');
+      const fields = form.querySelector('[data-fields]');
+      const button = form.querySelector('[data-submit]');
+      const labelText = form.querySelector('[data-label-text]');
+      const spinner = form.querySelector('[data-spinner]');
+      const idleLabel = button.getAttribute('data-label') || labelText.textContent;
+
+      function setLoading(loading) {
+        button.disabled = loading;
+        input.disabled = loading;
+        if (loading) {
+          labelText.textContent = 'Sending…';
+          spinner.classList.remove('hidden');
+        } else {
+          labelText.textContent = idleLabel;
+          spinner.classList.add('hidden');
+        }
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (form.dataset.submitting === '1') return;
+
+        if (!input.value || !input.checkValidity()) {
+          input.focus();
+          return;
+        }
+
+        form.dataset.submitting = '1';
+        errorEl.classList.add('hidden');
+        setLoading(true);
+
+        try {
+          const res = await fetch('/api/waitlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: input.value }),
+          });
+          if (!res.ok) throw new Error('request failed');
+          fields.classList.add('hidden');
+          success.classList.remove('hidden');
+        } catch {
+          errorEl.classList.remove('hidden');
+          setLoading(false);
+          form.dataset.submitting = '0';
+        }
+      });
+    }
+
+    function bindAll() {
+      document.querySelectorAll('[data-email-form]').forEach(bind);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', bindAll);
+    } else {
+      bindAll();
+    }
+  })();
+</script>
