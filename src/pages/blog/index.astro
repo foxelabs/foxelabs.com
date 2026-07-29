@@ -1,0 +1,102 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Section from '../../components/ui/Section.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import { Icon } from 'astro-icon/components';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+const readingTime = (body = '') =>
+  Math.max(1, Math.round(body.trim().split(/\s+/).length / 200));
+
+const trackMeta = {
+  oss:     { label: 'Software', soft: 'var(--oss-soft)',  deep: 'var(--oss-deep)' },
+  trading: { label: 'Trading',  soft: 'var(--gold-soft)', deep: 'var(--gold-deep)' },
+} as const;
+---
+<BaseLayout
+  title="Blog — Foxe Labs"
+  description="Notes on open-source software, expert advisor design, risk, and what we're building at Foxe Labs."
+>
+  <Nav />
+  <main class="track-hub">
+    <PageHeader
+      eyebrow="Writing"
+      title="From the studio"
+      lead="Notes on how we build — open-source software, expert advisor design, risk, and the occasional release."
+      narrow
+    />
+
+    <Section variant="light">
+      {posts.length === 0 ? (
+        <p style="color: var(--ink-dim);">No posts yet — check back soon.</p>
+      ) : (
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
+          {posts.map((post) => {
+            const m = post.data.track ? trackMeta[post.data.track] : null;
+            return (
+              <a href={`/blog/${post.id}`} class="card card--hover flex flex-col overflow-hidden group">
+                <div class="relative overflow-hidden" style="aspect-ratio: 16 / 9; background: var(--surface-alt);">
+                  {post.data.heroImage ? (
+                    <img
+                      src={post.data.heroImage}
+                      alt={post.data.heroImageAlt ?? ''}
+                      loading="lazy"
+                      class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                    />
+                  ) : (
+                    <div class="absolute inset-0 flex items-center justify-center" style="background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);">
+                      <Icon name="mingcute:code-fill" width={28} height={28} style="color: var(--ink-dim);" aria-hidden="true" />
+                    </div>
+                  )}
+                </div>
+
+                <div class="flex flex-col flex-1 p-6">
+                  <div class="flex items-center gap-3 mb-3">
+                    {m && (
+                      <span
+                        class="font-mono text-[10px] px-2.5 py-1 rounded-full"
+                        style={`background: ${m.soft}; color: ${m.deep}; letter-spacing: 0.08em;`}
+                      >
+                        {m.label}
+                      </span>
+                    )}
+                    <time class="font-mono text-[11px]" style="color: var(--ink-dim);">
+                      {fmt(post.data.pubDate)}
+                    </time>
+                    {readingTime(post.body) >= 3 && (
+                      <span class="font-mono text-[11px]" style="color: var(--ink-dim);">
+                        · {readingTime(post.body)} min
+                      </span>
+                    )}
+                  </div>
+
+                  <h2 style="font-size: var(--text-h3); font-weight: 700;" class="mb-2.5 transition-colors group-hover:text-[var(--accent-ink)]">
+                    {post.data.title}
+                  </h2>
+                  <p class="text-[14px] flex-1" style="color: var(--ink-body);">
+                    {post.data.description}
+                  </p>
+
+                  <span class="inline-flex items-center gap-1.5 mt-5 font-mono text-[12px] font-medium" style="color: var(--ink);">
+                    Read more
+                    <span class="transition-transform group-hover:translate-x-0.5">→</span>
+                  </span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      )}
+    </Section>
+  </main>
+  <Footer />
+</BaseLayout>

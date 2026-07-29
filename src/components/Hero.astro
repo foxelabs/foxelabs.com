@@ -1,94 +1,97 @@
 ---
 import EmailForm from './EmailForm.astro';
----
-<section class="relative overflow-hidden" data-reveal>
-  <svg class="absolute inset-0 w-full h-full pointer-events-none" aria-hidden="true">
-    <defs>
-      <pattern id="dotgrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-        <circle cx="1" cy="1" r="1" fill="#1F2937" />
-      </pattern>
-    </defs>
-    <rect width="100%" height="100%" fill="url(#dotgrid)" />
-  </svg>
+import Eyebrow from './ui/Eyebrow.astro';
 
-  <div class="container-x relative py-20 md:py-28">
-    <div class="grid md:grid-cols-12 gap-12 items-center">
-      <div class="md:col-span-7">
-        <p class="font-mono text-[11px] mb-6" style="color: var(--color-gold); letter-spacing: 2px;">
-          // algo trading tools · est. 2025
-        </p>
-        <h1
-          class="font-display font-bold text-[36px] md:text-[52px] leading-[1.05] mb-6"
-          style="letter-spacing: -1px;"
-        >
-          Built for traders who run on <span style="color: var(--color-gold);">edge</span>
+const candles = [
+  { x: 12,  wTop: 40, wBot: 92, bTop: 60, bH: 22, up: true  },
+  { x: 30,  wTop: 32, wBot: 78, bTop: 44, bH: 22, up: false },
+  { x: 48,  wTop: 46, wBot: 96, bTop: 62, bH: 24, up: true  },
+  { x: 66,  wTop: 38, wBot: 86, bTop: 52, bH: 22, up: true  },
+  { x: 84,  wTop: 30, wBot: 74, bTop: 42, bH: 24, up: false },
+  { x: 102, wTop: 36, wBot: 82, bTop: 50, bH: 22, up: true  },
+  { x: 120, wTop: 24, wBot: 70, bTop: 38, bH: 22, up: true  },
+  { x: 138, wTop: 20, wBot: 60, bTop: 32, bH: 20, up: false },
+  { x: 156, wTop: 14, wBot: 54, bTop: 24, bH: 22, up: true  },
+  { x: 174, wTop: 10, wBot: 48, bTop: 20, bH: 20, up: true  },
+  { x: 192, wTop: 18, wBot: 44, bTop: 28, bH: 12, up: false },
+  { x: 210, wTop: 6,  wBot: 36, bTop: 14, bH: 18, up: true  },
+];
+
+const UP = 'var(--chart-up)';
+const DOWN = 'var(--chart-down)';
+---
+<section class="band band--wash overflow-hidden" data-reveal>
+  <div class="container-x">
+    <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      <div class="lg:col-span-7">
+        <Eyebrow class="mb-6">Algo trading tools · new track, since 2025</Eyebrow>
+
+        <h1 style="font-size: var(--text-hero); font-weight: 700;" class="mb-6">
+          Built for traders who run on <span style="color: var(--gold-ink);">edge</span>.
         </h1>
-        <p class="text-[15px] mb-8 max-w-[440px]" style="color: var(--color-muted);">
-          Expert advisors, a trading journal, and precision tools — engineered for prop firm traders and serious algo traders.
+
+        <p class="mb-9 max-w-[520px]" style="font-size: var(--text-lead); color: var(--ink-body);">
+          Expert advisors, a universal trading journal, and precision tools —
+          engineered for prop firm traders and serious algo traders.
         </p>
 
         <EmailForm id="hero-form" />
 
-        <p class="mt-3 text-[11px]" style="color: var(--color-hint);">
+        <p class="mt-4 text-[13px]" style="color: var(--ink-dim);">
           No spam. First to know when products ship.
         </p>
       </div>
 
-      <div class="hidden md:flex md:col-span-5 justify-end">
-        <svg
-          width="220" height="130" viewBox="0 0 220 130"
-          style="opacity: 0.45;"
-          aria-hidden="true"
-        >
-          <g stroke="#1F2937" stroke-width="0.5">
-            <line x1="0" y1="20"  x2="220" y2="20" />
-            <line x1="0" y1="50"  x2="220" y2="50" />
-            <line x1="0" y1="80"  x2="220" y2="80" />
-            <line x1="0" y1="110" x2="220" y2="110" />
-          </g>
+      <div class="lg:col-span-5">
+        <div class="card card--invert p-6 md:p-7">
+          <div class="flex items-center justify-between mb-5">
+            <span class="font-mono text-[11px]" style="color: var(--gold); letter-spacing: 0.12em;">
+              XAUUSD · M15
+            </span>
+            <span class="font-mono text-[11px]" style="color: var(--ink-invert-dim);">
+              backtest
+            </span>
+          </div>
 
-          <!-- wicks -->
-          <g stroke-width="1">
-            <line x1="12"  y1="40" x2="12"  y2="92"  stroke="#10B981" />
-            <line x1="30"  y1="32" x2="30"  y2="78"  stroke="#EF4444" />
-            <line x1="48"  y1="46" x2="48"  y2="96"  stroke="#10B981" />
-            <line x1="66"  y1="38" x2="66"  y2="86"  stroke="#10B981" />
-            <line x1="84"  y1="30" x2="84"  y2="74"  stroke="#EF4444" />
-            <line x1="102" y1="36" x2="102" y2="82"  stroke="#10B981" />
-            <line x1="120" y1="24" x2="120" y2="70"  stroke="#10B981" />
-            <line x1="138" y1="20" x2="138" y2="60"  stroke="#EF4444" />
-            <line x1="156" y1="14" x2="156" y2="54"  stroke="#10B981" />
-            <line x1="174" y1="10" x2="174" y2="48"  stroke="#10B981" />
-            <line x1="192" y1="18" x2="192" y2="44"  stroke="#EF4444" />
-            <line x1="210" y1="6"  x2="210" y2="36"  stroke="#10B981" />
-          </g>
+          <svg viewBox="0 0 220 130" class="w-full h-auto" style="max-height: 140px;" role="img" aria-label="Illustrative XAUUSD candlestick chart with a rising trend line">
+            <g stroke="var(--border-invert)" stroke-width="0.5">
+              <line x1="0" y1="20"  x2="220" y2="20" />
+              <line x1="0" y1="50"  x2="220" y2="50" />
+              <line x1="0" y1="80"  x2="220" y2="80" />
+              <line x1="0" y1="110" x2="220" y2="110" />
+            </g>
 
-          <!-- bodies -->
-          <g>
-            <rect x="8"   y="60" width="8" height="22" fill="#10B981" />
-            <rect x="26"  y="44" width="8" height="22" fill="#EF4444" />
-            <rect x="44"  y="62" width="8" height="24" fill="#10B981" />
-            <rect x="62"  y="52" width="8" height="22" fill="#10B981" />
-            <rect x="80"  y="42" width="8" height="24" fill="#EF4444" />
-            <rect x="98"  y="50" width="8" height="22" fill="#10B981" />
-            <rect x="116" y="38" width="8" height="22" fill="#10B981" />
-            <rect x="134" y="32" width="8" height="20" fill="#EF4444" />
-            <rect x="152" y="24" width="8" height="22" fill="#10B981" />
-            <rect x="170" y="20" width="8" height="20" fill="#10B981" />
-            <rect x="188" y="28" width="8" height="12" fill="#EF4444" />
-            <rect x="206" y="14" width="8" height="18" fill="#10B981" />
-          </g>
+            {candles.map((c) => (
+              <g stroke={c.up ? UP : DOWN} fill={c.up ? UP : DOWN}>
+                <line x1={c.x} y1={c.wTop} x2={c.x} y2={c.wBot} stroke-width="1" />
+                <rect x={c.x - 4} y={c.bTop} width="8" height={c.bH} stroke="none" />
+              </g>
+            ))}
 
-          <line
-            class="trend-line"
-            x1="10" y1="100" x2="216" y2="20"
-            stroke="#F59E0B" stroke-width="1.2" stroke-dasharray="4 3" fill="none"
-          />
+            <line
+              class="trend-line"
+              x1="10" y1="100" x2="216" y2="20"
+              stroke="var(--gold)" stroke-width="1.4" stroke-dasharray="4 3" fill="none"
+            />
+          </svg>
 
-          <text x="6" y="126" font-family="JetBrains Mono, monospace" font-size="8" fill="#6B7280">
-            XAUUSD · M15
-          </text>
-        </svg>
+          <div class="grid grid-cols-3 gap-4 mt-6 pt-5" style="border-top: 1px solid var(--border-invert);">
+            {[
+              ['Focus', 'XAUUSD'],
+              ['Sessions', 'LDN · NY'],
+              ['Risk', 'Hard limits'],
+            ].map(([label, value]) => (
+              <div>
+                <p class="font-mono text-[11px] mb-1" style="color: var(--ink-invert-dim);">{label}</p>
+                <p class="font-display font-bold text-lg" style="color: var(--ink-invert);">{value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <p class="mt-3 text-center font-mono text-[10px]" style="color: var(--ink-dim);">
+          Illustrative chart — not a performance claim.
+        </p>
       </div>
     </div>
   </div>

@@ -4,15 +4,21 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  /** Absolute or root-relative path to a share image. Defaults to the site banner. */
+  image?: string;
+  /** Open Graph object type, e.g. 'article' for blog posts. */
+  ogType?: 'website' | 'article';
 }
 
 const {
-  title = 'Foxe Labs — Algorithmic Trading Tools',
-  description = 'Expert advisors, a universal trading journal, and precision trading tools. Built by traders, for prop firm traders.',
+  title = 'Foxe Labs — Lines of code, lines on the chart',
+  description = 'Open-source software and trading tools — WordPress plugins, PHP libraries, expert advisors, and a universal trading journal. Built in-house at Foxe Labs.',
+  image = '/social-banner.png',
+  ogType = 'website',
 } = Astro.props;
 
-const canonical = 'https://foxelabs.com';
-const ogImage = `${canonical}/icon.png`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://foxelabs.com').href;
+const ogImage = new URL(image, Astro.site ?? 'https://foxelabs.com').href;
 ---
 <!doctype html>
 <html lang="en">
@@ -22,7 +28,9 @@ const ogImage = `${canonical}/icon.png`;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta property="og:type" content="website" />
+    <link rel="alternate icon" type="image/x-icon" href="/favicon.ico" sizes="any" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />

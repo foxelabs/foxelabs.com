@@ -1,0 +1,118 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { data } = post;
+const { Content } = await render(post);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+const readingTime = Math.max(1, Math.round((post.body ?? '').trim().split(/\s+/).length / 200));
+
+const trackMeta = {
+  oss:     { label: 'Software', soft: 'var(--oss-soft)',  deep: 'var(--oss-deep)' },
+  trading: { label: 'Trading',  soft: 'var(--gold-soft)', deep: 'var(--gold-deep)' },
+} as const;
+const m = data.track ? trackMeta[data.track] : null;
+---
+<BaseLayout title={`${data.title} — Foxe Labs`} description={data.description} ogType="article">
+  <Nav />
+  <main class="track-hub">
+    <!-- Post header -->
+    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem) clamp(1.75rem, 3vw, 2.5rem);">
+      <div class="container-x">
+        <div class="max-w-3xl mx-auto">
+          <a href="/blog" class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            All posts
+          </a>
+
+          <div class="flex flex-wrap items-center gap-3 mb-5">
+            {m && (
+              <span class="font-mono text-[10px] px-2.5 py-1 rounded-full" style={`background: ${m.soft}; color: ${m.deep}; letter-spacing: 0.08em;`}>
+                {m.label}
+              </span>
+            )}
+            <time class="font-mono text-[11px]" style="color: var(--ink-dim);">{fmt(data.pubDate)}</time>
+            {readingTime >= 3 && <span class="font-mono text-[11px]" style="color: var(--ink-dim);">· {readingTime} min read</span>}
+            <span class="font-mono text-[11px]" style="color: var(--ink-dim);">· {data.author}</span>
+          </div>
+
+          <h1 style="font-size: var(--text-h2); font-weight: 700;" class="mb-4">
+            {data.title}
+          </h1>
+          <p style="font-size: var(--text-lead); color: var(--ink-body);">
+            {data.description}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Featured image -->
+    {data.heroImage && (
+      <div class="band band--alt" style="padding-block: 0 clamp(2.5rem, 5vw, 3.5rem);">
+        <div class="container-x">
+          <div class="max-w-3xl mx-auto">
+            <img
+              src={data.heroImage}
+              alt={data.heroImageAlt ?? ''}
+              class="w-full h-auto rounded-2xl"
+              style="aspect-ratio: 16 / 9; object-fit: cover; border: 1px solid var(--border-soft);"
+            />
+          </div>
+        </div>
+      </div>
+    )}
+
+    <!-- Body -->
+    <article class="band band--light" data-reveal>
+      <div class="container-x">
+        <div class="prose-foxe max-w-2xl mx-auto">
+          <Content />
+        </div>
+
+        {data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-14 pt-8 max-w-2xl mx-auto" style="border-top: 1px solid var(--border-soft);">
+            {data.tags.map((t) => (
+              <span
+                class="font-mono text-[10px] px-2.5 py-1.5 rounded-full"
+                style="background: var(--surface-alt); color: var(--ink-body); letter-spacing: 0.08em;"
+              >
+                #{t}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div class="max-w-2xl mx-auto mt-10">
+          <a href="/blog" class="inline-flex items-center gap-1.5 font-mono text-[12px] transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="19" y1="12" x2="5" y2="12" />
+              <polyline points="12 19 5 12 12 5" />
+            </svg>
+            Back to all posts
+          </a>
+        </div>
+      </div>
+    </article>
+
+    <CtaBanner />
+  </main>
+  <Footer />
+</BaseLayout>

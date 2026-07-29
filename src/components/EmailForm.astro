@@ -2,26 +2,41 @@
 interface Props {
   id?: string;
   buttonLabel?: string;
+  tone?: 'light' | 'invert';
 }
-const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
+const {
+  id = 'email-form',
+  buttonLabel = 'Get early access',
+  tone = 'light',
+} = Astro.props;
+
+const inputStyle =
+  tone === 'invert'
+    ? 'border-color: var(--border-invert); background: rgba(255,255,255,0.04); color: var(--ink-invert);'
+    : 'border-color: var(--border); background: var(--surface); color: var(--ink);';
+
+const successColor = tone === 'invert' ? 'var(--accent)' : 'var(--accent-ink)';
+const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
 ---
 <form data-email-form id={id} class="w-full max-w-md" novalidate>
-  <div data-fields class="flex flex-col sm:flex-row gap-2">
+  <div data-fields class="flex flex-col sm:flex-row gap-2.5">
     <input
       type="email"
       name="email"
       required
       placeholder="you@domain.com"
       aria-label="Email address"
-      class="flex-1 min-w-0 px-3 py-2.5 text-sm bg-transparent border rounded-md outline-none focus:border-[var(--color-gold)] transition-colors disabled:opacity-60"
-      style="border-color: var(--color-border); color: var(--color-text);"
+      class:list={[
+        'flex-1 min-w-0 px-4 py-3 text-[15px] border outline-none transition-colors disabled:opacity-60',
+        'rounded-full placeholder:text-[var(--ink-dim)]',
+      ]}
+      style={inputStyle}
     />
     <button
       type="submit"
       data-submit
       data-label={buttonLabel}
-      class="shrink-0 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
-      style="background: var(--color-gold); color: #0B0F1A;"
+      class="btn btn--primary shrink-0 justify-center !py-3 disabled:opacity-60 disabled:cursor-not-allowed"
     >
       <span data-label-text>{buttonLabel}</span>
       <svg data-spinner class="hidden animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -30,10 +45,10 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
       </svg>
     </button>
   </div>
-  <p data-success class="hidden mt-3 text-sm font-mono" style="color: var(--color-gold);">
+  <p data-success class="hidden mt-3 text-sm font-mono" style={`color: ${successColor};`}>
     You're on the list!
   </p>
-  <p data-error class="hidden mt-3 text-sm font-mono" style="color: var(--color-red);">
+  <p data-error class="hidden mt-3 text-sm font-mono" style={`color: ${errorColor};`}>
     Something went wrong. Try again.
   </p>
 </form>
@@ -55,6 +70,7 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
       const labelText = form.querySelector('[data-label-text]');
       const spinner = form.querySelector('[data-spinner]');
       const idleLabel = button.getAttribute('data-label') || labelText.textContent;
+      const defaultError = errorEl.textContent;
 
       function setLoading(loading) {
         button.disabled = loading;
@@ -73,11 +89,14 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
         if (form.dataset.submitting === '1') return;
 
         if (!input.value || !input.checkValidity()) {
+          errorEl.textContent = 'Please enter a valid email address.';
+          errorEl.classList.remove('hidden');
           input.focus();
           return;
         }
 
         form.dataset.submitting = '1';
+        errorEl.textContent = defaultError;
         errorEl.classList.add('hidden');
         setLoading(true);
 

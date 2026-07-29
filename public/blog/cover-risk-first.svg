@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-label="Trading — equity curve and drawdown cover">
+  <rect width="1200" height="675" fill="#1C1917"/>
+  <g stroke="#332F2C" stroke-width="1">
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="340" x2="1200" y2="340"/>
+    <line x1="0" y1="480" x2="1200" y2="480"/>
+  </g>
+  <g font-family="'JetBrains Mono', monospace">
+    <text x="80" y="110" fill="#F59E0B" font-size="22" letter-spacing="6">TRADING</text>
+    <text x="80" y="150" fill="#A8A29E" font-size="20">risk-first · backtest workflow</text>
+  </g>
+  <path d="M100 470 L260 430 L360 455 L480 360 L600 385 L740 300 L860 330 L1000 240 L1120 210"
+        fill="none" stroke="#F59E0B" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M100 470 L260 430 L360 455 L480 360 L600 385 L740 300 L860 330 L1000 240 L1120 210 L1120 540 L100 540 Z"
+        fill="#F59E0B" fill-opacity="0.08"/>
+  <g fill="#B45309" opacity="0.6">
+    <rect x="330" y="455" width="40" height="85"/>
+    <rect x="560" y="385" width="40" height="155"/>
+    <rect x="820" y="330" width="40" height="210"/>
+  </g>
+  <text x="80" y="620" fill="#57534E" font-family="'JetBrains Mono', monospace" font-size="18">Foxe Labs</text>
+</svg>

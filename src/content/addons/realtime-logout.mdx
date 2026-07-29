@@ -1,0 +1,38 @@
+---
+name: Real-time Logout
+tagline: Make a forced logout feel instant on open tabs.
+summary: Polls the server on an interval so a session ended elsewhere bounces open tabs straight back to the login screen, instead of lingering until the next click.
+parent: loggedin
+location: Settings tab
+tier: premium
+price: From $24.99
+order: 2
+docsUrl: https://docs.duckdev.com/loggedin/addons/realtime-logout
+url: https://checkout.freemius.com/plugin/19616
+features:
+  - Open tabs reload to wp-login within your polling interval
+  - Configurable refresh interval (60 seconds by default)
+  - Works on every host — simple polling, no WebSockets or sidecars
+  - The polling script loads only for logged-in users
+---
+
+## What it does
+
+Without it, a browser tab that has already been logged out elsewhere keeps
+rendering as if authenticated until the user clicks something. **Real-time
+Logout** closes that gap: a small script polls the server on a fixed
+interval, and the moment the session is gone — a logout elsewhere, an admin
+force-logout, or a hit concurrent-session limit — the tab hard-reloads back
+to wp-login.
+
+## How it works
+
+Despite the name, this isn't WebSockets or push — it's deliberate polling,
+because polling works on every WordPress host with no sidecar service or
+firewall changes. At the recommended 60-second interval the load is
+negligible, and the script is only shipped to logged-in users.
+
+It adds a **Real-time Logout** panel to the Loggedin settings tab where you
+set the refresh interval. Best paired with
+[Active Sessions](/software/plugins/loggedin/active-sessions) so an admin
+sign-out is both easy to trigger and quick to land.

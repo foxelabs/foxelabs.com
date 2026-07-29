@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Hero from '../../components/Hero.astro';
+import TrustBar from '../../components/TrustBar.astro';
+import Products from '../../components/Products.astro';
+import WhyFoxeLabs from '../../components/WhyFoxeLabs.astro';
+import About from '../../components/About.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import Footer from '../../components/Footer.astro';
+---
+<BaseLayout
+  title="Trading Tools — Foxe Labs"
+  description="Expert advisors, a universal trading journal, and precision tools — engineered for prop firm and serious retail traders."
+>
+  <Nav />
+  <main class="track-trading">
+    <Hero />
+    <TrustBar />
+    <Products />
+    <WhyFoxeLabs />
+    <About />
+    <CtaBanner />
+  </main>
+  <Footer />
+</BaseLayout>

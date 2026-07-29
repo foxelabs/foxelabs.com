@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import ContactForm from '../components/ContactForm.astro';
+import Section from '../components/ui/Section.astro';
+import Eyebrow from '../components/ui/Eyebrow.astro';
+import { Icon } from 'astro-icon/components';
+
+const studioSocials = [
+  { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
+  { href: 'https://github.com/duckdev',        label: 'GitHub',     icon: 'mingcute:github-line',   brand: '#8250DF' },
+  { href: 'https://youtube.com/@foxelabs',     label: 'YouTube',    icon: 'mingcute:youtube-line',  brand: '#FF0000' },
+  { href: 'https://instagram.com/foxelabs',    label: 'Instagram',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
+  { href: 'https://www.facebook.com/foxelabs', label: 'Facebook',   icon: 'mingcute:facebook-line', brand: '#1877F2' },
+];
+
+const founderSocials = [
+  { href: 'https://x.com/Joel_James',          label: '@Joel_James', icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
+  { href: 'https://github.com/joel-james',     label: 'joel-james',  icon: 'mingcute:github-line',   brand: '#8250DF' },
+  { href: 'https://instagram.com/joeltalks',   label: '@joeltalks',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
+];
+---
+<BaseLayout
+  title="Contact — Foxe Labs"
+  description="Questions about our software, trading tools, licensing, or a custom build? Get in touch with Foxe Labs."
+>
+  <Nav />
+  <main class="track-hub">
+    <Section variant="alt">
+      <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
+        <div class="lg:col-span-5">
+          <Eyebrow class="mb-5">Contact</Eyebrow>
+          <h1 style="font-size: var(--text-hero); font-weight: 700;" class="mb-5">
+            Say <span style="color: var(--accent-ink);">hello</span>.
+          </h1>
+          <p class="mb-8" style="font-size: var(--text-lead); color: var(--ink-body);">
+            A plugin question, an EA idea, licensing, or a custom build — send it
+            over. No ticket queues, no tier one: your message lands in the inbox
+            of the person who wrote the code.
+          </p>
+
+          <!-- Terminal easter-egg -->
+          <div
+            class="font-mono text-[12.5px] leading-[1.9] px-5 py-4 rounded-xl mb-8 overflow-x-auto"
+            style="background: var(--surface-invert); color: var(--ink-invert);"
+          >
+            <div><span style="color: var(--oss);">$</span> whoami</div>
+            <div style="color: var(--ink-invert-dim);">→ the fox who answers the mail</div>
+            <div><span style="color: var(--gold);">$</span> uptime --replies</div>
+            <div style="color: var(--ink-invert-dim);">→ usually within a day. IST, fox time.</div>
+          </div>
+
+          <div class="space-y-4 mb-9">
+            <a href="mailto:hi@foxelabs.com" class="flex items-center gap-3 text-[15px] transition-colors hover:text-[var(--ink)]" style="color: var(--ink-body);">
+              <Icon name="mingcute:mail-line" width={17} height={17} style="color: var(--accent-ink);" aria-hidden="true" />
+              hi@foxelabs.com
+            </a>
+            <p class="flex items-center gap-3 text-[15px] m-0" style="color: var(--ink-body);">
+              <Icon name="mingcute:location-line" width={17} height={17} style="color: var(--accent-ink);" aria-hidden="true" />
+              Kerala, India — London &amp; New York sessions
+            </p>
+          </div>
+
+          <div class="mb-7">
+            <p class="font-mono text-[11px] mb-3" style="color: var(--ink-dim); letter-spacing: 0.12em; text-transform: uppercase;">
+              The studio
+            </p>
+            <div class="flex flex-wrap gap-2">
+              {studioSocials.map((s) => (
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="social-pill inline-flex items-center gap-1.5 font-mono text-[12px] px-3 py-1.5 rounded-full"
+                  style={`--brand: ${s.brand};`}
+                >
+                  <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p class="font-mono text-[11px] mb-3" style="color: var(--ink-dim); letter-spacing: 0.12em; text-transform: uppercase;">
+              The human behind it
+            </p>
+            <div class="flex flex-wrap gap-2">
+              {founderSocials.map((s) => (
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="social-pill inline-flex items-center gap-1.5 font-mono text-[12px] px-3 py-1.5 rounded-full"
+                  style={`--brand: ${s.brand};`}
+                >
+                  <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7">
+          <div class="card p-7 md:p-9">
+            <ContactForm />
+          </div>
+        </div>
+      </div>
+    </Section>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Playful, brand-coloured social pills */
+  .social-pill {
+    background: var(--surface-alt);
+    color: var(--ink-body);
+    transition: background-color 180ms ease, color 180ms ease,
+      transform 180ms ease, box-shadow 180ms ease;
+    will-change: transform;
+  }
+  .social-pill__icon {
+    color: var(--brand);
+    transition: color 180ms ease, transform 180ms ease;
+  }
+  .social-pill:hover {
+    background: var(--brand);
+    color: #fff;
+    transform: translateY(-2px) rotate(-1deg);
+    box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--brand) 70%, transparent);
+  }
+  .social-pill:hover .social-pill__icon {
+    color: #fff;
+    transform: scale(1.15) rotate(6deg);
+  }
+  .social-pill:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .social-pill,
+    .social-pill:hover,
+    .social-pill__icon,
+    .social-pill:hover .social-pill__icon {
+      transform: none;
+    }
+  }
+</style>

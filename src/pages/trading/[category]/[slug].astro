@@ -1,0 +1,175 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import EmailForm from '../../../components/EmailForm.astro';
+import Button from '../../../components/ui/Button.astro';
+import PricingCard from '../../../components/ui/PricingCard.astro';
+import { Icon } from 'astro-icon/components';
+import { categoryMeta, categoryPath } from '../../../config/tracks';
+
+export async function getStaticPaths() {
+  const products = await getCollection(
+    'projects',
+    ({ data }) => !data.draft && data.track === 'trading'
+  );
+  return products.map((product) => ({
+    params: { category: product.data.category, slug: product.id },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+const { Content } = await render(product);
+const cat = categoryMeta('trading', data.category);
+
+const statusLabel: Record<string, string> = {
+  live: 'Live now',
+  waitlist: 'Waitlist open',
+  'coming-soon': 'Coming soon',
+};
+---
+<BaseLayout title={`${data.name} — Foxe Labs`} description={data.summary}>
+  <Nav />
+  <main class="track-trading">
+    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">
+      <div class="container-x">
+        <a href={categoryPath('trading', data.category)} class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          All {cat?.label ?? 'trading tools'}
+        </a>
+
+        <div class="flex items-center gap-3 mb-5">
+          <span
+            class="font-mono text-[10px] px-2.5 py-1.5 rounded-full"
+            style="background: var(--gold-soft); color: var(--gold-deep); letter-spacing: 0.08em;"
+          >
+            {statusLabel[data.status] ?? data.status}
+          </span>
+          <span class="font-mono text-[11px]" style="color: var(--ink-dim);">
+            {data.market} · {data.platform}{data.version ? ` · ${data.version}` : ''}
+          </span>
+        </div>
+
+        <h1 style="font-size: var(--text-hero); font-weight: 700;" class="mb-4">
+          {data.name}
+        </h1>
+        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">
+          {data.tagline}
+        </p>
+      </div>
+    </div>
+
+    {data.highlights.length > 0 && (
+      <section class="band band--invert band--glow" data-reveal>
+        <div class="container-x">
+          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+            {data.highlights.map((h) => (
+              <div>
+                <div
+                  class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+                  style="background: var(--surface-invert-raised); border: 1px solid var(--border-invert);"
+                >
+                  <Icon name={h.icon} width={20} height={20} style="color: var(--accent);" aria-hidden="true" />
+                </div>
+                <h3 style="font-size: 1.0625rem; font-weight: 700;" class="mb-2.5">{h.title}</h3>
+                <p class="text-[14.5px] m-0" style="color: var(--ink-invert-dim);">{h.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+
+    <section class="band band--light" data-reveal>
+      <div class="container-x">
+        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
+          <div class="lg:col-span-7">
+            {data.features.length > 0 && (
+              <ul class="list-none m-0 p-0 space-y-3 mb-12">
+                {data.features.map((f) => (
+                  <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
+                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            <article class="prose-foxe max-w-none">
+              <Content />
+            </article>
+          </div>
+
+          <aside class="lg:col-span-5">
+            <PricingCard
+              price={data.price}
+              badge={statusLabel[data.status] ?? data.status}
+              benefits={data.benefits}
+            >
+              {data.benefits.length === 0 && (
+                <p class="text-[14px] mb-6 -mt-1" style="color: var(--ink-body);">
+                  {data.status === 'live'
+                    ? 'Available now — lifetime updates included.'
+                    : 'Join the waitlist for launch access and early pricing.'}
+                </p>
+              )}
+
+              {data.status === 'live' && data.ctaUrl ? (
+                <div class="flex flex-col gap-2.5">
+                  <Button href={data.ctaUrl} variant="primary" arrow class="w-full justify-center">
+                    {data.ctaLabel ?? 'Get it now'}
+                  </Button>
+                  {data.signalUrl && (
+                    <Button href={data.signalUrl} variant="ghost" class="w-full justify-center gap-2">
+                      <Icon name="mingcute:chart-line-line" width={16} height={16} aria-hidden="true" />
+                      View live signal
+                    </Button>
+                  )}
+                  {data.demoUrl && (
+                    <Button href={data.demoUrl} variant="ghost" class="w-full justify-center gap-2">
+                      <Icon name="mingcute:download-2-line" width={16} height={16} aria-hidden="true" />
+                      {data.demoLabel ?? 'Download free demo'}
+                    </Button>
+                  )}
+                  {data.docsUrl && (
+                    <Button href={data.docsUrl} variant="ghost" class="w-full justify-center gap-2">
+                      <Icon name="mingcute:book-2-line" width={16} height={16} aria-hidden="true" />
+                      Documentation
+                    </Button>
+                  )}
+                  <Button href={data.supportUrl ?? '/contact'} variant="ghost" class="w-full justify-center gap-2">
+                    <Icon name="mingcute:chat-1-line" width={16} height={16} aria-hidden="true" />
+                    Get support
+                  </Button>
+                </div>
+              ) : (
+                <EmailForm id={`product-form-${product.id}`} buttonLabel="Notify me" />
+              )}
+
+              {data.specs.length > 0 && (
+                <dl class="m-0 mt-7" style="border-top: 1px solid var(--border-soft);">
+                  {data.specs.map((s) => (
+                    <div class="flex items-center justify-between gap-4 py-3 text-[14px]" style="border-bottom: 1px solid var(--border-soft);">
+                      <dt style="color: var(--ink-body);">{s.label}</dt>
+                      <dd class="font-mono text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </PricingCard>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

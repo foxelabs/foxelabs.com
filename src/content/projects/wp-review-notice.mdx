@@ -1,0 +1,33 @@
+---
+track: oss
+category: libraries
+name: WP Review Notice
+tagline: Ask for a WordPress.org review — politely, at the right moment.
+summary: A small library to gently request a wp.org review after a few days of use, with swappable storage and a testable, DI-friendly design.
+kind: PHP Library
+language: PHP
+license: GPL-2.0-or-later
+status: active
+registry: Packagist
+packageName: duckdev/wp-review-notice
+url: https://packagist.org/packages/duckdev/wp-review-notice
+repo: https://github.com/duckdev/wp-review-notice
+order: 8
+features:
+  - Prompts for a review only after a set period of real usage
+  - Swappable storage drivers for where state is kept
+  - Testable, dependency-injection-friendly architecture
+  - Dismissible and respectful of the user's choice
+---
+
+## What it does
+
+WP Review Notice asks plugin users for a WordPress.org review once they've
+actually used the plugin for a while — never on day one. It's built to be
+testable and DI-friendly, with swappable storage for the notice state.
+
+Install with Composer:
+
+```bash
+composer require duckdev/wp-review-notice
+```

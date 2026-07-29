@@ -1,0 +1,248 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import Button from '../../../components/ui/Button.astro';
+import Eyebrow from '../../../components/ui/Eyebrow.astro';
+import { Icon } from 'astro-icon/components';
+import { categoryMeta, categoryPath, addonPath } from '../../../config/tracks';
+
+export async function getStaticPaths() {
+  const projects = await getCollection(
+    'projects',
+    ({ data }) => !data.draft && data.track === 'oss'
+  );
+  return projects.map((project) => ({
+    params: { category: project.data.category, slug: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { data } = project;
+const { Content } = await render(project);
+const cat = categoryMeta('oss', data.category);
+
+// Add-ons that extend this project, ordered.
+const addons = (await getCollection('addons', (a) => !a.data.draft && a.data.parent === project.id))
+  .sort((a, b) => a.data.order - b.data.order);
+
+// Build an install one-liner from whatever registry info is present.
+// Libraries carry install docs in their body/docs, so skip the box for them.
+const install =
+  data.category === 'libraries'
+    ? null
+    : data.registry === 'Packagist' && data.packageName
+      ? `composer require ${data.packageName}`
+      : data.registry === 'npm' && data.packageName
+        ? `npm install ${data.packageName}`
+        : null;
+
+// Resource links. Fall back to the shared docs hub until per-product links exist.
+const DOCS_FALLBACK = 'https://docs.duckdev.com';
+const docsUrl = data.docsUrl ?? DOCS_FALLBACK;
+const changelogUrl = data.changelogUrl ?? DOCS_FALLBACK;
+// Acquired projects point support at the new owner's channel; ours goes to /contact.
+const supportUrl = data.supportUrl ?? '/contact';
+
+// Label + icon for the canonical listing button.
+const primaryCta =
+  data.registry === 'WordPress.org'
+    ? { label: 'View on WordPress.org', icon: 'ic:round-wordpress' }
+    : data.registry === 'Packagist'
+      ? { label: 'View on Packagist', icon: 'file-icons:php' }
+      : { label: 'View project', icon: 'mingcute:external-link-line' };
+
+const specs = [
+  data.license && { label: 'License', value: data.license },
+  data.language && { label: 'Language', value: data.language },
+  data.minPhp && { label: 'Requires', value: `PHP ${data.minPhp}+` },
+  data.since && { label: 'Since', value: data.since },
+  data.installs && { label: 'Installs', value: data.installs },
+  data.stars && { label: 'Stars', value: data.stars },
+  data.rating && { label: 'Rating', value: data.rating },
+].filter(Boolean) as { label: string; value: string }[];
+---
+<BaseLayout title={`${data.name} — Foxe Labs`} description={data.summary}>
+  <Nav />
+  <main class="track-oss">
+    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">
+      <div class="container-x">
+        <a href={categoryPath('oss', data.category)} class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          All {cat?.label ?? 'software'}
+        </a>
+
+        <div class="flex items-center gap-3 mb-5 flex-wrap">
+          <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+            {data.language}
+          </span>
+          <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+            Open source · {data.license}
+          </span>
+          <span class="font-mono text-[11px]" style="color: var(--ink-dim);">{data.kind}</span>
+        </div>
+
+        <h1 style="font-size: var(--text-hero); font-weight: 700;" class="mb-4">{data.name}</h1>
+        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">{data.tagline}</p>
+
+      </div>
+    </div>
+
+    <section class="band band--light" data-reveal>
+      <div class="container-x">
+        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
+          <div class="lg:col-span-7">
+            {data.acquired && (
+              <div
+                class="flex items-start gap-3 mb-12 p-5 rounded-2xl"
+                style="background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 22%, transparent);"
+                role="note"
+              >
+                <Icon name="mingcute:announcement-line" width={20} height={20} style="color: var(--accent-ink);" class="mt-0.5 shrink-0" aria-hidden="true" />
+                <p class="text-[14px] m-0" style="color: var(--accent-deep);">
+                  <strong>
+                    {data.acquiredBy ? (
+                      <>
+                        Now part of the{' '}
+                        {data.acquiredUrl
+                          ? <a href={data.acquiredUrl} target="_blank" rel="noopener" class="underline underline-offset-2 hover:no-underline" style="color: inherit;">{data.acquiredBy}</a>
+                          : data.acquiredBy}
+                        {' '}family.
+                      </>
+                    ) : 'Now acquired.'}
+                  </strong>{' '}
+                  Future maintenance, updates, support, and everything else related to {data.name} will
+                  be handled by {data.acquiredBy ? `the ${data.acquiredBy} team` : 'the new owners'}.
+                </p>
+              </div>
+            )}
+            {data.features.length > 0 && (
+              <ul class="list-none m-0 p-0 space-y-3 mb-12">
+                {data.features.map((f) => (
+                  <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
+                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <article class="prose-foxe max-w-none">
+              <Content />
+            </article>
+          </div>
+
+          <aside class="lg:col-span-5">
+            <div class="card p-7 lg:sticky lg:top-24">
+              {specs.length > 0 && (
+                <dl class="m-0 mb-7">
+                  {specs.map((s) => (
+                    <div class="flex items-center justify-between gap-4 py-3 text-[14px]" style="border-bottom: 1px solid var(--border-soft);">
+                      <dt style="color: var(--ink-body);">{s.label}</dt>
+                      <dd class="font-mono text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+
+              {install && (
+                <div class="mb-6">
+                  <p class="font-mono text-[11px] mb-2" style="color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase;">Install</p>
+                  <code class="block font-mono text-[13px] px-3 py-2.5 rounded-lg overflow-x-auto" style="background: var(--surface-invert); color: var(--ink-invert);">{install}</code>
+                </div>
+              )}
+
+              <div class="flex flex-col gap-2.5">
+                {data.url && (
+                  <Button href={data.url} variant="primary" class="w-full justify-center gap-2">
+                    <Icon name={primaryCta.icon} width={17} height={17} aria-hidden="true" />
+                    {primaryCta.label}
+                  </Button>
+                )}
+                {data.repo && (
+                  <Button href={data.repo} variant="ghost" class="w-full justify-center gap-2">
+                    <Icon name="mingcute:github-line" width={16} height={16} aria-hidden="true" />
+                    View source on GitHub
+                  </Button>
+                )}
+                {!data.acquired && (
+                  <>
+                    <Button href={docsUrl} variant="ghost" class="w-full justify-center gap-2">
+                      <Icon name="mingcute:book-2-line" width={16} height={16} aria-hidden="true" />
+                      Documentation
+                    </Button>
+                    <Button href={changelogUrl} variant="ghost" class="w-full justify-center gap-2">
+                      <Icon name="mingcute:history-line" width={16} height={16} aria-hidden="true" />
+                      Changelog
+                    </Button>
+                  </>
+                )}
+                <Button href={supportUrl} variant="ghost" class="w-full justify-center gap-2">
+                  <Icon name="mingcute:chat-1-line" width={16} height={16} aria-hidden="true" />
+                  Get support
+                </Button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    {addons.length > 0 && (
+      <section class="band band--alt" data-reveal>
+        <div class="container-x">
+          <div class="max-w-2xl mb-12">
+            <Eyebrow class="mb-5">Add-ons</Eyebrow>
+            <h2 style="font-size: var(--text-h2); font-weight: 700;" class="mb-4">
+              Extend {data.name} when you need more.
+            </h2>
+            <p style="font-size: var(--text-lead); color: var(--ink-body);">
+              The core plugin stays lean. Each add-on is a small, opt-in plugin
+              that snaps into the same settings screen — install only the ones you need.
+            </p>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-6">
+            {addons.map((addon) => (
+              <a
+                href={addonPath('oss', data.category, project.id, addon.id)}
+                class="card card--hover p-7 flex flex-col group"
+              >
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+                    <Icon name="mingcute:puzzled-line" width={21} height={21} style="color: var(--accent-ink);" aria-hidden="true" />
+                  </div>
+                  {addon.data.location && (
+                    <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full whitespace-nowrap" style="background: var(--surface-alt); color: var(--ink-dim); letter-spacing: 0.06em;">
+                      {addon.data.location}
+                    </span>
+                  )}
+                </div>
+                <h3 style="font-size: var(--text-h3); font-weight: 700;" class="mb-2 transition-colors group-hover:text-[var(--accent-ink)]">
+                  {addon.data.name}
+                </h3>
+                <p class="text-[15px] mb-6 flex-1" style="color: var(--ink-body);">{addon.data.summary}</p>
+                <div class="flex items-center justify-between gap-4">
+                  <span class="inline-flex items-center gap-1.5 font-mono text-[12px] font-medium" style="color: var(--accent-ink);">
+                    Learn more
+                    <span class="transition-transform group-hover:translate-x-0.5">→</span>
+                  </span>
+                  {addon.data.price && (
+                    <span class="font-mono text-[12px]" style="color: var(--ink);">{addon.data.price}</span>
+                  )}
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+  </main>
+  <Footer />
+</BaseLayout>

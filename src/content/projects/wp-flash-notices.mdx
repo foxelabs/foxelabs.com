@@ -1,0 +1,33 @@
+---
+track: oss
+category: libraries
+name: WP Flash Notices
+tagline: Admin notices that survive a page reload.
+summary: Show WordPress admin notices after a redirect — flash messages stored via the transient API, displayed once on the next page load.
+kind: PHP Library
+language: PHP
+license: GPL-2.0-or-later
+status: active
+registry: Packagist
+packageName: duckdev/wp-flash-notices
+url: https://packagist.org/packages/duckdev/wp-flash-notices
+repo: https://github.com/DuckDev/wp-flash-notices
+order: 7
+features:
+  - "Flash-style admin notices that display after a redirect"
+  - Stored with the transient API and shown exactly once
+  - Simple, expressive API for success/error/warning notices
+  - No dependencies beyond WordPress core
+---
+
+## What it does
+
+WordPress admin notices normally vanish on redirect. WP Flash Notices stores a
+notice as a transient and shows it once on the next page load — the flash-message
+pattern, done the WordPress way.
+
+Install with Composer:
+
+```bash
+composer require duckdev/wp-flash-notices
+```

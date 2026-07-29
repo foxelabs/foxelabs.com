@@ -1,18 +1,100 @@
 ---
+import { Icon } from 'astro-icon/components';
+
+const socials = [
+  { href: 'https://x.com/foxelabs',        label: 'Foxe Labs on X',        icon: 'mingcute:social-x-line' },
+  { href: 'https://github.com/duckdev',    label: 'Foxe Labs on GitHub',   icon: 'mingcute:github-line' },
+  { href: 'https://youtube.com/@foxelabs', label: 'Foxe Labs on YouTube',  icon: 'mingcute:youtube-line' },
+  { href: 'https://instagram.com/foxelabs', label: 'Foxe Labs on Instagram', icon: 'mingcute:instagram-line' },
+  { href: 'https://www.facebook.com/foxelabs', label: 'Foxe Labs on Facebook', icon: 'mingcute:facebook-line' },
+];
+
+const columns = [
+  {
+    title: 'Software',
+    links: [
+      { href: '/software/plugins', label: 'WordPress Plugins' },
+      { href: '/software/libraries', label: 'PHP Libraries' },
+      { href: '/software', label: 'All software' },
+    ],
+  },
+  {
+    title: 'Trading',
+    links: [
+      { href: '/trading/expert-advisors', label: 'Expert Advisors' },
+      { href: '/trading/tools', label: 'Trading Tools' },
+      { href: '/trading#waitlist', label: 'Waitlist' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { href: '/about', label: 'About' },
+      { href: '/blog', label: 'Blog' },
+      { href: '/contact', label: 'Contact' },
+    ],
+  },
+];
+
+const year = new Date().getFullYear();
 ---
-<footer class="py-10" style="border-top: 1px solid var(--color-border);">
-  <div class="container-x flex flex-col md:flex-row items-center justify-between gap-4">
-    <a href="/" class="font-display font-bold text-base tracking-tight" style="color: var(--color-muted);">
-      Foxe <span style="color: var(--color-gold);">Labs</span>
-    </a>
+<footer class="track-hub band--invert" style="padding-block: 4rem 2.5rem; border-top: 1px solid var(--border-invert);">
+  <div class="container-x">
+    <div class="grid md:grid-cols-12 gap-10 mb-12">
+      <div class="md:col-span-5">
+        <a href="/" class="flex items-center gap-2.5 font-display font-bold text-lg" style="color: var(--ink-invert); letter-spacing: -0.02em;">
+          <img src="/fox-white.svg" alt="Foxe Labs" width="32" height="32" class="w-8 h-8 shrink-0" />
+          Foxe <span style="color: var(--ink-invert-dim);">Labs</span>
+        </a>
+        <p class="mt-2 font-mono text-[12px]" style="color: var(--ink-invert-dim); letter-spacing: 0.04em;">
+          Lines of code, lines on the chart.
+        </p>
+        <p class="mt-4 text-[14px] max-w-[320px]" style="color: var(--ink-invert-dim);">
+          Open-source software and trading tools, built in-house.
+        </p>
 
-    <p class="font-mono text-[11px]" style="color: var(--color-hint); letter-spacing: 1px;">
-      © 2025 Foxe Labs · Kerala, India
-    </p>
+        <ul class="list-none m-0 p-0 mt-6 flex items-center gap-3">
+          {socials.map((s) => (
+            <li>
+              <a
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={s.label}
+                class="flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:text-[var(--ink-invert)]"
+                style="border: 1px solid var(--border-invert); color: var(--ink-invert-dim);"
+              >
+                <Icon name={s.icon} width={17} height={17} aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
 
-    <div class="flex items-center gap-6 text-[12px]" style="color: var(--color-muted);">
-      <a href="https://x.com/foxelabs" class="hover:text-white transition-colors">Twitter / X</a>
-      <a href="mailto:hi@foxelabs.com" class="hover:text-white transition-colors">Contact</a>
+      {columns.map((col) => (
+        <div class="md:col-span-2">
+          <p class="font-mono text-[11px] mb-4" style="color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;">
+            {col.title}
+          </p>
+          <ul class="list-none m-0 p-0 space-y-2.5 text-[14px]" style="color: var(--ink-invert-dim);">
+            {col.links.map((l) => (
+              <li><a href={l.href} class="transition-colors hover:text-[var(--ink-invert)]">{l.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+
+    <div
+      class="flex flex-col md:flex-row items-center justify-between gap-4 pt-8"
+      style="border-top: 1px solid var(--border-invert);"
+    >
+      <p class="font-mono text-[11px] m-0" style="color: var(--ink-invert-dim); letter-spacing: 0.06em;">
+        © {year} Foxe Labs · Kerala, India
+      </p>
+      <p class="text-[12px] m-0 md:text-right md:whitespace-nowrap" style="color: var(--ink-invert-dim);">
+        Software provided as-is. Trading carries risk — not financial advice.
+      </p>
     </div>
   </div>
 </footer>

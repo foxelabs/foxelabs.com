@@ -1,0 +1,72 @@
+---
+track: oss
+category: plugins
+name: Lazy Load for Comments
+tagline: Defer WordPress comments until the reader wants them.
+summary: Loads the native WordPress comments section only on demand — on scroll or click — to cut initial page weight.
+kind: WordPress Plugin
+language: PHP
+license: GPL-2.0-or-later
+status: stable
+registry: WordPress.org
+packageName: lazy-load-for-comments
+url: https://wordpress.org/plugins/lazy-load-for-comments/
+minPhp: '7.4'
+installs: 2,000+ active installs
+rating: 4.7★ (28 ratings)
+since: '2016'
+order: 4
+features:
+  - Loads native WordPress comments on scroll or click
+  - Cuts initial page weight and requests
+  - Works with the default comment system — no lock-in
+  - Zero configuration to get started
+---
+
+## What it does
+
+Lazy Load for Comments holds back the WordPress comments section until the reader
+scrolls to it or asks for it, so pages with long comment threads load fast up
+front.
+
+## Why it exists
+
+Not every visitor reads the comments — but every visitor pays for loading them.
+This plugin defers that cost to the moment it's actually needed. Maintained since 2016.
+
+## How loading works
+
+Everything lives under **Comments → Lazy Load** in the WordPress admin. The
+**Load Method** decides when comments appear:
+
+- **On scroll** — comments fetch automatically as the reader nears them. This is
+  the default and the smoothest option.
+- **On button click** — nothing loads until the reader clicks a **Load Comments**
+  button you can label and style yourself.
+- **Disabled** — lazy loading is off; comments load with the page, exactly like
+  stock WordPress.
+
+A **Minimum Comments** threshold lets you skip lazy loading on lightly-discussed
+posts — with the default of `1`, posts with no comments yet still show the form
+normally so readers can leave the first one. An optional spinner covers the brief
+fetch.
+
+## Customising the button
+
+With the *On button click* method you control the button end to end: its text,
+whether it inherits your theme's button style or uses the plugin's minimal built-in
+style, and any extra CSS classes you want to hang your own styling on.
+
+## SEO-safe by default
+
+Lazy loaded comments are fetched with JavaScript, so **Disable for Search Engines**
+serves the full comment markup to crawlers instead — keeping that content indexable.
+Leave it on.
+
+## Caching on block themes
+
+On block themes the plugin caches the serialized `core/comments` block in a
+transient the first time a post is viewed, so the REST endpoint re-renders from the
+cache instead of parsing the block tree on every request. The cache clears itself
+when you switch themes, and an admin-only **Clear comments cache** action flushes it
+on demand after template changes.

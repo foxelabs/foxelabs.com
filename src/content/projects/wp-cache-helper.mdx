@@ -1,0 +1,33 @@
+---
+track: oss
+category: libraries
+name: WP Cache Helper
+tagline: A cleaner API over the WordPress object cache and transients.
+summary: Helper library for the WordPress object cache and transients — group flush support, per-prefix scoping, and a swappable driver layer.
+kind: PHP Library
+language: PHP
+license: GPL-2.0-or-later
+status: active
+registry: Packagist
+packageName: duckdev/wp-cache-helper
+url: https://packagist.org/packages/duckdev/wp-cache-helper
+repo: https://github.com/duckdev/wp-cache-helper
+order: 6
+features:
+  - Unified API over the object cache and the transients API
+  - Group flush support to invalidate related entries at once
+  - Per-prefix scoping to avoid key collisions
+  - A swappable driver layer for testing and portability
+---
+
+## What it does
+
+WP Cache Helper wraps the WordPress object cache and transients behind one small,
+consistent API — with grouped invalidation, prefixed keys, and a driver layer you
+can swap out in tests.
+
+Install with Composer:
+
+```bash
+composer require duckdev/wp-cache-helper
+```

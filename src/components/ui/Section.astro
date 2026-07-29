@@ -1,0 +1,25 @@
+---
+interface Props {
+  variant?: 'light' | 'alt' | 'sunken' | 'invert' | 'wash';
+  id?: string;
+  reveal?: boolean;
+  class?: string;
+  /** Skip the inner .container-x when the section manages its own width. */
+  bare?: boolean;
+}
+
+const {
+  variant = 'light',
+  id,
+  reveal = true,
+  bare = false,
+  class: className = '',
+} = Astro.props;
+---
+<section
+  id={id}
+  class={`band band--${variant} ${className}`}
+  data-reveal={reveal ? '' : undefined}
+>
+  {bare ? <slot /> : <div class="container-x"><slot /></div>}
+</section>

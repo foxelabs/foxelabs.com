@@ -1,0 +1,36 @@
+---
+name: Limit Per Role
+tagline: Set a different session cap for each role.
+summary: Give administrators more headroom and keep subscribers tighter — a concurrent-session limit per WordPress role, built-in or custom.
+parent: loggedin
+location: Settings tab
+tier: premium
+price: From $24.99
+order: 4
+docsUrl: https://docs.duckdev.com/loggedin/addons/limit-per-role
+url: https://checkout.freemius.com/plugin/23270/
+features:
+  - Per-role concurrent-session limits for any registered role
+  - Multi-role users get the most permissive cap ("highest wins")
+  - Custom roles from other plugins appear automatically
+  - Roles without a limit fall back to the global setting
+---
+
+## What it does
+
+One global number rarely fits every role. **Limit Per Role** lets you cap
+concurrent sessions per WordPress role — more headroom for administrators,
+a tighter limit for subscribers and customers, or whatever split your site
+needs. It adds a panel to the Loggedin settings tab listing every
+registered role, each with its own toggle and number.
+
+## How it behaves
+
+Roles without a custom limit fall back to the global setting. When a user
+holds multiple roles with different limits, the **highest** one applies —
+a deliberately permissive rule so a user isn't surprised by a tighter cap
+inherited from a sibling role. Custom roles registered by other plugins or
+your theme show up automatically.
+
+Running [Limit Per User](/software/plugins/loggedin/limit-per-user) too?
+Per-user overrides take precedence over these role limits.

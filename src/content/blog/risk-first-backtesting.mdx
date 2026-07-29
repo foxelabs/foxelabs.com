@@ -1,0 +1,41 @@
+---
+title: A risk-first backtesting workflow
+description: Most backtests optimise for the equity curve and discover the drawdown in production. We flip the order — here's the workflow we use to design downside in first.
+pubDate: 2026-07-23
+author: Foxe Labs
+track: trading
+heroImage: /blog/cover-risk-first.svg
+heroImageAlt: Equity curve above a drawdown histogram
+tags:
+  - process
+  - backtesting
+  - risk
+---
+
+Ask most people how a strategy did and they'll quote the return. Ask how it
+*felt* to hold and they go quiet — because the return is the part you see in the
+brochure and the drawdown is the part that actually ends accounts. Our
+backtesting workflow is built to invert that.
+
+## Start from the drawdown
+
+Before we look at a single profit figure, we cap the model: fixed-fractional
+sizing, a hard daily loss limit, and a maximum peak-to-trough drawdown the
+strategy is not allowed to breach. Anything that only works with the brakes off
+never makes it past this stage.
+
+## One change at a time
+
+Every parameter sweep is logged and version-controlled. A result you can't
+reproduce isn't a result — it's a coincidence you got attached to. We keep the
+search space small and deliberate so we're not just mining noise.
+
+## Walk it forward
+
+The number that matters is out-of-sample. We reserve unseen data, walk the model
+forward across it, and only trust behaviour that survives the segments the
+optimiser never touched.
+
+None of this makes a strategy a sure thing — nothing does. But designing the
+downside in first is the difference between a tool you can actually run and a
+curve you can only admire.

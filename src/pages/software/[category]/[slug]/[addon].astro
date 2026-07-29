@@ -1,0 +1,153 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import Nav from '../../../../components/Nav.astro';
+import Footer from '../../../../components/Footer.astro';
+import Button from '../../../../components/ui/Button.astro';
+import PricingCard from '../../../../components/ui/PricingCard.astro';
+import { Icon } from 'astro-icon/components';
+import { projectPath } from '../../../../config/tracks';
+
+export async function getStaticPaths() {
+  const [addons, projects] = await Promise.all([
+    getCollection('addons', (a) => !a.data.draft),
+    getCollection('projects', (p) => !p.data.draft && p.data.track === 'oss'),
+  ]);
+
+  return addons.flatMap((addon) => {
+    const parent = projects.find((p) => p.id === addon.data.parent);
+    if (!parent) return [];
+    return [
+      {
+        params: {
+          category: parent.data.category,
+          slug: parent.id,
+          addon: addon.id,
+        },
+        props: { addon, parent },
+      },
+    ];
+  });
+}
+
+const { addon, parent } = Astro.props;
+const { data } = addon;
+const { Content } = await render(addon);
+
+const parentUrl = projectPath('oss', parent.data.category, parent.id);
+
+const DOCS_FALLBACK = 'https://docs.duckdev.com';
+const docsUrl = data.docsUrl ?? DOCS_FALLBACK;
+
+// Header metadata strip (facts we actually know).
+const meta = [
+  { label: 'Add-on for', value: parent.data.name },
+  data.location && { label: 'Appears in', value: data.location },
+].filter(Boolean) as { label: string; value: string }[];
+
+// Commercial "what you get" — verified from the Loggedin add-on docs.
+const benefits = [
+  `Works with the free ${parent.data.name} core plugin`,
+  'Automatic updates & support while licensed',
+  '1, 3 or unlimited-site licenses',
+];
+---
+<BaseLayout title={`${data.name} — ${parent.data.name} add-on — Foxe Labs`} description={data.summary}>
+  <Nav />
+  <main class="track-oss">
+    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">
+      <div class="container-x">
+        <a href={parentUrl} class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="19" y1="12" x2="5" y2="12" />
+            <polyline points="12 19 5 12 12 5" />
+          </svg>
+          All {parent.data.name} add-ons
+        </a>
+
+        <div class="flex items-center gap-3 mb-5 flex-wrap">
+          <span class="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+            <Icon name="mingcute:puzzled-line" width={12} height={12} aria-hidden="true" />
+            {parent.data.name} add-on
+          </span>
+        </div>
+
+        <h1 style="font-size: var(--text-hero); font-weight: 700;" class="mb-4">{data.name}</h1>
+        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">{data.tagline}</p>
+
+        {meta.length > 0 && (
+          <div class="flex flex-wrap gap-x-10 gap-y-3 mt-8">
+            {meta.map((m) => (
+              <div>
+                <p class="font-mono text-[10px] mb-1" style="color: var(--ink-dim); letter-spacing: 0.1em; text-transform: uppercase;">{m.label}</p>
+                <p class="text-[14px]" style="color: var(--ink);">{m.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <section class="band band--light" data-reveal>
+      <div class="container-x">
+        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
+          <div class="lg:col-span-7">
+            {data.features.length > 0 && (
+              <ul class="list-none m-0 p-0 space-y-3 mb-12">
+                {data.features.map((f) => (
+                  <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
+                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <article class="prose-foxe max-w-none">
+              <Content />
+            </article>
+          </div>
+
+          <aside class="lg:col-span-5">
+            <PricingCard
+              price={data.price}
+              badge={data.tier === 'premium' ? 'Premium add-on' : data.tier === 'free' ? 'Free add-on' : undefined}
+              benefits={benefits}
+            >
+              <div class="flex flex-col gap-2.5">
+                {data.url && (
+                  <Button href={data.url} variant="primary" class="w-full justify-center gap-2">
+                    <Icon name="mingcute:shopping-cart-1-line" width={16} height={16} aria-hidden="true" />
+                    Get {data.name}
+                  </Button>
+                )}
+                <Button href={docsUrl} variant="ghost" class="w-full justify-center gap-2">
+                  <Icon name="mingcute:book-2-line" width={16} height={16} aria-hidden="true" />
+                  Documentation
+                </Button>
+                <Button href="/contact" variant="ghost" class="w-full justify-center gap-2">
+                  <Icon name="mingcute:chat-1-line" width={16} height={16} aria-hidden="true" />
+                  Get support
+                </Button>
+              </div>
+
+              <div class="flex items-center gap-3.5 mt-6 p-4 rounded-xl" style="background: var(--accent-soft);">
+                <Icon name="mingcute:shield-line" width={34} height={34} style="color: var(--accent-ink);" class="shrink-0" aria-hidden="true" />
+                <div>
+                  <p class="text-[14px] font-semibold m-0" style="color: var(--ink);">7-day money-back guarantee</p>
+                  <p class="text-[13px] m-0" style="color: var(--ink-body);">Don't like it? 100% refund, no questions asked.</p>
+                </div>
+              </div>
+
+              <p class="mt-5 text-[13px]" style="color: var(--ink-dim);">
+                Requires the free <a href={parentUrl} style="color: var(--accent-ink);">{parent.data.name}</a> plugin to be installed and active.
+              </p>
+            </PricingCard>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

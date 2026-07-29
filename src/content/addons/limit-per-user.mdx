@@ -1,0 +1,37 @@
+---
+name: Limit Per User
+tagline: Override the session cap for a single account.
+summary: Give one account more (or fewer) concurrent sessions than your global limit, straight from the user's profile screen.
+parent: loggedin
+location: Profile screen
+tier: premium
+price: From $24.99
+order: 3
+docsUrl: https://docs.duckdev.com/loggedin/addons/limit-per-user
+url: https://checkout.freemius.com/plugin/19329
+features:
+  - Per-user concurrent-session override on the profile screen
+  - Takes precedence over both global and per-role limits
+  - Blank or zero simply falls back to the global limit
+  - Enforced on the next login, with nonce and capability checks
+---
+
+## What it does
+
+Some accounts legitimately need a different cap than everyone else — a
+shared editorial login, a service account, or an executive roaming between
+four devices. **Limit Per User** lets you set a concurrent-session limit on
+a single account, overriding the global setting.
+
+There's no separate settings panel: the control lives on the WordPress
+profile screen, both for your own profile and the edit-user screen admins
+see. Leave it blank to use the global limit, or enter a number to cap that
+one account.
+
+## Priority
+
+When several limit add-ons are active, per-user always wins:
+per-user → [per-role](/software/plugins/loggedin/limit-per-role) → global.
+A user with a per-user override uses that value regardless of any role
+limit. The change takes effect on their next login attempt, and saves are
+protected by a nonce and the `edit_user` capability.

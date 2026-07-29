@@ -1,0 +1,62 @@
+---
+// Paid-product pricing card: a big price, a commercial value checklist, and a
+// slot for the CTA(s) and fine print. Used on add-on and trading product pages.
+// Colours follow the surrounding track scope via --accent-ink.
+interface Props {
+  /** e.g. "From $29.99" or "$149 · one-time". Parsed into kicker/amount/qualifier. */
+  price?: string;
+  /** Small pill above the price, e.g. "Premium add-on". */
+  badge?: string;
+  /** Commercial "what you get" lines (licensing/updates/support) — not features. */
+  benefits?: string[];
+  class?: string;
+}
+
+const { price = '', badge, benefits = [], class: className = '' } = Astro.props;
+
+// Split "From $29.99 · one-time" → kicker "From", amount "$29.99", qualifier "one-time".
+const raw = price.trim();
+const kickerMatch = raw.match(/^(from|starting at)\s+/i);
+const kicker = kickerMatch ? kickerMatch[1] : '';
+const afterKicker = kickerMatch ? raw.slice(kickerMatch[0].length) : raw;
+const [amount, ...qParts] = afterKicker.split('·').map((s) => s.trim());
+const qualifier = qParts.join(' · ');
+---
+<div class={`card p-7 lg:sticky lg:top-24 ${className}`}>
+  {badge && (
+    <span class="inline-block font-mono text-[10px] px-2.5 py-1.5 rounded-full mb-5" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+      {badge}
+    </span>
+  )}
+
+  {amount && (
+    <div class="mb-6">
+      {kicker && (
+        <p class="font-mono text-[11px] mb-1" style="color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase;">{kicker}</p>
+      )}
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <span class="font-display font-bold" style="font-size: clamp(2.75rem, 2rem + 2vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; color: var(--ink);">
+          {amount}
+        </span>
+        {qualifier && (
+          <span class="text-[15px]" style="color: var(--ink-dim);">{qualifier}</span>
+        )}
+      </div>
+    </div>
+  )}
+
+  {benefits.length > 0 && (
+    <ul class="list-none m-0 p-0 space-y-2.5 mb-7">
+      {benefits.map((b) => (
+        <li class="flex items-start gap-2.5 text-[14px]" style="color: var(--ink-body);">
+          <svg class="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span>{b}</span>
+        </li>
+      ))}
+    </ul>
+  )}
+
+  <slot />
+</div>

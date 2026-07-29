@@ -1,53 +1,186 @@
 @import 'tailwindcss';
 
-@import '@fontsource/space-grotesk/600.css';
-@import '@fontsource/space-grotesk/700.css';
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
+@import '@fontsource/bricolage-grotesque/600.css';
+@import '@fontsource/bricolage-grotesque/700.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/500.css';
 
 :root {
-  --color-bg: #0B0F1A;
-  --color-surface: #111827;
-  --color-border: #1F2937;
-  --color-gold: #F59E0B;
-  --color-gold-dim: #92400E;
-  --color-gold-bg: #451A03;
-  --color-text: #F9FAFB;
-  --color-muted: #6B7280;
-  --color-hint: #4B5563;
-  --color-green: #10B981;
-  --color-red: #EF4444;
+  /* Warm neutral ramp — stone-tinted, never pure grey */
+  --stone-0:   #FFFFFF;
+  --stone-50:  #FAF9F7;
+  --stone-100: #F7F5F2;
+  --stone-200: #EDE9E3;
+  --stone-300: #D6D3D1;
+  --stone-500: #6B6560;  /* AA (5.28:1) on --surface-alt at small sizes */
+  --stone-600: #52504B;
+  --stone-900: #1C1917;
 
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
-  --font-body: 'Inter', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Bronze/brass ramp (Trading track). NOTE: var still named --gold for historical
+     reasons; the values below are bronze/muted-ochre — Trading is bronze now. */
+  --gold:      #CA9A1E;  /* bright accent — strokes/text on DARK only (white text fails on it) */
+  --gold-ink:  #92710E;  /* text/link on light AND dark fill w/ white label */
+  --gold-deep: #6B520A;  /* hover / pressed */
+  --gold-soft: #F5EDD2;  /* tinted surface */
+
+  /* Trading family — analogous neighbours of the bronze, for tinted surfaces,
+     category chips and gradient washes. Same hue arc, so the track still reads
+     as one colour at a glance. -ink values are all AA on white. */
+  --amber-ink:  #B45309;  /* warm amber, one step toward orange */
+  --amber-deep: #78350F;  /* small text on --amber-soft */
+  --amber-soft: #FDF0D5;
+  --amber:      #F59E0B;  /* dark bands only */
+  --clay-ink:   #9A3412;  /* burnt clay, far end of the arc */
+  --clay-deep:  #7C2D12;
+  --clay-soft:  #FCE9DC;
+  --clay:       #FB923C;  /* dark bands only */
+
+  /* Deep forest green ramp (Software track). NOTE: var still named --oss. */
+  --oss:       #22C55E;  /* bright accent — dots/strokes on DARK only (white text fails on it) */
+  --oss-ink:   #15803D;  /* text on light AND button fill w/ white label */
+  --oss-deep:  #166534;  /* hover, pill text on soft */
+  --oss-soft:  #DCFCE7;  /* tinted surface / badges */
+
+  /* Software family — analogous neighbours of the forest green. Same job as the
+     trading family above. -ink values are all AA on white. */
+  --teal-ink:  #0F766E;  /* cooler neighbour */
+  --teal-deep: #115E59;  /* small text on --teal-soft */
+  --teal-soft: #D7F3EF;
+  --teal:      #2DD4BF;  /* dark bands only */
+  --moss-ink:  #4D7C0F;  /* warmer/olive neighbour */
+  --moss-deep: #3F6212;
+  --moss-soft: #E8F5D0;
+  --moss:      #A3E635;  /* dark bands only */
+
+  /* Semantic accent — defaults to neutral ink (the common/hub brand). Per-track wrappers
+     below remap it, so .eyebrow / .btn--primary / accent bits theme automatically per page. */
+  --accent:     var(--ink-invert-dim);
+  --accent-ink: var(--stone-900);
+  --accent-deep:var(--stone-900);
+  --accent-soft:var(--stone-200);
+  --accent-btn: var(--stone-900);   /* neutral ink fill with a white label */
+  --accent-on:  #FFFFFF;            /* text color that sits ON --accent-btn */
+
+  /* Companion accents — the two analogous neighbours of the current track's hue.
+     Used for gradient washes, per-item category tints and chart series, never for
+     primary buttons. On the hub these resolve to the two TRACK colours instead, so
+     the hub reads colourful by showing both tracks rather than owning a third hue. */
+  --accent-2:      var(--ink-invert-dim);
+  --accent-2-ink:  var(--oss-ink);
+  --accent-2-deep: var(--oss-deep);
+  --accent-2-soft: var(--oss-soft);
+  --accent-3:      var(--ink-invert-dim);
+  --accent-3-ink:  var(--gold-ink);
+  --accent-3-deep: var(--gold-deep);
+  --accent-3-soft: var(--gold-soft);
+
+  /* Semantic surface roles */
+  --surface:        var(--stone-0);
+  --surface-alt:    var(--stone-100);
+  --surface-invert: var(--stone-900);
+  --surface-invert-raised: #262220;  /* cards sitting on --surface-invert */
+  --surface-sunken: var(--stone-50);
+
+  /* Semantic ink roles */
+  --ink:            var(--stone-900);
+  --ink-body:       var(--stone-600);
+  --ink-dim:        var(--stone-500);
+  --ink-invert:     #F5F3F0;
+  --ink-invert-dim: #A8A29E;
+
+  --border:        var(--stone-300);
+  --border-soft:   var(--stone-200);
+  --border-invert: #332F2C;
+
+  --green: #047857;  /* success — kept cooler/distinct from --oss-ink #15803D (software accent) */
+  --red:   #B91C1C;
+  --red-invert: #F87171;  /* error text on dark (invert) surfaces */
+
+  /* Bright variants for chart marks on dark (invert) surfaces only. */
+  --chart-up:   #34D399;
+  --chart-down: #F87171;
+
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  /* Fluid type scale */
+  --text-hero: clamp(2.25rem, 1.35rem + 4.3vw, 3.75rem);
+  --text-h2:   clamp(1.75rem, 1.25rem + 2.2vw, 2.5rem);
+  --text-h3:   clamp(1.125rem, 1.05rem + 0.5vw, 1.375rem);
+  --text-lead: clamp(1rem, 0.95rem + 0.35vw, 1.125rem);
+
+  /* Rhythm */
+  --space-section: clamp(4rem, 7vw, 5.6rem);
+  --container: 1200px;
+  --container-pad: 24px;
+
+  --r-card: 24px;
+  --r-md:   12px;
+  --r-sm:   8px;
+  --r-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px -8px rgba(28, 25, 23, 0.12);
+  --shadow-card-hover: 0 2px 4px rgba(28, 25, 23, 0.06), 0 16px 32px -12px rgba(28, 25, 23, 0.18);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+/* Element defaults live in @layer base so Tailwind utilities (in the
+   utilities layer) can still override them — unlayered rules would win. */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--surface);
+    color: var(--ink-body);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.625;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Sticky footer: on short pages, main grows so the footer sits at the
+     viewport bottom instead of leaving the white body showing beneath it. */
+  body {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+  body > main {
+    flex: 1 0 auto;
+  }
+
+  h1, h2, h3 { text-wrap: balance; }
+
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  input, textarea, select { font-family: inherit; }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--ink);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin: 0;
+  }
 }
-
-a { color: inherit; text-decoration: none; }
-button { font-family: inherit; cursor: pointer; }
-input { font-family: inherit; }
 
 .font-display { font-family: var(--font-display); }
 .font-body    { font-family: var(--font-body); }
 .font-mono    { font-family: var(--font-mono); }
 
 html { scroll-behavior: smooth; }
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
 
 [data-reveal] {
   opacity: 0;
@@ -59,10 +192,34 @@ html { scroll-behavior: smooth; }
   transform: translateY(0);
 }
 
+/* Stagger cards inside a revealed band — each fades in a beat after the last. */
+[data-reveal] .grid > .card {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+[data-reveal].is-visible .grid > .card { opacity: 1; transform: translateY(0); }
+[data-reveal].is-visible .grid > .card:nth-child(2) { transition-delay: 90ms; }
+[data-reveal].is-visible .grid > .card:nth-child(3) { transition-delay: 180ms; }
+[data-reveal].is-visible .grid > .card:nth-child(n + 4) { transition-delay: 270ms; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   [data-reveal] { opacity: 1; transform: none; transition: none; }
+  [data-reveal] .grid > .card { opacity: 1; transform: none; transition: none; }
   .trend-line { stroke-dashoffset: 0 !important; animation: none !important; }
+  .marquee-track { animation: none !important; }
+  .animate-fox-sniff { animation: none !important; }
+}
+
+/* 404 fox: a gentle curious wobble, like it's sniffing around for the page. */
+.animate-fox-sniff {
+  transform-origin: 50% 85%;
+  animation: foxSniff 2.8s ease-in-out infinite;
+}
+@keyframes foxSniff {
+  0%, 100% { transform: rotate(-5deg); }
+  50%      { transform: rotate(5deg); }
 }
 
 .trend-line {
@@ -75,9 +232,268 @@ html { scroll-behavior: smooth; }
 }
 
 .container-x {
-  max-width: 1120px;
+  max-width: var(--container);
   margin-left: auto;
   margin-right: auto;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding-left: var(--container-pad);
+  padding-right: var(--container-pad);
 }
+
+/* Component classes are layered too, so utilities beat them without !important. */
+@layer components {
+
+/* ---- Section bands ---- */
+.band { padding-block: var(--space-section); }
+.band--light  { background: var(--surface); }
+.band--alt    { background: var(--surface-alt); }
+.band--sunken { background: var(--surface-sunken); }
+.band--invert {
+  background: var(--surface-invert);
+  color: var(--ink-invert-dim);
+}
+.band--invert h1,
+.band--invert h2,
+.band--invert h3,
+.band--invert h4 { color: var(--ink-invert); }
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  padding: 11px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+              color 0.15s ease, transform 0.15s ease;
+}
+.btn:active { transform: translateY(1px); }
+
+.btn--primary {
+  background: var(--accent-btn);
+  color: var(--accent-on);
+}
+.btn--primary:hover { filter: brightness(0.94); }
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--ink);
+}
+.btn--ghost:hover { background: var(--surface-alt); border-color: var(--stone-500); }
+
+.btn--invert {
+  background: transparent;
+  border-color: var(--border-invert);
+  color: var(--ink-invert);
+}
+.btn--invert:hover { background: rgba(255, 255, 255, 0.06); }
+
+.btn__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-right: -8px;
+  border-radius: var(--r-pill);
+  background: rgba(28, 25, 23, 0.14);
+}
+.btn--invert .btn__arrow { background: rgba(255, 255, 255, 0.12); }
+
+/* ---- Cards ---- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.card--hover:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+.card--invert {
+  background: var(--surface-invert-raised);
+  border-color: var(--border-invert);
+  box-shadow: none;
+}
+
+/* ---- Eyebrow ---- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+.band--invert .eyebrow { color: var(--accent); }
+
+/* ---- Per-track accent scoping ---- */
+/* Hub / common shell — neutral ink accent, so the two tracks (forest green + copper)
+   stay the only saturated colours on the site. Home <main>, About, Contact, Nav
+   and Footer wear this. Bare --accent is consumed only by eyebrows/labels on dark
+   bands, hence the light value; everything else uses the ink ramp. */
+.track-hub {
+  --accent:      var(--ink-invert-dim);
+  --accent-ink:  var(--stone-900);
+  --accent-deep: var(--stone-900);
+  --accent-soft: var(--stone-200);
+  --accent-btn:  var(--stone-900);
+  --accent-on:   #FFFFFF;
+  /* Hub companions = the two tracks themselves. */
+  --accent-2:      var(--oss);
+  --accent-2-ink:  var(--oss-ink);
+  --accent-2-deep: var(--oss-deep);
+  --accent-2-soft: var(--oss-soft);
+  --accent-3:      var(--gold);
+  --accent-3-ink:  var(--gold-ink);
+  --accent-3-deep: var(--gold-deep);
+  --accent-3-soft: var(--gold-soft);
+}
+/* On the hub's dark bands the neutral ink button would vanish (black on black) —
+   flip it to a white fill with dark text. Track bands keep their coloured fills. */
+.track-hub .band--invert {
+  --accent-btn: var(--ink-invert);
+  --accent-on:  var(--stone-900);
+}
+.track-oss {
+  --accent:     var(--oss);
+  --accent-ink: var(--oss-ink);
+  --accent-deep:var(--oss-deep);
+  --accent-soft:var(--oss-soft);
+  --accent-btn: var(--oss-ink);   /* dark fill so a white label passes AA */
+  --accent-on:  #FFFFFF;
+  --accent-2:      var(--teal);
+  --accent-2-ink:  var(--teal-ink);
+  --accent-2-deep: var(--teal-deep);
+  --accent-2-soft: var(--teal-soft);
+  --accent-3:      var(--moss);
+  --accent-3-ink:  var(--moss-ink);
+  --accent-3-deep: var(--moss-deep);
+  --accent-3-soft: var(--moss-soft);
+}
+.track-trading {
+  --accent:     var(--gold);
+  --accent-ink: var(--gold-ink);
+  --accent-deep:var(--gold-deep);
+  --accent-soft:var(--gold-soft);
+  --accent-btn: var(--gold-ink);   /* dark bronze fill so a white label passes AA */
+  --accent-on:  #FFFFFF;
+  --accent-2:      var(--amber);
+  --accent-2-ink:  var(--amber-ink);
+  --accent-2-deep: var(--amber-deep);
+  --accent-2-soft: var(--amber-soft);
+  --accent-3:      var(--clay);
+  --accent-3-ink:  var(--clay-ink);
+  --accent-3-deep: var(--clay-deep);
+  --accent-3-soft: var(--clay-soft);
+}
+
+/* ---- Tone helpers ---- */
+/* Shift a single card/element onto a companion hue from the same family. Because
+   they remap the semantic vars locally, everything inside (icon wells, chips,
+   ghost buttons, markers) re-themes with no extra markup. */
+.tone-2 {
+  --accent-ink:  var(--accent-2-ink);
+  --accent-deep: var(--accent-2-deep);
+  --accent-soft: var(--accent-2-soft);
+  --accent-btn:  var(--accent-2-ink);
+  --accent:      var(--accent-2);
+}
+.tone-3 {
+  --accent-ink:  var(--accent-3-ink);
+  --accent-deep: var(--accent-3-deep);
+  --accent-soft: var(--accent-3-soft);
+  --accent-btn:  var(--accent-3-ink);
+  --accent:      var(--accent-3);
+}
+
+/* ---- Coloured washes ---- */
+/* A light band that fades from the track's tinted surfaces into the page instead
+   of sitting flat. Two offset radial pools (core hue + companion) keep it from
+   looking like a single blunt gradient. */
+.band--wash {
+  background:
+    radial-gradient(115% 85% at 8% -15%,
+      color-mix(in oklab, var(--accent-soft) 80%, transparent) 0%, transparent 62%),
+    radial-gradient(95% 75% at 98% 5%,
+      color-mix(in oklab, var(--accent-2-soft) 65%, transparent) 0%, transparent 58%),
+    linear-gradient(180deg, var(--surface-alt) 0%, var(--surface) 100%);
+}
+
+/* Dark bands are where the bright accents are legible, so this is where colour
+   gets to be saturated — a soft glow bleeding up from the band edges. */
+.band--invert.band--glow {
+  background:
+    radial-gradient(80% 120% at 15% 100%,
+      color-mix(in oklab, var(--accent) 14%, transparent) 0%, transparent 60%),
+    radial-gradient(70% 100% at 90% 0%,
+      color-mix(in oklab, var(--accent-2) 10%, transparent) 0%, transparent 55%),
+    var(--surface-invert);
+}
+
+}
+
+/* Rendered Markdown (blog posts, product bodies) */
+.prose-foxe {
+  color: var(--ink-body);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.prose-foxe > * + * { margin-top: 1.1em; }
+.prose-foxe h2,
+.prose-foxe h3 {
+  margin-top: 1.8em;
+  margin-bottom: 0.2em;
+  line-height: 1.2;
+}
+.prose-foxe h2 { font-size: 1.6rem; font-weight: 700; }
+.prose-foxe h3 { font-size: 1.25rem; font-weight: 600; }
+.prose-foxe strong { color: var(--ink); font-weight: 600; }
+.prose-foxe a {
+  color: var(--accent-ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-foxe a:hover { color: var(--accent-deep); }
+.prose-foxe ul,
+.prose-foxe ol { padding-left: 1.25em; }
+.prose-foxe ul { list-style: disc; }
+.prose-foxe ol { list-style: decimal; }
+.prose-foxe li { margin-top: 0.4em; }
+.prose-foxe li::marker { color: var(--accent-ink); }
+.prose-foxe code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  background: var(--surface-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  color: var(--ink);
+}
+.prose-foxe pre {
+  background: var(--surface-invert);
+  color: var(--ink-invert);
+  border-radius: var(--r-md);
+  padding: 1.1em;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+.prose-foxe pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+}
+.prose-foxe blockquote {
+  border-left: 3px solid var(--accent);
+  padding-left: 1em;
+  color: var(--ink-dim);
+  font-style: italic;
+}
+.prose-foxe hr { border: none; border-top: 1px solid var(--border-soft); }

@@ -1,0 +1,34 @@
+---
+track: oss
+category: libraries
+name: WP Queue Process
+tagline: Non-blocking background jobs for WordPress.
+summary: Async requests and background queue processing for WordPress — a swappable storage driver, load-aware batching, and a self-healing cron.
+kind: PHP Library
+language: PHP
+license: GPL-2.0-or-later
+status: active
+registry: Packagist
+packageName: duckdev/wp-queue-process
+url: https://packagist.org/packages/duckdev/wp-queue-process
+repo: https://github.com/duckdev/wp-queue-process
+order: 5
+features:
+  - Non-blocking async requests and background queue processing
+  - Swappable storage driver for where the queue lives
+  - Server-load-aware batching so it backs off under pressure
+  - A self-healing cron that recovers stalled queues
+---
+
+## What it does
+
+WP Queue Process runs long or repetitive work outside the request cycle, so a
+WordPress page never blocks waiting on it. Jobs are batched with an eye on server
+load, persisted through a swappable storage driver, and kept alive by a cron that
+heals itself if a queue stalls.
+
+Install with Composer:
+
+```bash
+composer require duckdev/wp-queue-process
+```
