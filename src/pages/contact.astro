@@ -9,15 +9,15 @@ import { Icon } from 'astro-icon/components';
 
 const studioSocials = [
   { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
-  { href: 'https://github.com/duckdev',        label: 'GitHub',     icon: 'mingcute:github-line',   brand: '#8250DF' },
-  { href: 'https://youtube.com/@foxelabs',     label: 'YouTube',    icon: 'mingcute:youtube-line',  brand: '#FF0000' },
-  { href: 'https://instagram.com/foxelabs',    label: 'Instagram',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
-  { href: 'https://www.facebook.com/foxelabs', label: 'Facebook',   icon: 'mingcute:facebook-line', brand: '#1877F2' },
+  { href: 'https://github.com/foxelabs',       label: '@foxelabs',  icon: 'mingcute:github-line',   brand: '#8250DF' },
+  { href: 'https://youtube.com/@foxelabs',     label: '@foxelabs',  icon: 'mingcute:youtube-line',  brand: '#FF0000' },
+  { href: 'https://instagram.com/foxelabs',    label: '@foxelabs',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
+  { href: 'https://www.facebook.com/foxelabs', label: '@foxelabs',  icon: 'mingcute:facebook-line', brand: '#1877F2' },
 ];
 
 const founderSocials = [
   { href: 'https://x.com/Joel_James',          label: '@Joel_James', icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
-  { href: 'https://github.com/joel-james',     label: 'joel-james',  icon: 'mingcute:github-line',   brand: '#8250DF' },
+  { href: 'https://github.com/joel-james',     label: '@joel-james', icon: 'mingcute:github-line',   brand: '#8250DF' },
   { href: 'https://instagram.com/joeltalks',   label: '@joeltalks',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
 ];
 ---
@@ -113,30 +113,30 @@ const founderSocials = [
 </BaseLayout>
 
 <style>
-  /* Playful, brand-coloured social pills */
+  /* Restrained, theme-aligned social pills */
   .social-pill {
     background: var(--surface-alt);
     color: var(--ink-body);
-    transition: background-color 180ms ease, color 180ms ease,
-      transform 180ms ease, box-shadow 180ms ease;
+    border: 1px solid var(--border);
+    transition: color 180ms ease, border-color 180ms ease,
+      transform 180ms ease;
     will-change: transform;
   }
   .social-pill__icon {
-    color: var(--brand);
+    color: var(--ink-dim);
     transition: color 180ms ease, transform 180ms ease;
   }
   .social-pill:hover {
-    background: var(--brand);
-    color: #fff;
-    transform: translateY(-2px) rotate(-1deg);
-    box-shadow: 0 6px 16px -6px color-mix(in srgb, var(--brand) 70%, transparent);
+    color: var(--ink);
+    border-color: var(--accent-ink);
+    transform: translateY(-2px);
   }
   .social-pill:hover .social-pill__icon {
-    color: #fff;
-    transform: scale(1.15) rotate(6deg);
+    color: var(--accent-ink);
+    transform: scale(1.1);
   }
   .social-pill:focus-visible {
-    outline: 2px solid var(--brand);
+    outline: 2px solid var(--accent-ink);
     outline-offset: 2px;
   }
 

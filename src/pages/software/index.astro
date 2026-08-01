@@ -10,7 +10,7 @@ import { Icon } from 'astro-icon/components';
 import { categoryPath } from '../../config/tracks';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
-const GITHUB_URL: string | null = 'https://github.com/duckdev';
+const GITHUB_URL: string | null = 'https://github.com/foxelabs';
 
 const projects = await getCollection('projects', ({ data }) => !data.draft && data.track === 'oss');
 const count = (cat: string) => projects.filter((p) => p.data.category === cat).length;

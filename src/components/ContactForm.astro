@@ -48,13 +48,54 @@ const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
     </button>
   </div>
 
-  <p data-success class="hidden mt-4 text-sm font-mono" style="color: var(--accent-ink);">
-    Thanks — your message is on its way. I'll reply soon.
-  </p>
+  <div data-success class="hidden flex-col items-center text-center py-6">
+    <span data-success-mark class="inline-flex items-center justify-center rounded-full mb-5"
+      style="width: 64px; height: 64px; background: color-mix(in srgb, var(--accent) 14%, transparent);">
+      <svg width="34" height="34" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+        <circle class="sm-ring" cx="26" cy="26" r="24" stroke="var(--accent-ink)" stroke-width="3" fill="none" />
+        <path class="sm-tick" d="M15 27l7.5 7.5L38 19" stroke="var(--accent-ink)" stroke-width="3.5"
+          stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      </svg>
+    </span>
+    <p class="text-lg font-semibold mb-1.5" style="color: var(--ink);">Message sent — caught by the fox. 🦊</p>
+    <p class="text-sm m-0" style="color: var(--ink-body);">
+      It just landed in the inbox. Expect a reply within a day, IST fox time.
+    </p>
+  </div>
   <p data-error class="hidden mt-4 text-sm font-mono" style="color: var(--red);">
     Something went wrong. Try again or email support@foxelabs.com.
   </p>
 </form>
+
+<style>
+  [data-success]:not(.hidden) { display: flex; }
+
+  [data-success]:not(.hidden) .sm-ring {
+    stroke-dasharray: 151;
+    stroke-dashoffset: 151;
+    animation: sm-draw 520ms ease-out forwards;
+  }
+  [data-success]:not(.hidden) .sm-tick {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: sm-draw 340ms ease-out 420ms forwards;
+  }
+  [data-success]:not(.hidden) [data-success-mark] {
+    animation: sm-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  @keyframes sm-draw { to { stroke-dashoffset: 0; } }
+  @keyframes sm-pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-success]:not(.hidden) .sm-ring,
+    [data-success]:not(.hidden) .sm-tick { animation: none; stroke-dashoffset: 0; }
+    [data-success]:not(.hidden) [data-success-mark] { animation: none; }
+  }
+</style>
 
 <script is:inline>
   (function () {
