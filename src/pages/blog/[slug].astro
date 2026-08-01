@@ -4,6 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
+import { articleLd, breadcrumbLd, SITE } from '../../config/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -27,8 +28,42 @@ const trackMeta = {
   trading: { label: 'Trading',  soft: 'var(--gold-soft)', deep: 'var(--gold-deep)' },
 } as const;
 const m = data.track ? trackMeta[data.track] : null;
+
+const pageTitle = `${data.seoTitle ?? data.title} | Foxe Labs`;
+const metaDescription = data.seoDescription ?? data.description;
+const postPath = `/blog/${post.id}`;
+const shareImage = data.heroImage ?? '/social-banner.png';
+const publishedIso = data.pubDate.toISOString();
+const modifiedIso = (data.updatedDate ?? data.pubDate).toISOString();
+
+const structuredData = [
+  breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+    { name: data.title, path: postPath },
+  ]),
+  articleLd({
+    headline: data.title,
+    description: data.description,
+    url: postPath,
+    datePublished: publishedIso,
+    dateModified: modifiedIso,
+    authorName: data.author,
+    image: shareImage,
+  }),
+];
 ---
-<BaseLayout title={`${data.title} — Foxe Labs`} description={data.description} ogType="article">
+<BaseLayout
+  title={pageTitle}
+  description={metaDescription}
+  ogType="article"
+  image={shareImage}
+  imageAlt={data.heroImageAlt ?? data.title}
+  publishedTime={publishedIso}
+  modifiedTime={modifiedIso}
+  author={data.author === SITE.name ? SITE.name : data.author}
+  jsonLd={structuredData}
+>
   <Nav />
   <main class="track-hub">
     <!-- Post header -->

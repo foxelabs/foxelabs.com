@@ -6,7 +6,8 @@ import Footer from '../../../components/Footer.astro';
 import Section from '../../../components/ui/Section.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
-import { categoryList, categoryMeta, projectPath } from '../../../config/tracks';
+import { categoryList, categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
+import { breadcrumbLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   return categoryList('oss').map(([category, meta]) => ({
@@ -23,8 +24,13 @@ const projects = (await getCollection(
 )).sort((a, b) => a.data.order - b.data.order);
 ---
 <BaseLayout
-  title={`${meta.label} — Foxe Labs`}
+  title={`Open-Source ${meta.label} | Foxe Labs`}
   description={`Open-source ${meta.label.toLowerCase()} by Foxe Labs — documented, GPL-licensed, and maintained in public.`}
+  jsonLd={breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Software', path: '/software' },
+    { name: meta.label, path: categoryPath('oss', category) },
+  ])}
 >
   <Nav />
   <main class="track-oss">

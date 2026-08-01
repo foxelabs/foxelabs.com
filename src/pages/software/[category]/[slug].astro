@@ -6,7 +6,8 @@ import Footer from '../../../components/Footer.astro';
 import Button from '../../../components/ui/Button.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import { Icon } from 'astro-icon/components';
-import { categoryMeta, categoryPath, addonPath } from '../../../config/tracks';
+import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
+import { breadcrumbLd, softwareApplicationLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -67,6 +68,33 @@ const primaryCta = data.websiteUrl
 // Registry listing shown as a secondary button only when it isn't the primary.
 const registryLink = data.url && data.websiteUrl ? { href: data.url, ...registryCta } : null;
 
+// Keyword-first <title>; falls back to the product name.
+const pageTitle = `${data.seoTitle ?? data.name} | Foxe Labs`;
+const metaDescription = data.seoDescription ?? data.summary;
+
+// Structured data: breadcrumb trail + the product itself.
+const catLabel = cat?.label ?? 'Software';
+const ratingMatch = data.rating?.match(/([\d.]+)\D+\(([\d,]+)/);
+const structuredData = [
+  breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Software', path: '/software' },
+    { name: catLabel, path: categoryPath('oss', data.category) },
+    { name: data.name, path: projectPath('oss', data.category, project.id) },
+  ]),
+  softwareApplicationLd({
+    name: data.name,
+    description: data.summary,
+    url: projectPath('oss', data.category, project.id),
+    applicationCategory: data.kind,
+    operatingSystem: data.category === 'plugins' ? 'WordPress' : 'PHP',
+    offerPrice: '0',
+    ratingValue: ratingMatch?.[1],
+    ratingCount: ratingMatch?.[2]?.replace(/,/g, ''),
+    sameAs: [data.url, data.repo, data.websiteUrl].filter(Boolean) as string[],
+  }),
+];
+
 const specs = [
   data.license && { label: 'License', value: data.license },
   data.language && { label: 'Language', value: data.language },
@@ -77,7 +105,7 @@ const specs = [
   data.rating && { label: 'Rating', value: data.rating },
 ].filter(Boolean) as { label: string; value: string }[];
 ---
-<BaseLayout title={`${data.name} — Foxe Labs`} description={data.summary}>
+<BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
   <main class="track-oss">
     <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">

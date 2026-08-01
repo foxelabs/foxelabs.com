@@ -8,10 +8,15 @@ import WhyFoxeLabs from '../../components/WhyFoxeLabs.astro';
 import About from '../../components/About.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import Footer from '../../components/Footer.astro';
+import { breadcrumbLd } from '../../config/seo';
 ---
 <BaseLayout
-  title="Trading Tools — Foxe Labs"
+  title="MetaTrader 5 Expert Advisors & Trading Tools | Foxe Labs"
   description="Expert advisors, a universal trading journal, and precision tools — engineered for prop firm and serious retail traders."
+  jsonLd={breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Trading', path: '/trading' },
+  ])}
 >
   <Nav />
   <main class="track-trading">

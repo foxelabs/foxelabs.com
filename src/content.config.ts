@@ -7,6 +7,10 @@ const base = {
   tagline: z.string(),
   // Short summary shown on listing cards.
   summary: z.string(),
+  // SEO overrides (affect <title>/meta only, never visible copy).
+  // seoTitle is the keyword-first lead; templates append " | Foxe Labs".
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
   featured: z.boolean().default(false),
   order: z.number().default(0),
   draft: z.boolean().default(false),
@@ -92,6 +96,8 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     author: z.string().default('Foxe Labs'),

@@ -6,6 +6,19 @@ import ContactForm from '../components/ContactForm.astro';
 import Section from '../components/ui/Section.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import { Icon } from 'astro-icon/components';
+import { breadcrumbLd, SITE } from '../config/seo';
+
+const contactLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact Foxe Labs',
+  url: `${SITE.url}/contact`,
+  mainEntity: {
+    '@type': 'Organization',
+    '@id': `${SITE.url}/#organization`,
+    email: 'support@foxelabs.com',
+  },
+};
 
 const studioSocials = [
   { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
@@ -22,8 +35,15 @@ const founderSocials = [
 ];
 ---
 <BaseLayout
-  title="Contact — Foxe Labs"
+  title="Contact Foxe Labs — Plugin & Trading Tool Support"
   description="Questions about our software, trading tools, licensing, or a custom build? Get in touch with Foxe Labs."
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Contact', path: '/contact' },
+    ]),
+    contactLd,
+  ]}
 >
   <Nav />
   <main class="track-hub">

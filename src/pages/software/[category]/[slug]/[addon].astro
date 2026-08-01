@@ -6,7 +6,8 @@ import Footer from '../../../../components/Footer.astro';
 import Button from '../../../../components/ui/Button.astro';
 import PricingCard from '../../../../components/ui/PricingCard.astro';
 import { Icon } from 'astro-icon/components';
-import { projectPath } from '../../../../config/tracks';
+import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
+import { breadcrumbLd, softwareApplicationLd } from '../../../../config/seo';
 
 export async function getStaticPaths() {
   const [addons, projects] = await Promise.all([
@@ -51,8 +52,32 @@ const benefits = [
   'Automatic updates & support while licensed',
   '1, 3 or unlimited-site licenses',
 ];
+
+const pageTitle = `${data.seoTitle ?? `${data.name} — ${parent.data.name} Add-on`} | Foxe Labs`;
+const metaDescription = data.seoDescription ?? data.summary;
+
+const catLabel = categoryMeta('oss', parent.data.category)?.label ?? 'Software';
+const priceMatch = data.price?.match(/([\d.]+)/);
+const structuredData = [
+  breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Software', path: '/software' },
+    { name: catLabel, path: categoryPath('oss', parent.data.category) },
+    { name: parent.data.name, path: parentUrl },
+    { name: data.name, path: addonPath('oss', parent.data.category, parent.id, addon.id) },
+  ]),
+  softwareApplicationLd({
+    name: `${data.name} — ${parent.data.name} add-on`,
+    description: data.summary,
+    url: addonPath('oss', parent.data.category, parent.id, addon.id),
+    applicationCategory: 'WordPress Plugin',
+    operatingSystem: 'WordPress',
+    offerPrice: priceMatch?.[1],
+    sameAs: data.url ? [data.url] : undefined,
+  }),
+];
 ---
-<BaseLayout title={`${data.name} — ${parent.data.name} add-on — Foxe Labs`} description={data.summary}>
+<BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
   <main class="track-oss">
     <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">

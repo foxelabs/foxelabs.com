@@ -6,6 +6,7 @@ import Footer from '../../components/Footer.astro';
 import Section from '../../components/ui/Section.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
 import { Icon } from 'astro-icon/components';
+import { breadcrumbLd } from '../../config/seo';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
@@ -23,8 +24,12 @@ const trackMeta = {
 } as const;
 ---
 <BaseLayout
-  title="Blog — Foxe Labs"
+  title="Blog — WordPress Development & Trading Notes | Foxe Labs"
   description="Notes on open-source software, expert advisor design, risk, and what we're building at Foxe Labs."
+  jsonLd={breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Blog', path: '/blog' },
+  ])}
 >
   <Nav />
   <main class="track-hub">

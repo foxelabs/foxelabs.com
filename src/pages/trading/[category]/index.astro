@@ -6,7 +6,8 @@ import Footer from '../../../components/Footer.astro';
 import Section from '../../../components/ui/Section.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
-import { categoryList, projectPath } from '../../../config/tracks';
+import { categoryList, categoryPath, projectPath } from '../../../config/tracks';
+import { breadcrumbLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   return categoryList('trading').map(([category, meta]) => ({
@@ -29,8 +30,13 @@ const statusLabel: Record<string, string> = {
 };
 ---
 <BaseLayout
-  title={`${meta.label} — Foxe Labs`}
+  title={`${meta.label} for MetaTrader 5 | Foxe Labs`}
   description={`${meta.label} by Foxe Labs — engineered risk-first for prop firm and serious retail traders.`}
+  jsonLd={breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Trading', path: '/trading' },
+    { name: meta.label, path: categoryPath('trading', category) },
+  ])}
 >
   <Nav />
   <main class="track-trading">

@@ -7,6 +7,7 @@ import Section from '../components/ui/Section.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
 import Button from '../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
+import { breadcrumbLd, personLd } from '../config/seo';
 
 const tracks = [
   {
@@ -49,8 +50,24 @@ const values = [
 ];
 ---
 <BaseLayout
-  title="About — Foxe Labs"
+  title="About Foxe Labs — Software Studio by Joel James"
   description="Foxe Labs is a one-person software studio by Joel James — open-source tools and trading software, built and used in-house."
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'About', path: '/about' },
+    ]),
+    personLd({
+      name: 'Joel James',
+      url: '/about',
+      image: '/joel.jpg',
+      sameAs: [
+        'https://x.com/Joel_James',
+        'https://github.com/joel-james',
+        'https://instagram.com/joeltalks',
+      ],
+    }),
+  ]}
 >
   <Nav />
   <main class="track-hub">

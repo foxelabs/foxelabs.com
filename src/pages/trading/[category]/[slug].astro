@@ -7,7 +7,8 @@ import EmailForm from '../../../components/EmailForm.astro';
 import Button from '../../../components/ui/Button.astro';
 import PricingCard from '../../../components/ui/PricingCard.astro';
 import { Icon } from 'astro-icon/components';
-import { categoryMeta, categoryPath } from '../../../config/tracks';
+import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
+import { breadcrumbLd, softwareApplicationLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   const products = await getCollection(
@@ -30,8 +31,31 @@ const statusLabel: Record<string, string> = {
   waitlist: 'Waitlist open',
   'coming-soon': 'Coming soon',
 };
+
+const pageTitle = `${data.seoTitle ?? data.name} | Foxe Labs`;
+const metaDescription = data.seoDescription ?? data.summary;
+
+const catLabel = cat?.label ?? 'Trading';
+const priceMatch = data.price?.match(/([\d.]+)/);
+const structuredData = [
+  breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Trading', path: '/trading' },
+    { name: catLabel, path: categoryPath('trading', data.category) },
+    { name: data.name, path: projectPath('trading', data.category, product.id) },
+  ]),
+  softwareApplicationLd({
+    name: data.name,
+    description: data.summary,
+    url: projectPath('trading', data.category, product.id),
+    applicationCategory: 'FinanceApplication',
+    operatingSystem: data.platform,
+    offerPrice: data.status === 'live' ? priceMatch?.[1] : undefined,
+    sameAs: data.signalUrl ? [data.signalUrl] : undefined,
+  }),
+];
 ---
-<BaseLayout title={`${data.name} — Foxe Labs`} description={data.summary}>
+<BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
   <main class="track-trading">
     <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">

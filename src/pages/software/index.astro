@@ -8,6 +8,7 @@ import Eyebrow from '../../components/ui/Eyebrow.astro';
 import Button from '../../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryPath } from '../../config/tracks';
+import { breadcrumbLd } from '../../config/seo';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
 const GITHUB_URL: string | null = 'https://github.com/foxelabs';
@@ -63,8 +64,12 @@ const stats = [
 ];
 ---
 <BaseLayout
-  title="Software — Foxe Labs"
+  title="Open-Source WordPress Plugins & PHP Libraries | Foxe Labs"
   description="WordPress plugins, PHP libraries, and apps by Foxe Labs — open source and GPL-licensed, documented, and actively maintained."
+  jsonLd={breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Software', path: '/software' },
+  ])}
 >
   <Nav />
   <main class="track-oss">
