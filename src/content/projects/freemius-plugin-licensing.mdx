@@ -1,0 +1,43 @@
+---
+track: oss
+category: libraries
+name: Freemius Plugin Licensing
+tagline: A lightweight, UI-free Freemius SDK for WordPress plugins.
+summary: Handles license activation, deactivation, update delivery, and add-on listing by talking to the Freemius API directly — no bundled UI, no bloat.
+kind: PHP Library
+language: PHP
+license: GPL-2.0-or-later
+status: active
+registry: Packagist
+packageName: duckdev/freemius-plugin-licensing
+url: https://packagist.org/packages/duckdev/freemius-plugin-licensing
+repo: https://github.com/duckdev/freemius-plugin-licensing
+docsUrl: https://docs.duckdev.com/wp-libraries/freemius-plugin-licensing/overview
+changelogUrl: https://docs.duckdev.com/wp-libraries/freemius-plugin-licensing/changelog
+minPhp: '7.4'
+order: 9
+features:
+  - License activation and deactivation against the Freemius API
+  - Automatic update delivery for licensed plugins
+  - Add-on listing without the full Freemius SDK
+  - UI-free by design — bring your own interface
+---
+
+## What it does
+
+Freemius Plugin Licensing is a slim alternative to the full Freemius SDK: it talks
+to the Freemius API directly to handle license activation, deactivation, update
+delivery, and add-on listing — and nothing else. There's no bundled admin UI, so
+you stay in control of how licensing looks and behaves in your plugin.
+
+## Why it exists
+
+The official SDK ships a lot of UI and opinion along with the licensing logic. When
+you only need the licensing plumbing — and want to design the experience yourself —
+this library gives you just that, keeping your plugin lean.
+
+Install with Composer:
+
+```bash
+composer require duckdev/freemius-plugin-licensing
+```
