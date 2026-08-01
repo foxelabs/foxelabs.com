@@ -58,6 +58,10 @@ const projects = defineCollection({
       license: z.string().default('MIT'),
       // Canonical listing page (wp.org plugin page or Packagist package page).
       url: z.string().url().optional(),
+      // Dedicated product website. When set, it becomes the primary CTA in
+      // place of the registry button (e.g. Disqus Conditional Load → dclwp.com).
+      websiteUrl: z.string().url().optional(),
+      websiteLabel: z.string().optional(),
       repo: z.string().url().optional(),
       docsUrl: z.string().url().optional(),
       changelogUrl: z.string().url().optional(),
