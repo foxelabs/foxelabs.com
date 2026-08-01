@@ -16,11 +16,11 @@ const esc = (s: string) =>
 
 export const POST: APIRoute = async ({ request }) => {
   const apiKey = import.meta.env.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
-  const to = import.meta.env.CONTACT_TO ?? process.env.CONTACT_TO ?? 'hi@foxelabs.com';
+  const to = import.meta.env.CONTACT_TO ?? process.env.CONTACT_TO ?? 'support@foxelabs.com';
   const from =
     import.meta.env.CONTACT_FROM ??
     process.env.CONTACT_FROM ??
-    'Foxe Labs <onboarding@resend.dev>';
+    'Foxe Labs <support@foxelabs.com>';
   const isDev = import.meta.env.DEV;
 
   if (!apiKey) {
