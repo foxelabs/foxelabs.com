@@ -4,7 +4,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
-import { articleLd, breadcrumbLd, SITE } from '../../config/seo';
+import { articleLd, breadcrumbLd, faqLd, SITE } from '../../config/seo';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -51,6 +51,7 @@ const structuredData = [
     authorName: data.author,
     image: shareImage,
   }),
+  ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
 ---
 <BaseLayout
@@ -121,6 +122,20 @@ const structuredData = [
         <div class="prose-foxe max-w-2xl mx-auto">
           <Content />
         </div>
+
+        {data.faq.length > 0 && (
+          <section class="prose-foxe max-w-2xl mx-auto mt-14 pt-10" style="border-top: 1px solid var(--border-soft);" aria-labelledby="faq-heading">
+            <h2 id="faq-heading" style="margin-top: 0; padding-top: 0; border-top: none;">Frequently asked questions</h2>
+            <dl class="faq-list">
+              {data.faq.map((item) => (
+                <div class="faq-item">
+                  <dt>{item.q}</dt>
+                  <dd>{item.a}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
 
         {data.tags.length > 0 && (
           <div class="flex flex-wrap gap-2 mt-14 pt-8 max-w-2xl mx-auto" style="border-top: 1px solid var(--border-soft);">

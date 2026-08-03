@@ -1,0 +1,329 @@
+---
+title: "How to view active login sessions on a WordPress site"
+description: WordPress lists every account that exists, but never the ones signed in right now. Here are four ways to see active login sessions — from a raw SQL query to a one-click admin tool — with honest pros and cons for each.
+seoTitle: How to view active login sessions on a WordPress site
+seoDescription: Four ways to see who's currently signed in to WordPress — SQL, WP-CLI, a PHP snippet, and a one-click admin tool — with the pros and cons of each.
+pubDate: 2026-06-27
+updatedDate: 2026-08-03
+author: Joel James
+track: oss
+heroImage: /blog/cover-active-login-sessions-wordpress.jpg
+heroImageAlt: A green terminal character holds a clipboard listing active users, each shown as an ID card with a green online dot, while it reaches out to sign one fading session out
+tags:
+  - wordpress
+  - security
+  - loggedin
+faq:
+  - q: How do I see who is currently logged in to WordPress?
+    a: WordPress has no built-in active-sessions screen. You can read active sessions from the wp_usermeta table (meta key session_tokens) with a SQL query, WP-CLI, or the WP_Session_Tokens PHP API — or add a UI with the free Loggedin plugin's Active Sessions add-on, which lists every user with a live session.
+  - q: Where does WordPress store login sessions?
+    a: In the wp_usermeta table, under the meta key session_tokens. Each user's value is a serialized array of tokens, and every token records its expiration, login time, IP address and user agent.
+  - q: Does closing the browser log a user out of WordPress?
+    a: No. The session token stays on the server until the user clicks Log Out, the token expires (2 days by default, or 14 days if "Remember Me" was ticked), or another login displaces it. A closed tab still counts as an active session.
+  - q: How do I force log out a WordPress user?
+    a: In code, call WP_Session_Tokens::get_instance($user_id)->destroy_all(). In WP-CLI, run "wp user session destroy <user>". In the admin, use the free Loggedin plugin's Force Logout panel, or the Active Sessions add-on to sign out a single device.
+---
+
+WordPress is famously bad at one thing: telling you who's actually signed in right
+now. The Users screen lists every account that *exists* on the site — not the ones
+that are logged in. There's no built-in "active sessions" panel, no per-device
+list, no last-seen column. For most sites this gap is invisible. For some it's a
+real problem:
+
+- A membership site where one paid account is being shared across a family, a
+  classroom, or a Discord server.
+- An LMS install where students log in from a coffee shop, forget to sign out, and
+  a stolen laptop quietly keeps the seat warm for weeks.
+- A WooCommerce store where a customer just got refunded and you'd like to revoke
+  their access without waiting for the session cookie to expire.
+- A staff portal where the security team needs to know which devices a leaver was
+  still signed into when they handed in their notice.
+
+If any of those sound familiar, this guide is for you. Below are four ways to view
+currently active login sessions on a WordPress website — from a raw database query
+through to a one-click admin tool — with honest pros and cons for each.
+
+## First, what's a "session" in WordPress?
+
+A WordPress session is created the moment a user successfully logs in. Internally
+it's a *session token* — a random string stored against the user in the database.
+The token is also placed in an authentication cookie on the user's browser. Every
+subsequent request hits the server, the cookie comes along, and WordPress matches
+the cookie against the stored token to keep the user signed in.
+
+Two important facts that catch people out:
+
+- **One session per browser, per device.** A phone and a laptop count as two
+  sessions. Two Chrome profiles on the same laptop count as two. An incognito
+  window counts as a third.
+- **Closing the tab does not end the session.** The token lives on the server until
+  the user explicitly clicks Log Out, the token expires (2 days by default, 14 days
+  if "Remember Me" was ticked), or another login displaces it.
+
+That's why a stale browser tab a week later can still render as if the user is
+signed in — and why simply asking "is anyone logged in?" is a more useful question
+than it sounds.
+
+WordPress stores these tokens in the `wp_usermeta` table under the meta key
+`session_tokens`. That's the same row every method below reads from.
+
+## Method 1 — Run a SQL query against wp_usermeta
+
+The most direct way to see active sessions is to ask the database. Open phpMyAdmin,
+Adminer, or your hosting control panel's SQL console, and run:
+
+```sql
+SELECT u.ID, u.user_login, u.user_email, um.meta_value
+FROM wp_users u
+JOIN wp_usermeta um ON um.user_id = u.ID
+WHERE um.meta_key = 'session_tokens';
+```
+
+You'll get one row per user who has ever logged in and not been pruned. The
+`meta_value` column is a serialized PHP array of every token that user holds, keyed
+by token verifier. Each token entry looks like this once you unserialize it:
+
+```php
+[
+    'expiration' => 1719999999,   // unix timestamp
+    'login'      => 1719399999,   // unix timestamp
+    'ip'         => '203.0.113.4',
+    'ua'         => 'Mozilla/5.0 …',
+]
+```
+
+<div class="pros">
+
+**Pros**
+
+- Works on every WordPress install. No plugins, no code.
+- Gives you the raw data — IP, user-agent, login time, expiry.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- The `meta_value` is serialized PHP. Reading it in your head is unrealistic past a few rows.
+- Expired tokens stick around until the user logs in again, so the count is not the same as "currently active." You have to filter `expiration > NOW()` yourself.
+- No search. No sort. No pagination.
+- Anyone running this needs database access — usually a developer, not the site owner.
+
+</div>
+
+This method is fine for a one-off diagnostic. It's not a workflow.
+
+## Method 2 — Use WP-CLI
+
+If you have shell access, WP-CLI gives you the same data in a much more readable
+form. To dump every user's active sessions:
+
+```bash
+wp user list --field=ID | while read uid; do
+  echo "User #$uid:"
+  wp eval "
+    \$tokens = get_user_meta( $uid, 'session_tokens', true );
+    \$tokens = is_array( \$tokens ) ? \$tokens : array();
+    foreach ( \$tokens as \$hash => \$t ) {
+      if ( \$t['expiration'] > time() ) {
+        echo '  ', date( 'Y-m-d H:i', \$t['login'] ),
+             '  ', \$t['ip'],
+             '  ', substr( \$t['ua'], 0, 60 ), \"\n\";
+      }
+    }
+  "
+done
+```
+
+You can also destroy any user's sessions in one line:
+
+```bash
+wp user session destroy <user>
+```
+
+<div class="pros">
+
+**Pros**
+
+- No serialization to read by eye — PHP does the work.
+- Scriptable. Easy to drop into a cron or a bash script.
+- The built-in `wp user session destroy` command is reliable.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- Requires SSH access and WP-CLI installed.
+- No nice list view. The output is whatever your terminal can render.
+- Still no search across users by anything except ID.
+- Not something you can hand to a non-technical site owner.
+
+</div>
+
+WP-CLI is the right tool for one-off incident response if you're already on the
+box. It's still not a workflow.
+
+## Method 3 — A short PHP snippet using WP_Session_Tokens
+
+WordPress exposes a clean PHP API for working with session tokens: the
+`WP_Session_Tokens` class. Drop the following into a small companion plugin (or
+your theme's `functions.php` if you really must) to print a list of every user with
+at least one active session:
+
+```php
+add_action( 'admin_notices', function () {
+    if ( ! current_user_can( 'manage_options' ) ) {
+        return;
+    }
+
+    $users = get_users( array( 'fields' => array( 'ID', 'user_login' ) ) );
+
+    echo '<div class="notice notice-info"><p><strong>Active sessions:</strong></p><ul>';
+
+    foreach ( $users as $u ) {
+        $manager  = WP_Session_Tokens::get_instance( $u->ID );
+        $sessions = $manager->get_all(); // array of currently-valid tokens
+
+        if ( empty( $sessions ) ) {
+            continue;
+        }
+
+        printf(
+            '<li>%s — %d active session(s)</li>',
+            esc_html( $u->user_login ),
+            count( $sessions )
+        );
+    }
+
+    echo '</ul></div>';
+} );
+```
+
+<div class="pros">
+
+**Pros**
+
+- Uses the official WP API. `get_all()` already filters out expired tokens, so the count is correct.
+- Compatible with custom session backends (Redis, Memcached) — anything that implements `WP_Session_Tokens` is honoured.
+- A great starting point if you want to build something custom.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- Iterating every user is expensive past a few hundred. On a 50,000-user site this will time out.
+- It's still just a list. No per-device drilldown, no IP, no sign-out button.
+- You're maintaining custom code. The next person has to figure out what it does.
+
+</div>
+
+This one is closer to a real solution than the previous two, but you're effectively
+writing the start of an admin tool you'll never quite finish.
+
+## A quick word on plugins people try (that don't do this)
+
+A common piece of advice on forums is to install **User Switching**. It's an
+excellent plugin — for switching between users — but it does not show you who is
+currently signed in. It's worth mentioning because if you search for "see who's
+logged in WordPress," you'll find it recommended, and you'll waste an hour
+discovering it doesn't do what you want.
+
+Same goes for **WP Activity Log**, **Stream**, and other audit-logging plugins.
+They tell you who did things and when. They don't tell you who is signed in right
+now.
+
+## Method 4 — A one-click admin tool (recommended)
+
+If you've made it this far, the through-line is obvious: WordPress has every piece
+of information you need in the database, but no UI to look at it. The fastest way to
+close that gap is to add the missing UI.
+
+The free [Loggedin plugin](/software/plugins/loggedin) already adds a
+concurrent-login limit and a Force Logout panel to the **Users → Loggedin** screen.
+Its [Active Sessions add-on](/software/plugins/loggedin/active-sessions) extends
+that screen with a dedicated **Sessions** tab showing every user with at least one
+live session, in one sortable, searchable list:
+
+- One row per user — display name, username, email, role, session count, last login
+  time, last IP.
+- Sortable by username, email, session count, or last login.
+- Searchable across username, email, and display name.
+- **Per-device drilldown** — click any row to open a modal listing every device
+  that user is signed in from, with IP, user-agent, sign-in time, and expiry side by
+  side.
+- **Single-session sign-out** — revoke one device without disturbing the others
+  (perfect for a stolen phone or an old tablet the user forgot about).
+- **One-click sign-out-all** — kill every session for a user, same as Loggedin's
+  Force Logout panel but without typing the username.
+- **Bulk sign-out from the list** — select multiple users and sign them all out in
+  one action (handy after a credential leak or a refund batch).
+
+It reads from the same `WP_Session_Tokens` storage every method above reads from,
+so the data is identical — there's no new database table, no migration, no cron.
+Install it, open the tab, see your sessions.
+
+### Why this is the practical answer
+
+<div class="table-wrap">
+
+| | SQL query | WP-CLI | PHP snippet | Active Sessions |
+| --- | :---: | :---: | :---: | :---: |
+| Non-technical owners can use it | — | — | — | ✓ |
+| Auto-filters expired tokens | — | manual | ✓ | ✓ |
+| Per-device view (IP, UA, expiry) | manual | manual | manual | ✓ |
+| Sign someone out from the UI | — | partial | — | ✓ |
+| Bulk operations | — | scripted | — | ✓ |
+| Scales to thousands of users | — | — | — | ✓ |
+
+</div>
+
+The other methods are perfectly valid for a one-off diagnostic or a developer who
+just needs to see what's there. For anything you're going to do more than once,
+having a real UI on top of the data is the difference between a workflow and a
+chore.
+
+## What about signing someone out once you've found them?
+
+Whichever method you use to see sessions, ending one is straightforward. WordPress
+ships the API; you just have to call it.
+
+- **One session, in code:** `WP_Session_Tokens::get_instance( $user_id )->destroy( $token_verifier );`
+- **All sessions for a user, in code:** `WP_Session_Tokens::get_instance( $user_id )->destroy_all();`
+- **All sessions for a user, in WP-CLI:** `wp user session destroy <user>`
+- **All sessions for a user, in the admin:** the core
+  [Loggedin plugin](/software/plugins/loggedin)'s Force Logout panel (free) accepts
+  a user ID, email, or username and clears them in one click.
+- **Per-device sign-out in the admin:** the
+  [Active Sessions add-on](/software/plugins/loggedin/active-sessions)'s per-user
+  modal — the only built-in option here that lets you revoke a single device
+  without disturbing the others.
+
+A signed-out user won't be notified, but the next page they try to load (or the next
+AJAX request from an already-open tab) will redirect them to `wp-login`. If you want
+that to happen the moment you click — without waiting for the user's next click —
+pair Loggedin with its
+[Real-time Logout add-on](/software/plugins/loggedin/realtime-logout), which reloads
+the user's open tabs the moment their session ends.
+
+## Wrapping up
+
+WordPress doesn't show you who is currently signed in by default, but the data has
+always been there in the `wp_usermeta` table. You can read it with SQL, with
+WP-CLI, or with a short PHP snippet — all three work, and any of them is fine for a
+quick one-off check.
+
+For a workflow you'll repeat — handling membership-share disputes, responding to a
+credential leak, kicking a refunded customer, auditing devices for a leaver — the
+answer is to add the missing UI rather than re-deriving it from raw data every time.
+That's the gap the Active Sessions add-on fills, sitting on top of the free
+Loggedin plugin's session controls.
+
+Either way, you now know what a WordPress session actually is, where it lives, how
+to find it, and how to end it. That alone puts you ahead of most install owners.
+
+— JJ

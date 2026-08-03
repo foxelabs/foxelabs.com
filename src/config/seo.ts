@@ -144,6 +144,27 @@ export function articleLd(a: ArticleArgs) {
   };
 }
 
+export interface FaqItem {
+  q: string;
+  /** Plain-text answer (no markup). Kept short and self-contained so answer
+   *  engines and rich results can quote it directly. */
+  a: string;
+}
+
+/** FAQPage node — powers Google's FAQ rich result and gives answer engines
+ *  (ChatGPT, Perplexity, AI Overviews) clean, quotable Q&A pairs. */
+export function faqLd(items: FaqItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((it) => ({
+      '@type': 'Question',
+      name: it.q,
+      acceptedAnswer: { '@type': 'Answer', text: it.a },
+    })),
+  };
+}
+
 /** Person node for the About page. */
 export function personLd(args: { name: string; url: string; image?: string; sameAs?: string[] }) {
   const node: Record<string, unknown> = {

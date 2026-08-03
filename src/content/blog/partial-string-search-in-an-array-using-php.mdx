@@ -1,0 +1,143 @@
+---
+title: "Partial string search in an array using PHP"
+description: There's no built-in PHP function to find every array element that contains a substring. Here's the small helper I wrote for it — and the two one-liners that replace it on modern PHP.
+seoTitle: Partial string search in an array using PHP
+seoDescription: How to find all array elements containing a substring in PHP — a simple strpos helper, plus the modern str_contains and preg_grep one-liners.
+pubDate: 2020-01-27
+updatedDate: 2026-08-03
+author: Joel James
+track: oss
+heroImage: /blog/cover-partial-string-search-php.jpg
+heroImageAlt: A green terminal character sifting a list of words through a magnifying glass, pulling out the ones that contain a highlighted substring
+tags:
+  - php
+  - arrays
+  - strings
+faq:
+  - q: How do I search for a partial string in a PHP array?
+    a: PHP has no single built-in function for it. On PHP 8+, use array_filter() with str_contains(); use preg_grep() to match a pattern; or write a foreach loop around strpos(). Each returns every array element that contains the given substring.
+  - q: What is the difference between strpos and str_contains here?
+    a: str_contains() (PHP 8.0+) returns a boolean and reads clearly. strpos() returns the position of the match and needs a strict "!== false" check, because a match at position 0 is falsy and a loose comparison would drop it.
+  - q: How do I make the array search case-insensitive?
+    a: Use stripos() instead of strpos(); lower-case both sides with strtolower() when using str_contains(); or add the /i flag to your preg_grep() pattern.
+  - q: Does array_filter keep the original array keys?
+    a: Yes. Both array_filter() and preg_grep() preserve the original keys, so the result can have gaps. Wrap it in array_values() if you need a clean, zero-indexed list.
+---
+
+I once needed something PHP doesn't ship: a function that takes an array of
+strings and returns every element containing a given substring. `in_array()` only
+matches whole values, `array_search()` does the same and returns a key, and
+`array_filter()` gets you close but you still have to supply the matching logic.
+So for a WordPress project I wrote a tiny helper — and it turns out there are a
+couple of one-liners worth knowing too.
+
+## The helper: a loop around strpos
+
+The most readable version is just a loop that keeps every string the keyword
+appears inside. `strpos()` returns the position of the first match, or `false` if
+there's none — so the `!== false` check is doing the work:
+
+```php
+/**
+ * Partial-search an array of strings for a keyword.
+ *
+ * @param string[] $array   Array of strings to search.
+ * @param string   $keyword Substring to look for.
+ *
+ * @return string[] Every element that contains the keyword.
+ */
+function array_partial_search( array $array, string $keyword ): array {
+    $found = [];
+
+    foreach ( $array as $string ) {
+        if ( strpos( $string, $keyword ) !== false ) {
+            $found[] = $string;
+        }
+    }
+
+    return $found;
+}
+
+$fruits = [ 'apple', 'grapes', 'orange', 'pineapple' ];
+
+$found = array_partial_search( $fruits, 'ap' );
+// [ 'apple', 'grapes', 'pineapple' ]
+```
+
+The one thing that catches people out here is the `!== false` — with `strpos`
+you *must* use the strict operator. A match at position `0` (the keyword at the
+very start of the string, like `'ap'` in `'apple'`) is a falsy `0`, so a loose
+`!= false` would silently drop it.
+
+## The modern one-liner: str_contains
+
+PHP 8.0 added `str_contains()`, which returns a plain boolean and reads exactly
+like what you mean. Drop it into `array_filter()` and the helper collapses to a
+single line — no strict-comparison footgun, no loop:
+
+```php
+$found = array_filter(
+    $fruits,
+    fn ( string $string ) => str_contains( $string, 'ap' )
+);
+```
+
+One difference to keep in mind: `array_filter()` **preserves the original keys**,
+so you get `[0 => 'apple', 1 => 'grapes', 3 => 'pineapple']` — note the missing
+`2`. If you want a clean, re-indexed list, wrap it in `array_values()`.
+
+## The regex one-liner: preg_grep
+
+If you're happy to reach for a regular expression, `preg_grep()` does the whole
+thing in one call — it returns every array element that matches a pattern:
+
+```php
+$found = preg_grep( '/ap/', $fruits );
+```
+
+That's the shortest option, but there's a catch: your keyword is now a *regex*.
+If it ever contains characters like `.`, `+`, `(` or `/`, they'll be interpreted
+as pattern syntax rather than literal text. When the keyword is user input, escape
+it with `preg_quote()` first:
+
+```php
+$keyword = '(ap';
+$pattern = '/' . preg_quote( $keyword, '/' ) . '/';
+
+$found = preg_grep( $pattern, $fruits );
+```
+
+Like `array_filter()`, `preg_grep()` preserves keys — `array_values()` again if
+you want them reset.
+
+## Case-insensitive search
+
+All three approaches match case by default, so `'AP'` wouldn't find `'apple'`.
+Making them case-insensitive is a small tweak per approach:
+
+```php
+// strpos → stripos
+stripos( $string, $keyword ) !== false;
+
+// str_contains → lower-case both sides
+str_contains( strtolower( $string ), strtolower( $keyword ) );
+
+// preg_grep → the /i flag
+preg_grep( '/ap/i', $fruits );
+```
+
+## Which one to reach for
+
+- On **PHP 8+**, `array_filter()` with `str_contains()` is the clearest — it says
+  what it does and sidesteps the `!== false` trap entirely.
+- `preg_grep()` is the most compact, and the natural choice when you're matching a
+  *pattern* rather than a fixed substring — just remember `preg_quote()` for
+  untrusted input.
+- The explicit **helper** still earns its place when you're on older PHP, or when
+  you want an obvious, named function that the next person can read at a glance.
+
+None of them is doing anything clever — that's rather the point. It's a gap small
+enough that PHP never filled it, and small enough that any of these one-liners
+closes it in a line.
+
+— JJ

@@ -1,0 +1,101 @@
+---
+title: "What the 404 to 301 tracking incident taught me about plugin security"
+description: In 2016 my most popular plugin shipped a usage-tracking feature that a partner turned into cloaked ads for search-engine crawlers. Here's a level-headed account of what went wrong and the lessons that still guide how I build plugins.
+seoTitle: Plugin security lessons from the 404 to 301 tracking incident
+seoDescription: A calm retrospective on the 2016 404 to 301 tracking issue — cloaked links, shared commit access, and the plugin-security lessons every WordPress developer can take from it.
+pubDate: 2016-08-17
+updatedDate: 2026-08-03
+author: Joel James
+track: oss
+heroImage: /blog/cover-404-to-301-security-lesson.jpg
+heroImageAlt: A green terminal character inspecting a WordPress plugin with a magnifying glass and shield, catching a hidden link that only appears to a search-engine crawler bot
+tags:
+  - wordpress
+  - security
+  - plugins
+faq:
+  - q: Is the 404 to 301 plugin safe to use now?
+    a: Yes. The usage-tracking feature was removed completely in 2016, within hours of the issue surfacing, and 404 to 301 has contained no third-party tracking or remote ad code since.
+  - q: What happened with the 404 to 301 plugin in 2016?
+    a: An optional usage-tracking feature, added through a partnership, collected anonymous visitor data and displayed a third-party credit link fetched from a remote server. The partner later changed that server to inject cloaked ad links for search-engine crawlers. Once reported, the feature was removed and the plugin updated.
+  - q: What is cloaking in the context of a WordPress plugin?
+    a: Cloaking means serving different content to search-engine crawlers than to human visitors. In this case, hidden ad links were injected only when a bot crawled the page, so real visitors never saw them. Google treats cloaking as a violation that can hurt a site's rankings.
+  - q: What are the main plugin-security lessons from this incident?
+    a: Never share commit access without keeping review and control; treat any feature that loads remote content as an untrusted attack surface and verify its responses continuously; and make any third-party ads or tracking strictly opt-in and non-identifying.
+---
+
+Back in 2016, [404 to 301](/software/plugins/404-to-301) — my most-used plugin,
+then on 100,000+ sites — was flagged publicly for shipping a feature that
+misbehaved. It was one of the hardest weeks of my open-source life, and also one of
+the most instructive. I've kept the original apology on my old blog, but what's
+actually worth carrying forward isn't the drama — it's the engineering lessons.
+So here's the level-headed version, years later.
+
+## What actually happened
+
+The plugin had an optional **usage-tracking feature**. It came out of a partnership:
+another developer wanted anonymous usage statistics (visitor IP and user-agent), and
+in exchange the plugin would display a small third-party "credit" text link. On
+install, users were asked to opt in.
+
+Two things made that a bad design, and I own both:
+
+1. **The credit links were remote content.** The text to display was fetched from
+   the partner's server, so what actually got served wasn't fixed in my plugin's
+   code — it could change at any time, without a new plugin release for anyone to
+   review.
+2. **That's exactly what happened.** The partner later changed their server to
+   return **cloaked ad links** — injected near the top of the page, but only when a
+   search-engine crawler requested it, so a normal visitor never saw them. That's
+   cloaking, and it can damage a site's search rankings. A security vendor found it,
+   published a report, and a wave of negative reviews followed.
+
+I removed the tracking feature completely and shipped an update within hours of
+learning about it. The WordPress.org plugins team reviewed the situation, and the
+takeaway they reinforced has stuck with me: **third-party ads must be opt-in and
+must never track users.**
+
+## The three mistakes
+
+Stripped of everything else, I made three concrete engineering errors:
+
+- **I shared commit access without keeping control.** The partner's code went out
+  under my account, and I treated their contributions with less scrutiny than my own.
+- **I misread the guidelines on remote content.** I thought a small credit link was
+  harmless. Loading anything from a third-party server into someone else's site is
+  not harmless — it's a decision with security and privacy weight.
+- **I didn't keep verifying the remote response.** I tested it once, saw the small
+  credit text, and trusted it. A response you fetch from someone else's server is not
+  a thing you verify once; it's a thing that can change the day after you look away.
+
+## Why this is a supply-chain problem, not a one-off
+
+The reason this is worth retelling is that it's the same shape as the supply-chain
+attacks that keep hitting the ecosystem: **code or content you don't fully control,
+running inside software people trust.** It doesn't matter whether it arrives as an
+npm dependency, a "partner" SDK, or a friendly credit link — the moment a remote
+party can change what your software does after review, you've handed them your
+users' trust.
+
+The uncomfortable part is that the popularity of the plugin made it *more*
+attractive as a vector, not less. Reach is exactly what makes a plugin a target.
+
+## What I do differently now
+
+- **No shared commit access without review.** Contributions get read and understood
+  before they ship, no matter who they're from.
+- **Remote content is an attack surface.** If a feature loads anything from an
+  external server, it gets treated as untrusted — verified, constrained, and
+  monitored, not tested once and forgotten.
+- **Opt-in, and no tracking.** Anything touching a user's visitors is opt-in by
+  default and collects nothing that identifies them. When in doubt, it doesn't ship.
+- **Fix first, explain fully.** Remove the offending code immediately, then be
+  transparent about what happened. People are remarkably forgiving of an honest,
+  fast response.
+
+404 to 301 has carried no third-party tracking or remote ad code since that 2016
+update, and it never will again. The incident was avoidable, and owning that is the
+point — but the reason to write it down is so the next developer weighing a
+too-good partnership offer recognises the shape of it before signing on.
+
+— JJ

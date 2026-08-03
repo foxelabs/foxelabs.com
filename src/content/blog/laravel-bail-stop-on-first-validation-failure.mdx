@@ -1,0 +1,94 @@
+---
+title: "Laravel bail: stop validation on the first failure"
+description: A single validation rule kept firing every check on a field and throwing a database error along the way. The fix was a one-word rule called bail — one I ended up contributing to Laravel itself.
+seoTitle: How to stop Laravel validation on the first failure with bail
+pubDate: 2016-02-01
+updatedDate: 2026-08-03
+author: Joel James
+track: oss
+heroImage: /blog/cover-laravel-bail.jpg
+heroImageAlt: A green terminal character with the Laravel logo raises a hand to halt a row of validation gates — the first passes, the second is stopped by a barrier, and the later gates (including a database check) sit dimmed and never reached
+tags:
+  - laravel
+  - php
+  - validation
+faq:
+  - q: How do I stop Laravel validation on the first failure?
+    a: Add the bail rule first in the field's rule list, e.g. 'bail|required|integer|unique:users'. Laravel then stops running that field's remaining rules the moment one of them fails.
+  - q: Is Laravel's bail rule per-field or global?
+    a: bail is per-attribute. It only short-circuits the field it is placed on; every other field still runs all of its own rules normally.
+  - q: Why does rule order matter when using bail?
+    a: Rules run top to bottom, so place cheap structural checks (required, integer) before expensive ones that hit the database (unique, exists). That way a broken value fails early and never reaches the database query.
+  - q: When was the bail rule added to Laravel?
+    a: The bail rule was merged into the framework and shipped in Laravel 5.2, and it is still the idiomatic way to stop on the first failure today.
+---
+
+Laravel ships with a deep set of validation rules, and most of the time they're
+all you need. But the docs don't surface everything — now and then the feature
+you want is sitting right there in the source, just undocumented. This is the
+story of one of those, and how it ended up in the framework.
+
+## The bug my tests didn't catch
+
+I had a `user_id` field with what looked like sensible rules: it had to be
+present, an integer, and unique in the `users` table.
+
+```php
+$this->validate($request, [
+    'user_id' => 'required|integer|unique:users,user_id',
+]);
+```
+
+It worked in my own testing. Then QA typed letters into the field and got a
+**database error** instead of a clean validation message.
+
+Here's why. By default Laravel runs *every* rule on an attribute and collects all
+the failures. So with a non-integer value, `required` passed, `integer` failed —
+and `unique` still ran anyway, firing a `SELECT` against a column the schema only
+allows integers in. The query blew up before validation could return a tidy
+message. My first instinct was a custom rule to work around it.
+
+## The one-word fix
+
+What I actually wanted was for validation to **stop at the first failure** on that
+attribute, so a broken value never reaches the `unique` query. At the time the
+clean way to do that wasn't in the documentation — so I built it and opened a [pull
+request against Laravel](https://github.com/laravel/framework/pull/11986). It was
+merged, and shipped in **Laravel 5.2** as the `bail` rule:
+
+```php
+$this->validate($request, [
+    'user_id' => 'bail|required|integer|unique:users,user_id',
+]);
+```
+
+With `bail` first, the moment `required` or `integer` fails, Laravel stops and
+never runs `unique` — no stray query, no database error. Two things to remember:
+
+- **Order matters.** Rules run top to bottom, so put the cheap, structural checks
+  (`required`, `integer`) before the ones that hit the database (`unique`,
+  `exists`).
+- **`bail` is per-attribute.** It only short-circuits the field it's on; other
+  fields still validate normally.
+
+## Still true today
+
+Ten years on, `bail` is still the idiomatic answer, and it reads even better with
+the array syntax most Laravel code uses now:
+
+```php
+use Illuminate\Validation\Rule;
+
+$request->validate([
+    'user_id' => ['bail', 'required', 'integer', Rule::unique('users', 'user_id')],
+]);
+```
+
+That's the whole trick — one small rule that turns a leaky "run everything" pass
+into a clean "stop when it breaks" one. It's also a nice reminder that the
+frameworks we lean on every day are just code, and open enough to fix when they
+come up short.
+
+Love Laravel. Keep coding.
+
+— JJ

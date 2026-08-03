@@ -1,0 +1,154 @@
+---
+title: "Gold Scalpel: a pre-tuned XAUUSD scalper EA for MT5"
+description: Gold Scalpel is our first expert advisor — a fully automated gold scalper for MetaTrader 5 that trades genuine XAUUSD breakouts, moves every trade to breakeven early, and ships pre-tuned with just eight settings.
+seoTitle: "Gold scalper EA for MT5 — Gold Scalpel (XAUUSD scalper)"
+seoDescription: Gold Scalpel is a pre-tuned XAUUSD scalper EA for MetaTrader 5 — a breakout gold scalper with early-breakeven risk control, a live MQL5 signal track record, and a free Strategy Tester demo.
+pubDate: 2026-07-12
+updatedDate: 2026-08-03
+author: Foxe Labs
+track: trading
+heroImage: /blog/cover-gold-scalpel.jpg
+heroImageAlt: A green terminal character watching a gold XAUUSD candlestick chart break out upward on a dark premium background, with a shield marking an early breakeven stop
+tags:
+  - expert-advisors
+  - xauusd
+  - mql5
+faq:
+  - q: What is Gold Scalpel?
+    a: Gold Scalpel is a fully automated XAUUSD scalper EA (expert advisor) for MetaTrader 5. It trades genuine gold breakouts in both directions, moves each trade to breakeven as soon as it is onside, then trails the stop. It ships pre-tuned with about eight settings, so there is nothing to optimise.
+  - q: Is Gold Scalpel a good gold scalper for prop firm challenges?
+    a: Its design goals line up with prop-firm rules — a small, tightly-capped average loss, a daily drawdown guard, a maximum-lot ceiling, and percentage-risk sizing. You still set a conservative risk percentage that fits your firm's daily and overall drawdown limits, and should validate on the free demo first.
+  - q: What broker and account does an XAUUSD scalper EA need?
+    a: Spread is the single biggest factor for any gold scalper. Gold Scalpel runs on any MetaTrader 5 broker but is built for raw-spread or zero-spread accounts, on the XAUUSD (gold) symbol, with either a hedging or netting account. A VPS is recommended for 24/5 operation but not required.
+  - q: Does Gold Scalpel use martingale or grid trading?
+    a: No. There is no martingale, grid, or averaging into losing positions. It sizes each trade from your risk percentage, protects it with an early breakeven and trailing stop, and never adds to a loser.
+  - q: How much does Gold Scalpel cost, and is there a demo?
+    a: Gold Scalpel is a one-time purchase of $199 on the MQL5 Market, with lifetime updates and activation on up to 10 devices. A free demo runs in the MetaTrader 5 Strategy Tester so you can backtest it on your own gold history before buying.
+---
+
+Today we're shipping **Gold Scalpel**, the first expert advisor out of Foxe Labs —
+a fully automated **XAUUSD scalper EA** for MetaTrader 5. It was built from a
+specific frustration: most **gold scalper** EAs on the market are either curve-fit
+demos that fall apart out of sample, or account-blowing grid bots that martingale
+their way to a margin call. We wanted the opposite — a disciplined gold scalper that
+treats **capital preservation as the first job** and edge as the second.
+
+Here's what it is, how it trades, and how to try it.
+
+## What is Gold Scalpel?
+
+Gold Scalpel is a pre-tuned, fully automated MQL5 expert advisor for **XAUUSD
+(gold)** on **MetaTrader 5**. Rather than predicting direction, it identifies
+meaningful highs and lows around price, positions itself on **both sides** of the
+range, and commits only when price genuinely breaks through — never on a touch or a
+near-miss. The moment it's in a trade, the focus switches to protection: the stop
+advances to **breakeven** as soon as the trade is onside, then trails the move.
+
+It ships **dialled in at the factory** — the strategy's internals are fixed, and you
+adjust only a handful of account-specific settings (about eight in total). There's
+nothing to optimise, no dozens of parameters to guess at.
+
+## How the gold scalping strategy works
+
+Every trade follows the same disciplined lifecycle:
+
+1. **Wait for a real move.** No breakout, no trade — the EA stays patient.
+2. **Enter on the break.** It's already positioned on both sides, so it catches the
+   genuine push when it comes.
+3. **Protect quickly.** As soon as the trade is onside, the stop moves to breakeven,
+   so a winner rarely turns back into a loser.
+4. **Trail the move.** The stop follows price, locking in more of a clean run and
+   exiting automatically when momentum fades.
+5. **Stand aside.** A short cooldown after each trade avoids re-entering the same
+   exhausted move.
+
+That produces an **asymmetric risk profile**: most trades end at scratch or a small
+profit, a few ride a clean breakout for a real win, and large losses are rare
+because protection kicks in fast. You don't need a high win rate — you need the
+**average loss kept tiny**, which is exactly what early breakeven is engineered to
+do. There's **no martingale, grid, or averaging** into losers.
+
+## Risk control comes first
+
+A scalper lives and dies by its losers, so Gold Scalpel runs several protections
+automatically:
+
+- **Early breakeven & trailing** — the primary safeguard that keeps the average loss
+  small.
+- **Position cap** — bounds how many trades can be open at once.
+- **Post-trade cooldown** — a short pause that prevents over-trading one move.
+- **Optional losing-streak cooldown** — pause new entries after a run of losses, then
+  resume automatically.
+- **Automatic weekend pause** — cancels resting orders and stops new trades into the
+  weekend gap.
+- **Maximum-lot ceiling** — a hard cap on size, whatever the risk calc suggests.
+
+Position sizing is **percentage-of-equity**: set your risk percentage and the EA
+computes the lot, capped by your maximum lot and snapped to your broker's lot step.
+A live **on-chart dashboard** shows account, strategy state, and position counts,
+refreshed every second — even when the market is closed.
+
+## What the testing shows
+
+Gold Scalpel's performance is tracked forward in real time on a public
+**[MQL5 live signal](https://www.mql5.com/en/signals/2382197?source=foxelabs.com)**.
+For a reference point, here's a single real-tick backtest of the shipping build — one
+run, on one broker, over one period:
+
+| Test condition | Value |
+|---|---|
+| Symbol / platform | XAUUSD · MetaTrader 5 |
+| Period | ~18 months (Jan 2025 – Jul 2026) |
+| Modelling | Every tick based on real ticks (100%) |
+| Risk per trade | 2.0% (the conservative default) |
+| Win rate | ~78% |
+| Profit factor | ~3.9 |
+| Max drawdown | ~6.8% |
+| Total trades | 319 |
+
+At that 2% default risk, the ~18-month run compounded **$1,000 into ~$15,232 — a
++1,423% return**. Because sizing is percentage-of-equity and compounding, that figure
+scales directly with your risk setting: raising the risk above the default produces a
+much larger return *and* a proportionally larger drawdown. Most traders should stay at
+**1–2%** for a smoother curve like this one.
+
+The high win rate is a *by-product* of early breakeven — many trades are protected
+before they can turn into losers — not a promise that most trades always win. The
+metrics that actually describe the edge are the risk-adjusted ones: **win
+consistency, profit factor, and drawdown**. Be sceptical of raw percentage returns,
+because sizing is percentage-of-equity and compounding, so the headline return scales
+directly with your risk setting — a bigger number at higher risk is the *same*
+strategy taking more risk, not a better one.
+
+> **Trading involves risk.** Every figure above is from a **backtest**, not live
+> trading. Past performance — including real-tick backtests and the live signal — does
+> **not** guarantee future results, and results vary with your broker, spread, period,
+> and risk setting. Always validate on the free demo and a demo account before
+> committing real capital, and only risk what you can afford to lose.
+
+## Who it's for (and what you need)
+
+Gold Scalpel is for traders who want a hands-off gold scalper with a few simple, safe
+settings rather than a parameter jungle — and who prefer many small, tightly-managed
+trades over a few big swings. Because it's a scalper, **spread is the single biggest
+factor** in how it performs:
+
+- **Platform:** MetaTrader 5, on the **XAUUSD** symbol, any chart timeframe.
+- **Account:** hedging or netting, **raw-spread or zero-spread** strongly recommended.
+- **Balance:** runs from $100 in testing; **$1,000+** recommended for live capital,
+  paired with a conservative 1–2% risk.
+- **VPS:** recommended for 24/5 operation, not required.
+
+## How to get it
+
+Gold Scalpel is a **one-time $199 purchase** on the MQL5 Market — lifetime updates,
+activation on up to 10 devices, and a **free demo** that runs in the MT5 Strategy
+Tester so you can backtest on your own gold history first.
+
+- **Product details:** [Gold Scalpel on Foxe Labs](/trading/expert-advisors/gold-scalpel)
+- **Buy or download the free demo:** [Gold Scalpel on the MQL5 Market](https://www.mql5.com/en/market/product/175235?source=foxelabs.com)
+- **Setup guide:** [Getting started docs](https://docs.foxelabs.com/expert-advisors/gold-scalpel/getting-started)
+
+Gold Scalpel is the first of several tools on our roadmap — a universal trading
+journal and a set of precision indicators are in the works. Test it honestly, size it
+sensibly, and let the discipline compound.

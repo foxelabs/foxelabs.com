@@ -1,0 +1,75 @@
+---
+title: "My first WordPress core contribution is live"
+description: WordPress 4.7 shipped today with my name in the contributor list — a small patch for a broken importer link that now runs on millions of sites. Here's the bug, the fix, and why giving back is worth it.
+seoTitle: My first WordPress core contribution is live (WordPress 4.7)
+seoDescription: The story behind my first WordPress core contribution — a broken WordPress Importer link fixed in WordPress 4.7 via Trac ticket #37943 — and how to start giving back yourself.
+pubDate: 2016-12-07
+updatedDate: 2026-08-03
+author: Joel James
+track: oss
+heroImage: /blog/cover-wordpress-core-contribution.jpg
+heroImageAlt: A developer at a desk contributing to WordPress, with a friendly green terminal character looking on and the WordPress logo glowing above the screen
+tags:
+  - wordpress
+  - open-source
+  - contributing
+faq:
+  - q: How do I make my first WordPress core contribution?
+    a: Find a bug, fix it locally, then open a ticket with a patch on WordPress Core Trac. Committers review it, and once accepted your fix ships in a future release. Non-code contributions are also available through the Make WordPress teams.
+  - q: What was WordPress 4.7?
+    a: WordPress 4.7, codenamed "Vaughan", was released on December 7, 2016. It was led by Helen Hou-Sandí with 482 contributors, 205 of whom were contributing to core for the first time.
+  - q: Do you need to be a committer to contribute to WordPress core?
+    a: No. Anyone can open a Trac ticket and attach a patch; core committers review and merge it. Many valuable contributions — documentation, translation, support and design — involve no code at all.
+---
+
+[WordPress 4.7](https://wordpress.org/news/2016/12/vaughan/) — named "Vaughan" in
+honour of the jazz vocalist Sarah "Sassy" Vaughan — shipped today. And for the
+first time, my name is in the list of core contributors. It's a small patch, but
+seeing your name in a release that runs on millions of sites is a hard feeling to
+put into words.
+
+The 4.7 release was led by Helen Hou-Sandí with release deputies Jeff Paul and
+Aaron Jorbin. There were **482 contributors** this cycle — **205 of them for the
+first time**, including me.
+
+## Giving back
+
+Almost everything I build on belongs to open source. WordPress, Drupal, Laravel —
+I lean on them every day, for personal projects and professional work alike. So I
+try to give back to the community whenever I can. Over the years that's mostly
+meant building and maintaining a handful of
+[free WordPress plugins](https://profiles.wordpress.org/joelcj91/#content-plugins);
+I'd like to do more as I learn.
+
+## The contribution
+
+One of the best ways to give back is to contribute to core itself, because a single
+fix there can help millions of websites at once. That thought alone was enough
+motivation to turn a private workaround into a real patch.
+
+I hit the bug while importing content into a multisite install. After installing
+the WordPress Importer plugin, the AJAX response came back with a **broken link**.
+I fixed it for my own site first by editing a single core file — the kind of quick
+patch that's easy to keep to yourself and move on.
+
+Instead, I opened a ticket on
+[WordPress Core Trac (#37943)](https://core.trac.wordpress.org/ticket/37943) with a
+patch. After a few rounds of feedback from other committers, a refined version
+[landed in WordPress 4.7](https://core.trac.wordpress.org/changeset/38704).
+
+That's the whole loop, and it's smaller than people expect: notice something
+broken, fix it locally, then take the extra step of writing it up for everyone else.
+
+## If you want to start
+
+You don't need to be a core committer to help. A good first step is
+[Get involved](https://make.wordpress.org/) — the Make WordPress hub, where every
+team (core, docs, polyglots, support, design) lists ways to jump in. Plenty of
+contributions never touch PHP at all.
+
+The contribution itself was tiny. The lesson wasn't: the projects we all depend on
+are only as healthy as the people willing to file the ticket instead of quietly
+patching their own copy. Thanks to WordPress and the community around it for making
+that first step so welcoming.
+
+— JJ

@@ -108,6 +108,9 @@ const blog = defineCollection({
     heroImageAlt: z.string().optional(),
     // Which track a post belongs to (for filtering + hub feed). Optional.
     track: z.enum(['oss', 'trading']).optional(),
+    // Q&A pairs rendered as a visible FAQ section + FAQPage JSON-LD (SEO rich
+    // results + GEO: clean, quotable answers for AI answer engines).
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
     draft: z.boolean().default(false),
   }),
 });
