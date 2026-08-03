@@ -36,7 +36,12 @@ const isActive = (href: string) => path === href || path.startsWith(href + '/');
     </nav>
 
     <div class="flex items-center gap-3">
-      <Button href="/contact" variant="ghost" class="hidden sm:inline-flex !py-2 !px-4">
+      <Button
+        href="/contact"
+        variant={isActive('/contact') ? 'primary' : 'ghost'}
+        aria-current={isActive('/contact') ? 'page' : undefined}
+        class="hidden sm:inline-flex !py-2 !px-4"
+      >
         Get in touch
       </Button>
       <button
@@ -69,7 +74,14 @@ const isActive = (href: string) => path === href || path.startsWith(href + '/');
         style={isActive(l.href) ? 'color: var(--ink); font-weight: 600;' : undefined}
       >{l.label}</a>
     ))}
-    <a href="/contact" class="block py-2.5 font-semibold" style="color: var(--accent-ink);">Get in touch</a>
+    <a
+      href="/contact"
+      aria-current={isActive('/contact') ? 'page' : undefined}
+      class="block py-2.5 font-semibold"
+      style={isActive('/contact')
+        ? 'color: var(--accent-ink); box-shadow: inset 2px 0 0 0 var(--accent-ink); padding-left: 0.75rem;'
+        : 'color: var(--accent-ink);'}
+    >Get in touch</a>
   </div>
 </header>
 
