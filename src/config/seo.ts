@@ -7,7 +7,7 @@ export const SITE = {
   // Square logo for Organization markup.
   logo: 'https://foxelabs.com/favicon-black/android-chrome-512x512.png',
   // Default share banner (1280×640).
-  banner: 'https://foxelabs.com/social-banner.png',
+  banner: 'https://foxelabs.com/social-banner.jpg',
   twitter: '@foxelabs',
   locale: 'en_US',
   founder: 'Joel James',

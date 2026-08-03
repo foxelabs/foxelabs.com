@@ -32,7 +32,7 @@ const m = data.track ? trackMeta[data.track] : null;
 const pageTitle = `${data.seoTitle ?? data.title} | Foxe Labs`;
 const metaDescription = data.seoDescription ?? data.description;
 const postPath = `/blog/${post.id}`;
-const shareImage = data.heroImage ?? '/social-banner.png';
+const shareImage = data.heroImage ?? '/social-banner.jpg';
 const publishedIso = data.pubDate.toISOString();
 const modifiedIso = (data.updatedDate ?? data.pubDate).toISOString();
 
