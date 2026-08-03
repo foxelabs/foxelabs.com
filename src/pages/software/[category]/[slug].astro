@@ -296,7 +296,7 @@ const specs = [
               >
                 <div class="flex items-center justify-between gap-3 mb-4">
                   <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
-                    <Icon name="mingcute:puzzled-line" width={21} height={21} style="color: var(--accent-ink);" aria-hidden="true" />
+                    <Icon name={addon.data.icon ?? 'mingcute:puzzled-line'} width={21} height={21} style="color: var(--accent-ink);" aria-hidden="true" />
                   </div>
                   {addon.data.location && (
                     <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full whitespace-nowrap" style="background: var(--surface-alt); color: var(--ink-dim); letter-spacing: 0.06em;">

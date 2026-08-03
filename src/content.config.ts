@@ -135,6 +135,8 @@ const addons = defineCollection({
     docsUrl: z.string().url().optional(),
     order: z.number().default(0),
     features: z.array(z.string()).default([]),
+    // Iconify name shown on the parent project's add-on card, e.g. 'mingcute:group-line'.
+    icon: z.string().optional(),
     draft: z.boolean().default(false),
   }),
 });
