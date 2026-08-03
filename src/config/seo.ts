@@ -5,7 +5,7 @@ export const SITE = {
   name: 'Foxe Labs',
   url: 'https://foxelabs.com',
   // Square logo for Organization markup.
-  logo: 'https://foxelabs.com/apple-touch-icon.png',
+  logo: 'https://foxelabs.com/favicon-black/android-chrome-512x512.png',
   // Default share banner (1280×640).
   banner: 'https://foxelabs.com/social-banner.png',
   twitter: '@foxelabs',
