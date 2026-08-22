@@ -24,6 +24,7 @@ export function organizationLd() {
     '@type': 'Organization',
     '@id': `${SITE.url}/#organization`,
     name: SITE.name,
+    alternateName: 'FoxeLabs',
     url: SITE.url,
     logo: SITE.logo,
     description:
@@ -45,7 +46,9 @@ export function websiteLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${SITE.url}/#website`,
+    // `name` is the site name Google may show above the SERP title.
     name: SITE.name,
+    alternateName: ['FoxeLabs', 'foxelabs.com'],
     url: SITE.url,
     publisher: { '@id': `${SITE.url}/#organization` },
     inLanguage: 'en',

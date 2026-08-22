@@ -49,12 +49,15 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
+    {/* Default icon for crawlers (Google ignores media queries and would otherwise
+        pick the white fox, which vanishes on the white SERP background). */}
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
     {/* Black fox on light tabs, white fox on dark tabs (via prefers-color-scheme). */}
     <link rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" href="/favicon-black/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" media="(prefers-color-scheme: light)" href="/favicon-black/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" media="(prefers-color-scheme: dark)" href="/favicon-white/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" media="(prefers-color-scheme: dark)" href="/favicon-white/favicon-16x16.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-white/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon-black/apple-touch-icon.png" />
     <meta name="theme-color" content="#0d0d0f" />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.name} />
