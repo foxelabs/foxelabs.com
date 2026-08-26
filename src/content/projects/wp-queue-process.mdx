@@ -21,6 +21,15 @@ features:
   - Swappable storage driver for where the queue lives
   - Server-load-aware batching so it backs off under pressure
   - A self-healing cron that recovers stalled queues
+faq:
+  - q: How do I run background jobs in WordPress?
+    a: Install WP Queue Process with `composer require foxelabs/wp-queue-process`, push items onto a queue, and it processes them in non-blocking async requests instead of holding up the page load. A self-healing cron picks the queue back up if a batch stalls.
+  - q: How is this different from WP Background Processing?
+    a: It covers the same ground — async requests and batched queue processing — with a swappable storage driver so the queue does not have to live in the options table, load-aware batching that backs off when the server is under pressure, and a cron that recovers stalled queues on its own.
+  - q: Where is the queue stored?
+    a: Behind a storage driver, so you choose. The default keeps things in WordPress, and the interface lets you point it at a custom table or another store without touching the processing logic — which also makes the library straightforward to test.
+  - q: Does it need WP-Cron to be enabled?
+    a: Processing runs over async HTTP requests, so the work does not depend on cron firing. Cron is used as the safety net that restarts a queue which stopped mid-run.
 ---
 
 ## What it does

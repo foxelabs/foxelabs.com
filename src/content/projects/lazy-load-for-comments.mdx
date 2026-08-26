@@ -25,6 +25,15 @@ features:
   - Cuts initial page weight and requests
   - Works with the default comment system — no lock-in
   - Zero configuration to get started
+faq:
+  - q: How do I lazy load WordPress comments?
+    a: Install Lazy Load for Comments and choose a load method under Comments → Lazy Load. The native WordPress comment section is then held back until the reader scrolls to it or clicks a button, instead of loading with every page view.
+  - q: Does lazy loading comments affect SEO?
+    a: Comments loaded on demand are not present in the initial HTML, so they may not be indexed. That is usually a fair trade — comment text rarely drives rankings, while the page-weight reduction improves Core Web Vitals, which do. If a page depends on its comment content for search traffic, leave that content loading normally.
+  - q: Does it work with plugins that replace WordPress comments?
+    a: It targets the native WordPress comment system, so there is no lock-in and no third-party service involved. Comment systems that render their own embed (Disqus, for example) need a plugin built for them — Disqus Conditional Load handles that case.
+  - q: Is any configuration required?
+    a: No. The plugin works as soon as it is activated, with sensible defaults. The settings under Comments → Lazy Load exist if you want to change the load method or the button text.
 ---
 
 ## What it does

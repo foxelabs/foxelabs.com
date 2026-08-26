@@ -27,6 +27,15 @@ features:
   - Full 404 error log with referrer, IP, and user-agent details
   - Email notifications when errors occur
   - Redirect to a custom page, the homepage, or a 301/302/307 of your choosing
+faq:
+  - q: How do I redirect 404 errors in WordPress?
+    a: Install 404 to 301 and pick a redirect target — the homepage, a specific page, or a custom URL — and every 404 on the site is sent there automatically with the HTTP status you choose (301, 302, or 307). You can also set per-URL rules when a particular broken link needs its own destination.
+  - q: Does 404 to 301 log the errors it redirects?
+    a: "Yes. Every 404 is written to a log with the requested URL, the referrer, the visitor's IP address, and the user agent, so you can see which links are breaking and where the traffic is coming from before you decide how to redirect it."
+  - q: Will redirecting all 404s to the homepage hurt SEO?
+    a: It can. Google treats a mass redirect of unrelated URLs to the homepage as a soft 404, so the redirect passes little value. Use the log to find the URLs that actually matter and give those a relevant per-URL target; a blanket homepage redirect is best used as a fallback, not a strategy.
+  - q: Is 404 to 301 free?
+    a: Yes. 404 to 301 is free and GPL-2.0-or-later licensed on WordPress.org, where it runs on over 100,000 active sites. It has been maintained since 2014 and is now part of Awesome Motive.
 ---
 
 ## What it does

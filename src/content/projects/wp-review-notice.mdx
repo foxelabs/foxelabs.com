@@ -21,6 +21,15 @@ features:
   - Swappable storage drivers for where state is kept
   - Testable, dependency-injection-friendly architecture
   - Dismissible and respectful of the user's choice
+faq:
+  - q: How do I ask plugin users for a WordPress.org review?
+    a: WP Review Notice shows a dismissible admin notice asking for a review, but only after the user has actually used the plugin for a set period — so the request lands after some value has been delivered, not on day one.
+  - q: Will it keep nagging users who dismiss it?
+    a: "No. A dismissal is respected and stored, which is the whole point of the library — a review prompt that ignores 'no' costs more goodwill than the review is worth."
+  - q: Where does it store the review state?
+    a: Behind a swappable storage driver, so it can live wherever your plugin already keeps its state. The design is dependency-injection-friendly, which also makes the timing logic testable without a WordPress bootstrap.
+  - q: Does it work for themes as well as plugins?
+    a: The notice and timing logic are not plugin-specific — anything that runs in wp-admin and has a WordPress.org listing can point the prompt at its own review URL.
 ---
 
 ## What it does

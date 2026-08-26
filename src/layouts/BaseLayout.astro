@@ -9,6 +9,9 @@ interface Props {
   image?: string;
   /** Alt text for the share image. */
   imageAlt?: string;
+  /** Pixel size of the share image. Defaults to the site banner's 1200×630. */
+  imageWidth?: number;
+  imageHeight?: number;
   /** Open Graph object type, e.g. 'article' for blog posts. */
   ogType?: 'website' | 'article';
   /** Keep the page out of search indexes (e.g. 404). */
@@ -26,6 +29,8 @@ const {
   description = 'Open-source software and trading tools — WordPress plugins, PHP libraries, expert advisors, and a universal trading journal. Built in-house at Foxe Labs.',
   image = '/social-banner.jpg',
   imageAlt = 'Foxe Labs — open-source software and trading tools',
+  imageWidth = 1200,
+  imageHeight = 630,
   ogType = 'website',
   noindex = false,
   publishedTime,
@@ -36,6 +41,11 @@ const {
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
 const ogImage = new URL(image, Astro.site ?? SITE.url).href;
+const ogImageType = ogImage.endsWith('.png')
+  ? 'image/png'
+  : ogImage.endsWith('.webp')
+    ? 'image/webp'
+    : 'image/jpeg';
 
 // Sitewide structured data + any page-specific nodes, deduped into one array.
 const pageLd = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
@@ -66,9 +76,9 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1280" />
-    <meta property="og:image:height" content="640" />
+    <meta property="og:image:type" content={ogImageType} />
+    <meta property="og:image:width" content={String(imageWidth)} />
+    <meta property="og:image:height" content={String(imageHeight)} />
     <meta property="og:image:alt" content={imageAlt} />
     {ogType === 'article' && publishedTime && (
       <meta property="article:published_time" content={publishedTime} />
@@ -117,7 +127,11 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
               }
             });
           },
-          { threshold: 0.12 }
+          // Fire as soon as any part of the section is near the viewport.
+          // A percentage threshold silently fails on sections taller than the
+          // viewport — 12% of them can never be on screen at once, so they
+          // would stay at opacity 0 forever.
+          { threshold: 0, rootMargin: '0px 0px -8% 0px' }
         );
         nodes.forEach((n) => io.observe(n));
       })();

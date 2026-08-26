@@ -7,6 +7,8 @@ import Section from '../components/ui/Section.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import Button from '../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
+import Faq from '../components/ui/Faq.astro';
+import { faqLd } from '../config/seo';
 
 // Activity feed = real published blog posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -33,6 +35,29 @@ const proof = [
   { value: 'In-house', label: 'designed & built' },
 ];
 
+const faq = [
+  {
+    q: 'What is Foxe Labs?',
+    a:
+      'Foxe Labs is a one-person software studio run by Joel James from Kerala, India. It ships two things: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5. The plugins have been maintained since 2014 and run on over 110,000 active sites.',
+  },
+  {
+    q: 'Are the WordPress plugins free?',
+    a:
+      'Yes. Every plugin and library on the software track is free and GPL-2.0-or-later licensed, published on WordPress.org and Packagist with the source on GitHub. Some plugins offer paid add-ons that extend them, but the core plugin is always free.',
+  },
+  {
+    q: 'What trading software does Foxe Labs make?',
+    a:
+      'Gold Scalpel, a fully automated XAUUSD breakout scalper for MetaTrader 5, is live on the MQL5 Market with a free Strategy Tester demo. Further expert advisors and trading tools are in development and open by waitlist. Trading carries substantial risk and nothing published here is financial advice.',
+  },
+  {
+    q: 'How do I get support?',
+    a:
+      'Free plugins are supported on their WordPress.org support forums, and anything else goes through the contact form or support@foxelabs.com. Messages reach the person who wrote the code — there are no support tiers to escalate through.',
+  },
+];
+
 // Small line-chart motif for the hero's trading half — rising trend with a soft area fill.
 const linePts: [number, number][] = [
   [2, 40], [14, 33], [26, 36], [38, 25], [50, 28], [62, 17], [74, 19], [90, 7],
@@ -40,7 +65,7 @@ const linePts: [number, number][] = [
 const lineD = 'M ' + linePts.map(([x, y]) => `${x} ${y}`).join(' L ');
 const areaD = `${lineD} L 90 48 L 2 48 Z`;
 ---
-<BaseLayout>
+<BaseLayout jsonLd={faqLd(faq)}>
   <Nav />
   <main class="track-hub">
     <!-- Brand hero -->
@@ -238,7 +263,10 @@ const areaD = `${lineD} L 90 48 L 2 48 Z`;
                     <img
                       src={post.data.heroImage}
                       alt={post.data.heroImageAlt ?? ''}
+                      width="1600"
+                      height="900"
                       loading="lazy"
+                      decoding="async"
                       class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   ) : (
@@ -297,6 +325,11 @@ const areaD = `${lineD} L 90 48 L 2 48 Z`;
         </div>
       </div>
     </section>
+    <Section variant="alt">
+      <div class="max-w-3xl mx-auto">
+        <Faq items={faq} bare />
+      </div>
+    </Section>
   </main>
   <Footer />
 </BaseLayout>

@@ -22,6 +22,15 @@ features:
   - Automatic update delivery for licensed plugins
   - Add-on listing without the full Freemius SDK
   - UI-free by design — bring your own interface
+faq:
+  - q: Can I use Freemius licensing without the full Freemius SDK?
+    a: "Yes. WP Freemius Client talks to the Freemius API directly for license activation, deactivation, update delivery, and add-on listing, leaving out the bundled SDK's admin UI, opt-in screens, and tracking."
+  - q: Why avoid the official Freemius SDK?
+    a: "The official SDK ships a large amount of code and its own interface, which can conflict with a plugin's design or with another plugin bundling a different SDK version. This library is UI-free by design: it handles the API calls, and you build the interface you want."
+  - q: Does it handle automatic updates for licensed plugins?
+    a: Yes. Update delivery for licensed installs is one of its core jobs, alongside activating and deactivating license keys.
+  - q: What PHP version does it need?
+    a: PHP 7.4 or newer. Install it with `composer require foxelabs/wp-freemius-client`; it is GPL-2.0-or-later licensed.
 ---
 
 ## What it does

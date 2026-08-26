@@ -6,7 +6,7 @@ import Footer from '../../components/Footer.astro';
 import Section from '../../components/ui/Section.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
 import { Icon } from 'astro-icon/components';
-import { breadcrumbLd } from '../../config/seo';
+import { breadcrumbLd, collectionPageLd } from '../../config/seo';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
@@ -26,10 +26,18 @@ const trackMeta = {
 <BaseLayout
   title="Blog — WordPress Development & Trading Notes | Foxe Labs"
   description="Notes on open-source software, expert advisor design, risk, and what we're building at Foxe Labs."
-  jsonLd={breadcrumbLd([
-    { name: 'Home', path: '/' },
-    { name: 'Blog', path: '/blog' },
-  ])}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+    ]),
+    collectionPageLd({
+      name: 'Foxe Labs Blog',
+      description: "Notes on open-source software, expert advisor design, risk, and what we're building at Foxe Labs.",
+      url: '/blog',
+      items: posts.map((post) => ({ name: post.data.title, path: `/blog/${post.id}` })),
+    }),
+  ]}
 >
   <Nav />
   <main class="track-hub">
@@ -54,7 +62,10 @@ const trackMeta = {
                     <img
                       src={post.data.heroImage}
                       alt={post.data.heroImageAlt ?? ''}
+                      width="1600"
+                      height="900"
                       loading="lazy"
+                      decoding="async"
                       class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
                     />
                   ) : (

@@ -2,3 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://foxelabs.com/sitemap-index.xml
+
+# Site map for answer engines: https://foxelabs.com/llms.txt

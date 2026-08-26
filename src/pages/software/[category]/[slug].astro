@@ -7,7 +7,8 @@ import Button from '../../../components/ui/Button.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
-import { breadcrumbLd, softwareApplicationLd } from '../../../config/seo';
+import Faq from '../../../components/ui/Faq.astro';
+import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -93,6 +94,7 @@ const structuredData = [
     ratingCount: ratingMatch?.[2]?.replace(/,/g, ''),
     sameAs: [data.url, data.repo, data.websiteUrl].filter(Boolean) as string[],
   }),
+  ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
 
 const specs = [
@@ -319,6 +321,16 @@ const specs = [
                 </div>
               </a>
             ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    {data.faq.length > 0 && (
+      <section class="band band--light" data-reveal>
+        <div class="container-x">
+          <div class="max-w-3xl">
+            <Faq items={data.faq} bare />
           </div>
         </div>
       </section>

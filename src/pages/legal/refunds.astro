@@ -4,18 +4,31 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Section from '../../components/ui/Section.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
-import { breadcrumbLd } from '../../config/seo';
+import { breadcrumbLd, webPageLd } from '../../config/seo';
 
-const updated = 'August 27, 2026';
+const pageDescription =
+  'Our 7-day no-questions-asked money-back guarantee on paid plugin purchases — how it works and how to request a refund.';
+
+// Single source of truth for the visible date and the schema's dateModified.
+const updatedIso = '2026-08-27';
+const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+});
 ---
 <BaseLayout
   title="Refund Policy | Foxe Labs"
-  description="Our 7-day no-questions-asked money-back guarantee on paid plugin purchases — how it works and how to request a refund."
+  description={pageDescription}
   jsonLd={[
     breadcrumbLd([
       { name: 'Home', path: '/' },
       { name: 'Refund Policy', path: '/legal/refunds' },
     ]),
+    webPageLd({
+      name: 'Refund Policy',
+      description: pageDescription,
+      url: '/legal/refunds',
+      dateModified: updatedIso,
+    }),
   ]}
 >
   <Nav />

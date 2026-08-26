@@ -21,6 +21,15 @@ features:
   - Stored with the transient API and shown exactly once
   - Simple, expressive API for success/error/warning notices
   - No dependencies beyond WordPress core
+faq:
+  - q: How do I show a WordPress admin notice after a redirect?
+    a: "Store the notice before redirecting and render it on the next request. WP Flash Notices does exactly that: the message is saved with the transient API, displayed once on the page the user lands on, and then cleared."
+  - q: Why do admin notices disappear after a form submission?
+    a: Most admin form handlers finish with a redirect to avoid a resubmission prompt, and the redirect ends the request that queued the notice. A flash message survives that hop because it is stored, not printed.
+  - q: Does the notice show more than once?
+    a: No. Each notice is displayed exactly once and removed, so a stale success message cannot reappear on a later page load.
+  - q: Does it have dependencies?
+    a: None beyond WordPress core. It is a small, GPL-2.0-or-later library installed with `composer require foxelabs/wp-flash-notices`.
 ---
 
 ## What it does

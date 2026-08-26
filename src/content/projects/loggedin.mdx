@@ -25,6 +25,15 @@ features:
   - Choose to block the new login or log out the oldest session
   - Works site-wide with a single setting
   - Lightweight, with no impact on front-end performance
+faq:
+  - q: How do I limit concurrent logins in WordPress?
+    a: Install Loggedin and set a maximum number of simultaneous sessions per user. It works site-wide from a single setting, so once the limit is set every account is capped without any per-user configuration.
+  - q: What happens when a user hits the login limit?
+    a: You choose. Loggedin can either block the new login attempt and leave existing sessions alone, or allow the new login and automatically log out the oldest session. Blocking is the stricter option; the override keeps a locked-out user from having to wait.
+  - q: Can I set different login limits for different user roles?
+    a: The core plugin applies one limit site-wide. The Limit Per Role add-on sets separate caps per role — for example one session for subscribers and three for editors — and Limit Per User overrides the cap for individual accounts.
+  - q: Does Loggedin slow down my site?
+    a: No. The session check runs at login, not on every page view, so there is no front-end performance cost. The plugin is deliberately small — it does one job rather than bundling a full security suite.
 ---
 
 ## What it does

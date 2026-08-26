@@ -8,7 +8,8 @@ import Eyebrow from '../../components/ui/Eyebrow.astro';
 import Button from '../../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryPath } from '../../config/tracks';
-import { breadcrumbLd } from '../../config/seo';
+import Faq from '../../components/ui/Faq.astro';
+import { breadcrumbLd, faqLd } from '../../config/seo';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
 const GITHUB_URL: string | null = 'https://github.com/foxelabs';
@@ -57,6 +58,29 @@ const whyItems = [
 
 // Real aggregates, summed from the plugins' WordPress.org figures (conservative rounding).
 // 100k+8k+3k+2k active installs; 2.20M+0.14M+0.21M+0.23M downloads; oldest plugin 2014.
+const faq = [
+  {
+    q: 'Are Foxe Labs WordPress plugins free?',
+    a:
+      'Yes. Every plugin and library here is free and GPL-2.0-or-later licensed — published on WordPress.org and Packagist, with the source on GitHub. Some plugins sell optional add-ons that extend them; the core plugin stays free either way.',
+  },
+  {
+    q: 'Which Foxe Labs plugin should I use to limit WordPress logins?',
+    a:
+      'Loggedin. It caps how many simultaneous sessions each account can have, and you choose whether a login over the limit is blocked or logs out the oldest session. Add-ons extend it to per-role and per-user limits.',
+  },
+  {
+    q: 'Are these plugins still maintained?',
+    a:
+      'Yes. The oldest have shipped continuously since 2014 and are updated for current WordPress and PHP versions. Development happens in public on GitHub, so the commit history shows exactly how active each project is.',
+  },
+  {
+    q: 'Can I use these plugins on client sites?',
+    a:
+      'Yes. The GPL places no restriction on commercial or client use — install them on as many sites as you like, modify them, and redistribute them under the same license.',
+  },
+];
+
 const stats = [
   { value: '110,000+', label: 'active installs' },
   { value: '2.7M+', label: 'downloads' },
@@ -66,10 +90,13 @@ const stats = [
 <BaseLayout
   title="Open-Source WordPress Plugins & PHP Libraries | Foxe Labs"
   description="WordPress plugins, PHP libraries, and apps by Foxe Labs — open source and GPL-licensed, documented, and actively maintained."
-  jsonLd={breadcrumbLd([
-    { name: 'Home', path: '/' },
-    { name: 'Software', path: '/software' },
-  ])}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Software', path: '/software' },
+    ]),
+    faqLd(faq),
+  ]}
 >
   <Nav />
   <main class="track-oss">
@@ -237,6 +264,11 @@ const stats = [
         </div>
       </div>
     </section>
+    <Section variant="alt">
+      <div class="max-w-3xl mx-auto">
+        <Faq items={faq} bare />
+      </div>
+    </Section>
   </main>
   <Footer />
 </BaseLayout>

@@ -7,7 +7,7 @@ import Section from '../../../components/ui/Section.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
 import { categoryList, categoryPath, projectPath } from '../../../config/tracks';
-import { breadcrumbLd } from '../../../config/seo';
+import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   return categoryList('trading').map(([category, meta]) => ({
@@ -32,11 +32,19 @@ const statusLabel: Record<string, string> = {
 <BaseLayout
   title={`${meta.label} for MetaTrader 5 | Foxe Labs`}
   description={`${meta.label} by Foxe Labs — engineered risk-first for prop firm and serious retail traders.`}
-  jsonLd={breadcrumbLd([
-    { name: 'Home', path: '/' },
-    { name: 'Trading', path: '/trading' },
-    { name: meta.label, path: categoryPath('trading', category) },
-  ])}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Trading', path: '/trading' },
+      { name: meta.label, path: categoryPath('trading', category) },
+    ]),
+    collectionPageLd({
+      name: `${meta.label} for MetaTrader 5`,
+      description: `${meta.label} by Foxe Labs — engineered risk-first for prop firm and serious retail traders.`,
+      url: categoryPath('trading', category),
+      items: products.map((p) => ({ name: p.data.name, path: projectPath('trading', p.data.category, p.id) })),
+    }),
+  ]}
 >
   <Nav />
   <main class="track-trading">

@@ -14,6 +14,9 @@ const base = {
   featured: z.boolean().default(false),
   order: z.number().default(0),
   draft: z.boolean().default(false),
+  // Q&A pairs rendered as a visible FAQ section + FAQPage JSON-LD (SEO rich
+  // results + GEO: clean, quotable answers for AI answer engines).
+  faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
 };
 
 // One collection, two shapes, discriminated on `track`.

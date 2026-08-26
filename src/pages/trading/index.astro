@@ -8,15 +8,44 @@ import WhyFoxeLabs from '../../components/WhyFoxeLabs.astro';
 import About from '../../components/About.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import Footer from '../../components/Footer.astro';
-import { breadcrumbLd } from '../../config/seo';
+import Section from '../../components/ui/Section.astro';
+import Faq from '../../components/ui/Faq.astro';
+import { breadcrumbLd, faqLd } from '../../config/seo';
+
+const faq = [
+  {
+    q: 'What trading software does Foxe Labs sell?',
+    a:
+      'Gold Scalpel, an automated XAUUSD breakout scalper for MetaTrader 5, is live on the MQL5 Market for a one-time price with lifetime updates and a free Strategy Tester demo. Further expert advisors and trading tools are in development, with a waitlist open.',
+  },
+  {
+    q: 'Do the expert advisors work with prop firm accounts?',
+    a:
+      'They are built risk-first, which is what prop firm rules demand: percentage-based position sizing, a maximum-lot ceiling, early breakeven stops, position caps, and cooldowns after trades and losing streaks. Always confirm the specific rules of your firm — drawdown limits and news restrictions vary.',
+  },
+  {
+    q: 'Can I test an EA before buying?',
+    a:
+      'Yes. Gold Scalpel has a free demo for the MT5 Strategy Tester so you can backtest it on your own broker\'s data, and a live MQL5 signal tracks it on a real account.',
+  },
+  {
+    q: 'Is any of this financial advice?',
+    a:
+      'No. These are software tools, not investment recommendations. Trading gold and other leveraged products carries substantial risk of loss, past and live performance never guarantees future results, and every trading decision remains yours.',
+  },
+];
+
 ---
 <BaseLayout
   title="MetaTrader 5 Expert Advisors & Trading Tools | Foxe Labs"
   description="Expert advisors, a universal trading journal, and precision tools — engineered for prop firm and serious retail traders."
-  jsonLd={breadcrumbLd([
-    { name: 'Home', path: '/' },
-    { name: 'Trading', path: '/trading' },
-  ])}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Trading', path: '/trading' },
+    ]),
+    faqLd(faq),
+  ]}
 >
   <Nav />
   <main class="track-trading">
@@ -25,6 +54,11 @@ import { breadcrumbLd } from '../../config/seo';
     <Products />
     <WhyFoxeLabs />
     <About />
+    <Section variant="alt">
+      <div class="max-w-3xl mx-auto">
+        <Faq items={faq} bare />
+      </div>
+    </Section>
     <CtaBanner />
   </main>
   <Footer />

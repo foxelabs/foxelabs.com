@@ -4,18 +4,31 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Section from '../../components/ui/Section.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
-import { breadcrumbLd } from '../../config/seo';
+import { breadcrumbLd, webPageLd } from '../../config/seo';
 
-const updated = 'August 27, 2026';
+const pageDescription =
+  'What data foxelabs.com collects, why, who processes it, and the rights you have over it.';
+
+// Single source of truth for the visible date and the schema's dateModified.
+const updatedIso = '2026-08-27';
+const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+});
 ---
 <BaseLayout
   title="Privacy Policy | Foxe Labs"
-  description="What data foxelabs.com collects, why, who processes it, and the rights you have over it."
+  description={pageDescription}
   jsonLd={[
     breadcrumbLd([
       { name: 'Home', path: '/' },
       { name: 'Privacy Policy', path: '/legal/privacy' },
     ]),
+    webPageLd({
+      name: 'Privacy Policy',
+      description: pageDescription,
+      url: '/legal/privacy',
+      dateModified: updatedIso,
+    }),
   ]}
 >
   <Nav />
@@ -73,12 +86,19 @@ const updated = 'August 27, 2026';
         </p>
         <h3>Analytics</h3>
         <p>
-          We use <strong>Google Analytics</strong> to understand how the site is used —
-          pages visited, approximate location, device and browser type. Google
+          <strong>Cloudflare Web Analytics</strong> measures page views and basic
+          performance for every page on this site. It is cookieless and does not
+          fingerprint or track individuals across sites — see
+          <a href="https://www.cloudflare.com/web-analytics/" target="_blank" rel="noopener noreferrer">Cloudflare's overview</a>
+          and their <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener noreferrer">privacy policy</a>.
+        </p>
+        <p>
+          We also use <strong>Google Analytics</strong> to understand how the site is
+          used — pages visited, approximate location, device and browser type. Google
           Analytics sets cookies and processes data under
           <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's privacy policy</a>.
-          We use it for aggregate statistics only; we do not use advertising features
-          or sell data to anyone.
+          We use it for aggregate statistics only; we do not use advertising features,
+          and we never sell data to anyone.
         </p>
         <h3>Server logs</h3>
         <p>
@@ -90,16 +110,18 @@ const updated = 'August 27, 2026';
         <h2>3. Cookies</h2>
         <p>
           The site itself sets no cookies for browsing, reading the blog, or using the
-          docs. Cookies come from two places: Google Analytics (measurement) and the
-          Freemius checkout when you make a purchase (session and fraud prevention).
-          You can block cookies in your browser without breaking the site.
+          docs, and our Cloudflare analytics is cookieless. Cookies come from two
+          places: Google Analytics (measurement) and the Freemius checkout when you
+          make a purchase (session and fraud prevention). You can block cookies in
+          your browser without breaking the site.
         </p>
 
         <h2>4. Who we share data with</h2>
         <p>
           We don't sell, rent, or trade personal data. Full stop. Data is shared only
           with the processors named above — Resend (email delivery), Freemius
-          (checkout and licensing), Google (analytics), and Vercel (hosting) — each
+          (checkout and licensing), Google and Cloudflare (analytics), and Vercel
+          (hosting) — each
           bound by its own privacy terms, and each receiving only what its job
           requires. We would also disclose data if a valid legal order compelled it.
         </p>

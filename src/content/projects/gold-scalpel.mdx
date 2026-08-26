@@ -65,6 +65,17 @@ specs:
     value: Up to 10 devices
   - label: License
     value: Lifetime updates
+faq:
+  - q: Is Gold Scalpel a scalper or a breakout EA?
+    a: Both — it scalps gold by trading genuine range breakouts. It places orders on both sides of the range and commits only when price actually breaks through, so there is no directional prediction involved; a touch or a near-miss does not trigger an entry.
+  - q: What are the minimum requirements to run Gold Scalpel?
+    a: MetaTrader 5 with a XAUUSD (gold) symbol from your broker. It runs on one chart and is licensed for up to 10 devices with a one-time purchase. A free demo is available for the MT5 Strategy Tester, so you can backtest before buying.
+  - q: How does Gold Scalpel manage risk?
+    a: "Every position is sized from your risk percentage and account equity, capped by a maximum-lot ceiling and snapped to your broker's lot step. The stop moves to breakeven as soon as a trade is onside and then trails the move, and exposure is bounded by a position cap, a post-trade cooldown, an automatic weekend pause, and an optional losing-streak cooldown."
+  - q: Does Gold Scalpel need optimising or curve-fitting?
+    a: No. It ships pre-tuned with eight settings, and only the risk and behaviour parameters are meant to be changed for your account — the rest are fixed. There is no optimisation step and no parameter set to re-fit as conditions change.
+  - q: Can I see live results before buying?
+    a: Yes. A live MQL5 signal tracks the EA on a real account, and a free Strategy Tester demo lets you run your own backtests. Note that past and live performance never guarantees future results — trading gold is high risk, and nothing here is financial advice.
 ---
 
 ## How it trades

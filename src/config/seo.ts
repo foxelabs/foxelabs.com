@@ -13,9 +13,17 @@ export const SITE = {
   founder: 'Joel James',
 } as const;
 
-/** Absolute URL for a root-relative path. */
-export const abs = (path: string): string =>
-  path.startsWith('http') ? path : new URL(path, SITE.url).href;
+/** Absolute URL for a root-relative path.
+ *  Paths are normalised to a trailing slash so every URL we emit in structured
+ *  data matches the canonical the page renders — same entity, one identifier. */
+export const abs = (path: string): string => {
+  if (path.startsWith('http')) return path;
+  const url = new URL(path, SITE.url);
+  // Files (anything with an extension) keep their exact path.
+  const isFile = /\.[a-z0-9]+$/i.test(url.pathname);
+  if (!isFile && !url.pathname.endsWith('/')) url.pathname += '/';
+  return url.href;
+};
 
 /** Sitewide Organization node — rendered once, on every page. */
 export function organizationLd() {
@@ -180,4 +188,57 @@ export function personLd(args: { name: string; url: string; image?: string; same
   if (args.image) node.image = abs(args.image);
   if (args.sameAs?.length) node.sameAs = args.sameAs;
   return node;
+}
+
+/** WebPage node for a static page — mainly useful on policy pages, where
+ *  answer engines want to know how current the terms they are quoting are. */
+export function webPageLd(a: {
+  name: string;
+  description: string;
+  url: string;
+  dateModified: string; // ISO
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': abs(a.url),
+    name: a.name,
+    description: a.description,
+    url: abs(a.url),
+    dateModified: a.dateModified,
+    isPartOf: { '@id': `${SITE.url}/#website` },
+    publisher: { '@id': `${SITE.url}/#organization` },
+    inLanguage: 'en',
+  };
+}
+
+/** CollectionPage + ItemList for a listing page. Gives crawlers and answer
+ *  engines the page's inventory in order, instead of leaving them to infer it
+ *  from the card markup. */
+export function collectionPageLd(a: {
+  name: string;
+  description: string;
+  url: string;
+  items: { name: string; path: string }[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    '@id': abs(a.url),
+    name: a.name,
+    description: a.description,
+    url: abs(a.url),
+    isPartOf: { '@id': `${SITE.url}/#website` },
+    inLanguage: 'en',
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: a.items.length,
+      itemListElement: a.items.map((it, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: it.name,
+        url: abs(it.path),
+      })),
+    },
+  };
 }

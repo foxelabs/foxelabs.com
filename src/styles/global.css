@@ -559,14 +559,44 @@ html { scroll-behavior: smooth; }
 
 /* FAQ — visible Q&A that also feeds the FAQPage schema. */
 .prose-foxe .faq-list { margin-top: 1.2em; }
-.prose-foxe .faq-item + .faq-item {
-  margin-top: 1em;
-  padding-top: 1em;
+.prose-foxe .faq-item {
   border-top: 1px solid var(--border-soft);
 }
-.prose-foxe .faq-item dt {
+.prose-foxe .faq-item:last-child {
+  border-bottom: 1px solid var(--border-soft);
+}
+.prose-foxe .faq-item summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 0.95em 0;
   font-weight: 600;
   color: var(--ink);
-  margin-bottom: 0.3em;
+  cursor: pointer;
+  list-style: none;
+  transition: color 140ms ease;
 }
-.prose-foxe .faq-item dd { margin: 0; color: var(--ink-body); }
+/* Safari still paints its own disclosure triangle without this. */
+.prose-foxe .faq-item summary::-webkit-details-marker { display: none; }
+.prose-foxe .faq-item summary:hover { color: var(--accent-ink); }
+.prose-foxe .faq-item summary:focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.prose-foxe .faq-item__chevron {
+  flex-shrink: 0;
+  margin-top: 0.15em;
+  color: var(--ink-dim);
+  transition: transform 180ms ease;
+}
+.prose-foxe .faq-item[open] .faq-item__chevron { transform: rotate(180deg); }
+.prose-foxe .faq-item > p {
+  margin: 0 0 1.15em;
+  padding-right: 2.5rem;
+  color: var(--ink-body);
+}
+@media (prefers-reduced-motion: reduce) {
+  .prose-foxe .faq-item__chevron { transition: none; }
+}

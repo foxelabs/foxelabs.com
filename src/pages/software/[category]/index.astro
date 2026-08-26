@@ -7,7 +7,7 @@ import Section from '../../../components/ui/Section.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
 import { categoryList, categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
-import { breadcrumbLd } from '../../../config/seo';
+import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
   return categoryList('oss').map(([category, meta]) => ({
@@ -26,11 +26,19 @@ const projects = (await getCollection(
 <BaseLayout
   title={`Open-Source ${meta.label} | Foxe Labs`}
   description={`Open-source ${meta.label.toLowerCase()} by Foxe Labs — documented, GPL-licensed, and maintained in public.`}
-  jsonLd={breadcrumbLd([
-    { name: 'Home', path: '/' },
-    { name: 'Software', path: '/software' },
-    { name: meta.label, path: categoryPath('oss', category) },
-  ])}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Software', path: '/software' },
+      { name: meta.label, path: categoryPath('oss', category) },
+    ]),
+    collectionPageLd({
+      name: `Open-Source ${meta.label}`,
+      description: `Open-source ${meta.label.toLowerCase()} by Foxe Labs — documented, GPL-licensed, and maintained in public.`,
+      url: categoryPath('oss', category),
+      items: projects.map((p) => ({ name: p.data.name, path: projectPath('oss', p.data.category, p.id) })),
+    }),
+  ]}
 >
   <Nav />
   <main class="track-oss">

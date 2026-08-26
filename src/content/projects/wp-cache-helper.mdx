@@ -21,6 +21,15 @@ features:
   - Group flush support to invalidate related entries at once
   - Per-prefix scoping to avoid key collisions
   - A swappable driver layer for testing and portability
+faq:
+  - q: What does WP Cache Helper do?
+    a: It puts one API over both the WordPress object cache and the transients API, so caching code does not change shape depending on which backing store it uses. It adds group flushing, per-prefix key scoping, and a swappable driver layer on top.
+  - q: How do I flush a group of related cache entries in WordPress?
+    a: WordPress core has no portable group flush — `wp_cache_flush_group()` depends on the object cache drop-in supporting it. WP Cache Helper implements grouping itself, so invalidating every entry in a group works the same whether you are on a persistent object cache or falling back to transients.
+  - q: Why use per-prefix scoping?
+    a: "Cache keys are a global namespace shared with core, themes, and every other plugin. Scoping your keys under a prefix means a generic key name cannot collide with someone else's, and it makes your plugin's entries identifiable when you need to clear them."
+  - q: Can I use it without a persistent object cache?
+    a: Yes. Without a persistent object cache the driver layer falls back to the transients API, so the same calls keep working — just backed by the database instead of memory.
 ---
 
 ## What it does

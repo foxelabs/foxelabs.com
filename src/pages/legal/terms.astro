@@ -4,18 +4,31 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import Section from '../../components/ui/Section.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
-import { breadcrumbLd } from '../../config/seo';
+import { breadcrumbLd, webPageLd } from '../../config/seo';
 
-const updated = 'August 27, 2026';
+const pageDescription =
+  'The terms that govern your use of foxelabs.com, our open-source software, paid plugin licenses, and trading tools.';
+
+// Single source of truth for the visible date and the schema's dateModified.
+const updatedIso = '2026-08-27';
+const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC',
+});
 ---
 <BaseLayout
   title="Terms of Service | Foxe Labs"
-  description="The terms that govern your use of foxelabs.com, our open-source software, paid plugin licenses, and trading tools."
+  description={pageDescription}
   jsonLd={[
     breadcrumbLd([
       { name: 'Home', path: '/' },
       { name: 'Terms of Service', path: '/legal/terms' },
     ]),
+    webPageLd({
+      name: 'Terms of Service',
+      description: pageDescription,
+      url: '/legal/terms',
+      dateModified: updatedIso,
+    }),
   ]}
 >
   <Nav />

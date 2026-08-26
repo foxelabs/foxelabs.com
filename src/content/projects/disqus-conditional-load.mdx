@@ -27,6 +27,15 @@ features:
   - Keeps comment-heavy pages fast and cache-friendly
   - Works alongside the official Disqus plugin
   - Fine-grained control over where and when comments load
+faq:
+  - q: How do I stop Disqus from slowing down my WordPress site?
+    a: Disqus Conditional Load defers the Disqus JavaScript until a reader scrolls to the comments or clicks to load them, so none of that third-party weight is on the initial page load. Comments still work exactly as before — they just cost nothing until someone wants them.
+  - q: Does it work with the official Disqus plugin?
+    a: Yes. Disqus Conditional Load runs alongside the official Disqus for WordPress plugin, handling when the embed loads while Disqus itself handles the comments.
+  - q: Will lazy-loaded Disqus comments still be indexed by Google?
+    a: Comments loaded on demand are not in the initial HTML, so search engines generally will not index them. If comment text is important to your rankings, the native WordPress comment system indexes reliably; Disqus comments are hosted off-site and have always been weak for SEO regardless of how they load.
+  - q: Is Disqus Conditional Load compatible with caching plugins?
+    a: Yes — that is part of the point. Because the deferral happens client-side, the cached HTML stays identical for every visitor, so page caching and CDN caching work normally.
 ---
 
 ## What it does
