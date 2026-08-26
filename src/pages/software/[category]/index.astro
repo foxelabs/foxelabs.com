@@ -43,7 +43,7 @@ const projects = (await getCollection(
           All software
         </a>
         <Eyebrow class="mb-4">Software</Eyebrow>
-        <h1 style="font-size: var(--text-hero); font-weight: 700;">{meta.label}</h1>
+        <h1 style="font-size: var(--text-hero); font-weight: 800;">{meta.label}</h1>
       </div>
     </section>
 
@@ -61,7 +61,7 @@ const projects = (await getCollection(
                 </div>
                 <span class="font-mono text-[11px] whitespace-nowrap" style="color: var(--ink-dim);">{p.data.kind}</span>
               </div>
-              <h2 style="font-size: var(--text-h3); font-weight: 700;" class="mb-2">{p.data.name}</h2>
+              <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-2">{p.data.name}</h2>
               <p class="text-[15px] mb-6 flex-1" style="color: var(--ink-body);">{p.data.summary}</p>
               <div class="font-mono text-[12px] flex flex-col gap-1 mb-5" style="color: var(--ink-dim);">
                 <span style="color: var(--accent-ink);">● Open source · GPL</span>
@@ -78,7 +78,7 @@ const projects = (await getCollection(
         </div>
       ) : (
         <div class="card p-10 md:p-14 text-center max-w-2xl mx-auto">
-          <h2 style="font-size: var(--text-h3); font-weight: 700;" class="mb-3">More on the way.</h2>
+          <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-3">More on the way.</h2>
           <p class="text-[15px] mb-8 max-w-md mx-auto" style="color: var(--ink-body);">
             We're adding {meta.label.toLowerCase()} here. In the meantime, explore the rest of our open-source work.
           </p>

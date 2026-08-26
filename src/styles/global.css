@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 
-@import '@fontsource/bricolage-grotesque/600.css';
-@import '@fontsource/bricolage-grotesque/700.css';
+@import '@fontsource-variable/bricolage-grotesque';
 @import '@fontsource/ibm-plex-sans/400.css';
 @import '@fontsource/ibm-plex-sans/500.css';
 @import '@fontsource/ibm-plex-sans/600.css';
@@ -103,7 +102,7 @@
   --chart-up:   #34D399;
   --chart-down: #F87171;
 
-  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
   --font-body:    'IBM Plex Sans', system-ui, sans-serif;
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
@@ -161,8 +160,13 @@
   button { font-family: inherit; cursor: pointer; }
   input, textarea, select { font-family: inherit; }
 
+  /* Headings opt out of the body's antialiased smoothing: on macOS it thins
+     the strokes enough that 800 reads closer to 600. */
   h1, h2, h3, h4 {
     font-family: var(--font-display);
+    font-weight: 800;
+    -webkit-font-smoothing: auto;
+    -moz-osx-font-smoothing: auto;
     color: var(--ink);
     letter-spacing: -0.02em;
     line-height: 1.08;
@@ -457,12 +461,12 @@ html { scroll-behavior: smooth; }
    space above it give the reader a clear break between them. */
 .prose-foxe h2 {
   font-size: 1.6rem;
-  font-weight: 700;
+  font-weight: 800;
   margin-top: 2.75em;
   padding-top: 1.75em;
   border-top: 1px solid var(--border-soft);
 }
-.prose-foxe h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.9em; }
+.prose-foxe h3 { font-size: 1.25rem; font-weight: 800; margin-top: 1.9em; }
 .prose-foxe strong { color: var(--ink); font-weight: 600; }
 .prose-foxe a {
   color: var(--accent-ink);

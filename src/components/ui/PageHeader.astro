@@ -16,7 +16,7 @@ const { eyebrow, title, titleAccent, lead, narrow = false } = Astro.props;
   <div class="container-x">
     <div class={narrow ? 'max-w-3xl' : 'max-w-4xl'}>
       <Eyebrow class="mb-5">{eyebrow}</Eyebrow>
-      <h1 style="font-size: var(--text-hero); font-weight: 700;" class={lead ? 'mb-5' : ''}>
+      <h1 style="font-size: var(--text-hero); font-weight: 800;" class={lead ? 'mb-5' : ''}>
         {title}
         {titleAccent && <span style="color: var(--accent-ink);">{titleAccent}</span>}
       </h1>
