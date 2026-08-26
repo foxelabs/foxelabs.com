@@ -1,0 +1,171 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Section from '../../components/ui/Section.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import { breadcrumbLd } from '../../config/seo';
+
+const updated = 'August 27, 2026';
+---
+<BaseLayout
+  title="Terms of Service | Foxe Labs"
+  description="The terms that govern your use of foxelabs.com, our open-source software, paid plugin licenses, and trading tools."
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Terms of Service', path: '/legal/terms' },
+    ]),
+  ]}
+>
+  <Nav />
+  <main class="track-hub">
+    <PageHeader
+      eyebrow="Legal"
+      title="Terms of Service"
+      lead="The plain-English rules for using our website and software. Short version: use the tools honestly, respect the licenses, and understand what we do and don't promise."
+      narrow
+    />
+    <Section reveal={false}>
+      <article class="prose-foxe max-w-3xl">
+        <p class="font-mono text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
+
+        <h2>1. Who we are</h2>
+        <p>
+          These Terms of Service ("Terms") are an agreement between you and
+          <strong>Foxe Labs LLP</strong> ("Foxe Labs", "we", "us"), a limited liability
+          partnership based in Kerala, India. They govern your use of
+          <a href="/">foxelabs.com</a>, our documentation, our blog, and the software we
+          publish — including free open-source releases and paid licenses.
+        </p>
+        <p>
+          By using the site or our software, you accept these Terms. If you don't agree
+          with them, please don't use the site or the software.
+        </p>
+
+        <h2>2. Our products</h2>
+        <p>We ship two kinds of things, and slightly different rules apply to each:</p>
+        <ul>
+          <li>
+            <strong>Open-source software</strong> — our WordPress plugins and PHP
+            libraries are released under their own open-source licenses (typically
+            GPL-2.0-or-later for plugins). The license bundled with each project governs
+            how you may use, modify, and redistribute that code. Nothing in these Terms
+            restricts the rights those licenses grant you.
+          </li>
+          <li>
+            <strong>Paid licenses and add-ons</strong> — premium versions, add-ons, and
+            support plans are sold through our checkout partner
+            <a href="https://freemius.com" target="_blank" rel="noopener noreferrer">Freemius</a>,
+            which acts as the merchant of record. A paid license grants you the right to
+            receive updates and support for the covered sites and period you purchased.
+          </li>
+        </ul>
+        <p>
+          Our trading software (expert advisors and trading tools) is currently in
+          development and available by waitlist only. When it launches, product-specific
+          terms will apply and will be presented at purchase.
+        </p>
+
+        <h2>3. Accounts and license keys</h2>
+        <p>
+          Paid products may require a license key or a Freemius account to activate
+          updates and support. You are responsible for keeping keys confidential. Don't
+          share, resell, or publish license keys, and don't use technical tricks to
+          activate a license on more sites than it covers.
+        </p>
+
+        <h2>4. Acceptable use</h2>
+        <p>When using our site, software, or support channels, you agree not to:</p>
+        <ul>
+          <li>break the law, or use our tools to help someone else break it;</li>
+          <li>probe, overload, or attempt to gain unauthorized access to our systems;</li>
+          <li>misrepresent our software as your own or strip license and copyright notices where a license requires them;</li>
+          <li>use our name, logo, or branding in a way that suggests endorsement we haven't given;</li>
+          <li>abuse support — we're a small team, and we help everyone in good faith.</li>
+        </ul>
+
+        <h2>5. Purchases, billing, and refunds</h2>
+        <p>
+          Payments are processed by Freemius; we never see or store your card details.
+          Prices are shown at checkout and may change for future purchase cycles. Paid
+          licenses renew automatically unless you cancel before the renewal date — you
+          can cancel any time from your Freemius account, and cancelling stops future
+          charges without affecting the current period.
+        </p>
+        <p>
+          Refunds are covered by our <a href="/legal/refunds">Refund Policy</a> — in
+          short, a 7-day no-questions-asked money-back guarantee on paid plugin
+          purchases.
+        </p>
+
+        <h2>6. Trading software disclaimer</h2>
+        <p>
+          <strong>Nothing on this site is financial advice.</strong> Our trading tools
+          are software utilities, not investment recommendations. Trading foreign
+          exchange, CFDs, and other leveraged products carries substantial risk of loss
+          and is not suitable for everyone. Past performance — including backtests and
+          our own live results — does not guarantee future results. You alone are
+          responsible for your trading decisions and for complying with the regulations
+          that apply to you.
+        </p>
+
+        <h2>7. Intellectual property</h2>
+        <p>
+          The Foxe Labs name, logo, site design, and written content are owned by
+          Foxe Labs LLP. Open-source code is yours to use under its license. Blog posts
+          and documentation may be quoted with attribution and a link; wholesale
+          republishing is not permitted.
+        </p>
+
+        <h2>8. Warranty disclaimer</h2>
+        <p>
+          Our software is provided <strong>"as is" and "as available"</strong>, without
+          warranties of any kind, express or implied — including merchantability,
+          fitness for a particular purpose, and non-infringement. We work hard to ship
+          reliable software, but we can't promise it will be uninterrupted, error-free,
+          or compatible with every environment. Always keep backups and test updates on
+          a staging site first.
+        </p>
+
+        <h2>9. Limitation of liability</h2>
+        <p>
+          To the maximum extent permitted by law, Foxe Labs LLP will not be liable for
+          any indirect, incidental, special, consequential, or exemplary damages —
+          including lost profits, lost data, or trading losses — arising from your use
+          of the site or software. Our total liability for any claim is limited to the
+          amount you paid us for the product giving rise to the claim in the twelve
+          months before the claim arose, or ₹1,000 if you paid nothing.
+        </p>
+
+        <h2>10. Termination</h2>
+        <p>
+          We may suspend or terminate access to paid services if you materially breach
+          these Terms — for example, by sharing license keys or abusing support. Your
+          rights under open-source licenses survive, as those licenses provide.
+        </p>
+
+        <h2>11. Changes to these Terms</h2>
+        <p>
+          We may update these Terms as our products evolve. The "Last updated" date at
+          the top reflects the current version. Material changes will be noted on this
+          page; continued use after a change means you accept the updated Terms.
+        </p>
+
+        <h2>12. Governing law</h2>
+        <p>
+          These Terms are governed by the laws of India. Any dispute will be subject to
+          the exclusive jurisdiction of the courts of Kerala, India.
+        </p>
+
+        <h2>13. Contact</h2>
+        <p>
+          Questions about these Terms? Email
+          <a href="mailto:support@foxelabs.com">support@foxelabs.com</a> or use the
+          <a href="/contact">contact page</a>.
+        </p>
+      </article>
+    </Section>
+  </main>
+  <Footer />
+</BaseLayout>

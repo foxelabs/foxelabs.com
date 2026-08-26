@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Section from '../../components/ui/Section.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import { breadcrumbLd } from '../../config/seo';
+
+const updated = 'August 27, 2026';
+---
+<BaseLayout
+  title="Privacy Policy | Foxe Labs"
+  description="What data foxelabs.com collects, why, who processes it, and the rights you have over it."
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Privacy Policy', path: '/legal/privacy' },
+    ]),
+  ]}
+>
+  <Nav />
+  <main class="track-hub">
+    <PageHeader
+      eyebrow="Legal"
+      title="Privacy Policy"
+      lead="We collect as little as we can get away with. Here's exactly what we collect, why, and who touches it."
+      narrow
+    />
+    <Section reveal={false}>
+      <article class="prose-foxe max-w-3xl">
+        <p class="font-mono text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
+
+        <h2>1. Who is responsible</h2>
+        <p>
+          This policy explains how <strong>Foxe Labs LLP</strong> ("we", "us"), based in
+          Kerala, India, handles personal data collected through
+          <a href="/">foxelabs.com</a> and our software services. For anything in this
+          policy, you can reach us at
+          <a href="mailto:support@foxelabs.com">support@foxelabs.com</a>.
+        </p>
+
+        <h2>2. What we collect, and why</h2>
+        <h3>Contact form</h3>
+        <p>
+          When you write to us through the <a href="/contact">contact page</a>, we
+          receive the name, email address, and message you submit. It is delivered to
+          our inbox by <a href="https://resend.com" target="_blank" rel="noopener noreferrer">Resend</a>,
+          our email delivery provider, and used only to reply to you.
+        </p>
+        <h3>Waitlist</h3>
+        <p>
+          Joining a product waitlist stores your email address so we can tell you when
+          the product launches. That's the only thing it's used for, and every email we
+          send includes a way to opt out.
+        </p>
+        <h3>Purchases</h3>
+        <p>
+          Paid plugins are sold through
+          <a href="https://freemius.com" target="_blank" rel="noopener noreferrer">Freemius</a>,
+          the merchant of record. Freemius collects your name, email, billing details,
+          and payment information under its own
+          <a href="https://freemius.com/privacy/" target="_blank" rel="noopener noreferrer">privacy policy</a>.
+          We receive your name, email, license details, and order metadata so we can
+          deliver updates and support — <strong>we never see or store your card
+          numbers</strong>.
+        </p>
+        <h3>Plugin usage data</h3>
+        <p>
+          Our WordPress plugins do not phone home by default. If a plugin offers
+          opt-in usage tracking (via the Freemius SDK), it collects data only after you
+          explicitly allow it, and you can opt out at any time from the plugin's
+          account screen.
+        </p>
+        <h3>Analytics</h3>
+        <p>
+          We use <strong>Google Analytics</strong> to understand how the site is used —
+          pages visited, approximate location, device and browser type. Google
+          Analytics sets cookies and processes data under
+          <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's privacy policy</a>.
+          We use it for aggregate statistics only; we do not use advertising features
+          or sell data to anyone.
+        </p>
+        <h3>Server logs</h3>
+        <p>
+          Our host, <a href="https://vercel.com" target="_blank" rel="noopener noreferrer">Vercel</a>,
+          keeps standard server logs (IP address, request URL, timestamp) for security
+          and debugging. These rotate automatically.
+        </p>
+
+        <h2>3. Cookies</h2>
+        <p>
+          The site itself sets no cookies for browsing, reading the blog, or using the
+          docs. Cookies come from two places: Google Analytics (measurement) and the
+          Freemius checkout when you make a purchase (session and fraud prevention).
+          You can block cookies in your browser without breaking the site.
+        </p>
+
+        <h2>4. Who we share data with</h2>
+        <p>
+          We don't sell, rent, or trade personal data. Full stop. Data is shared only
+          with the processors named above — Resend (email delivery), Freemius
+          (checkout and licensing), Google (analytics), and Vercel (hosting) — each
+          bound by its own privacy terms, and each receiving only what its job
+          requires. We would also disclose data if a valid legal order compelled it.
+        </p>
+
+        <h2>5. How long we keep it</h2>
+        <ul>
+          <li><strong>Contact messages</strong> — kept in our inbox as long as needed to handle your request and reasonable follow-ups.</li>
+          <li><strong>Waitlist emails</strong> — until the launch mails go out or you unsubscribe, whichever comes first.</li>
+          <li><strong>Order and license records</strong> — for the life of your license plus what tax law requires us to retain.</li>
+          <li><strong>Analytics</strong> — per Google Analytics' retention settings, in aggregate form.</li>
+        </ul>
+
+        <h2>6. Your rights</h2>
+        <p>
+          Depending on where you live — including under India's Digital Personal Data
+          Protection Act and the EU/UK GDPR — you may have the right to access,
+          correct, export, or delete your personal data, and to withdraw consent where
+          processing is based on it. To exercise any of these, email
+          <a href="mailto:support@foxelabs.com">support@foxelabs.com</a> — no forms, no
+          hoops. We'll respond within 30 days.
+        </p>
+
+        <h2>7. Data transfers</h2>
+        <p>
+          Our processors (Vercel, Resend, Freemius, Google) operate globally, so data
+          may be processed outside your country, including in the United States. Each
+          provider maintains recognized safeguards for international transfers.
+        </p>
+
+        <h2>8. Children</h2>
+        <p>
+          Our site and products are not directed at children under 18, and we don't
+          knowingly collect their data. If you believe a child has given us personal
+          data, contact us and we'll delete it.
+        </p>
+
+        <h2>9. Changes to this policy</h2>
+        <p>
+          When our data practices change — a new tool, a dropped provider — we'll
+          update this page and the date at the top. Significant changes will be called
+          out on the page itself.
+        </p>
+
+        <h2>10. Contact</h2>
+        <p>
+          Privacy questions or requests:
+          <a href="mailto:support@foxelabs.com">support@foxelabs.com</a>.
+        </p>
+      </article>
+    </Section>
+  </main>
+  <Footer />
+</BaseLayout>

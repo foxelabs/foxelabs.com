@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import Section from '../../components/ui/Section.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import { breadcrumbLd } from '../../config/seo';
+
+const updated = 'August 27, 2026';
+---
+<BaseLayout
+  title="Refund Policy | Foxe Labs"
+  description="Our 7-day no-questions-asked money-back guarantee on paid plugin purchases — how it works and how to request a refund."
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Refund Policy', path: '/legal/refunds' },
+    ]),
+  ]}
+>
+  <Nav />
+  <main class="track-hub">
+    <PageHeader
+      eyebrow="Legal"
+      title="Refund Policy"
+      lead="Seven days, no questions asked. If a paid plugin isn't right for you, you get your money back — that's the whole policy."
+      narrow
+    />
+    <Section reveal={false}>
+      <article class="prose-foxe max-w-3xl">
+        <p class="font-mono text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
+
+        <h2>1. The guarantee</h2>
+        <p>
+          Every paid plugin, add-on, and license sold on foxelabs.com comes with a
+          <strong>7-day no-questions-asked money-back guarantee</strong>. If you're not
+          happy with a purchase — for any reason, or no reason — request a refund
+          within 7 days of the purchase date and we'll return the full amount.
+        </p>
+        <p>
+          We'd still love to hear what went wrong, because it helps us build better
+          software — but telling us is optional, not a condition of the refund.
+        </p>
+
+        <h2>2. How to request a refund</h2>
+        <p>Three ways, whichever is easier:</p>
+        <ul>
+          <li>
+            Use the <a href="/contact">contact form</a>, mentioning the product and
+            order (the Freemius receipt email has the order number).
+          </li>
+          <li>
+            Email <a href="mailto:support@foxelabs.com">support@foxelabs.com</a> from
+            the address you purchased with, with the same details.
+          </li>
+          <li>
+            Request it directly from your
+            <a href="https://users.freemius.com" target="_blank" rel="noopener noreferrer">Freemius account</a>,
+            where your purchases are listed.
+          </li>
+        </ul>
+        <p>
+          Refunds are processed by Freemius, our merchant of record, back to your
+          original payment method. Approval on our side is same-or-next business day;
+          the money typically lands within 5–10 business days depending on your bank.
+        </p>
+
+        <h2>3. Renewals</h2>
+        <p>
+          Licenses renew automatically so your updates and support don't lapse. If a
+          renewal charge catches you by surprise, the same 7-day window applies from
+          the renewal date — contact us and we'll refund it. To avoid future renewals,
+          cancel any time from your Freemius account; your license stays active until
+          the end of the paid period.
+        </p>
+
+        <h2>4. What isn't covered</h2>
+        <ul>
+          <li><strong>Requests after 7 days</strong> — outside the window, refunds are at our discretion. We're reasonable; ask.</li>
+          <li><strong>Free products</strong> — nothing was paid, so there's nothing to refund.</li>
+          <li><strong>Custom development work</strong> — bespoke projects are governed by their own agreement.</li>
+          <li><strong>Chargeback-abuse</strong> — filing a chargeback instead of asking us first may void the guarantee and suspend the license. Just email us; it's faster than a dispute.</li>
+        </ul>
+
+        <h2>5. Trading products</h2>
+        <p>
+          Our trading software is not yet on sale. When it launches, its refund terms
+          will be published here and shown at checkout before you pay.
+        </p>
+
+        <h2>6. Questions</h2>
+        <p>
+          Unsure whether your case qualifies? Email
+          <a href="mailto:support@foxelabs.com">support@foxelabs.com</a> — a human (the
+          one who wrote the plugin) reads every message.
+        </p>
+      </article>
+    </Section>
+  </main>
+  <Footer />
+</BaseLayout>
