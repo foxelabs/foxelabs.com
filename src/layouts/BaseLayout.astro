@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Analytics from '../components/Analytics.astro';
 import { SITE, organizationLd, websiteLd } from '../config/seo';
 
 interface Props {
@@ -106,6 +107,7 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
         data-cf-beacon='{"token": "33c34e18a89d4d40ba323b8e1dfe0ba3"}'
       />
     )}
+    <Analytics />
   </head>
   <body>
     <slot />

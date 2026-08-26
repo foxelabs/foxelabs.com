@@ -1,0 +1,46 @@
+---
+// Google Analytics 4, kept off the critical path.
+//
+// gtag.js is ~90KB of script that nothing on the page waits for, so loading it
+// normally spends LCP and main-thread budget on a measurement call. Instead the
+// dataLayer queue and the config command run immediately — so no events are
+// lost — while the script itself is fetched once the browser goes idle, and the
+// queued commands flush the moment it arrives.
+const GA_ID = 'G-JJEWCLB8DK';
+---
+{import.meta.env.PROD && (
+  <>
+    {/* Warms DNS + TLS only; costs nothing on the critical path and saves a
+        round trip when the deferred script is finally requested. */}
+    <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+    <script is:inline define:vars={{ GA_ID }}>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { window.dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      // send_page_view fires from the queue, so the pageview is timestamped at
+      // load rather than whenever the script happens to arrive.
+      gtag('config', GA_ID);
+
+      (function () {
+        var loaded = false;
+        function loadGa() {
+          if (loaded) return;
+          loaded = true;
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+          document.head.appendChild(s);
+        }
+        // Idle is the happy path; the timeout is the backstop for a tab that
+        // never goes idle, and pagehide covers a visitor who leaves first.
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGa, { timeout: 5000 });
+        } else {
+          setTimeout(loadGa, 2500);
+        }
+        addEventListener('pagehide', loadGa, { once: true });
+      })();
+    </script>
+  </>
+)}
