@@ -1,6 +1,8 @@
 ---
 name: Limit Per User
 tagline: Override the session cap for a single account.
+seoTitle: "Limit Concurrent Logins Per User in WordPress"
+seoDescription: Set a concurrent-session limit on one WordPress account, overriding your global and per-role limits — straight from the user's profile screen.
 summary: Give one account more (or fewer) concurrent sessions than your global limit, straight from the user's profile screen.
 parent: loggedin
 location: Profile screen
@@ -14,25 +16,76 @@ features:
   - Per-user concurrent-session override on the profile screen
   - Takes precedence over both global and per-role limits
   - Blank or zero simply falls back to the global limit
+  - Your chosen login logic still applies — only the number changes
   - Enforced on the next login, with nonce and capability checks
+faq:
+  - q: How do I limit concurrent logins for one WordPress user?
+    a: Install the free Loggedin plugin with the Limit Per User add-on, edit the account under Users → All Users, and enter a number in the Concurrent Sessions Limit field. That account is capped at that number regardless of your global setting.
+  - q: Where is the per-user login limit field?
+    a: On the WordPress profile screen — both your own profile and the edit-user screen administrators see. It sits near the bottom under a Loggedin heading. There is no separate settings panel for this add-on.
+  - q: What happens if I leave the per-user limit blank?
+    a: The account falls back to your global limit, or to its role limit if you also run Limit Per Role. Entering zero behaves the same way, and the add-on deletes the stored value rather than keeping a meaningless row.
+  - q: Which limit wins when several Loggedin add-ons are active?
+    a: Per-user beats per-role, and per-role beats the global setting. An account with a per-user override always uses that number, whatever limits are configured for the roles it holds.
+  - q: When does a changed per-user limit take effect?
+    a: On that user's next login attempt. Changing the number does not sign out sessions that already exist — it changes what happens the next time the account tries to sign in.
+  - q: Can a non-admin raise their own session limit?
+    a: No. Saving the field requires the edit_user capability and passes a nonce check, so an ordinary user cannot lift their own cap by crafting a request against their profile.
 ---
 
 ## What it does
 
 Some accounts legitimately need a different cap than everyone else — a
-shared editorial login, a service account, or an executive roaming between
-four devices. **Limit Per User** lets you set a concurrent-session limit on
-a single account, overriding the global setting.
+shared editorial login, a service account, a support desk with three people
+on rotation, or an executive roaming between four devices. Tuning the global
+limit to suit them loosens it for the entire site.
 
-There's no separate settings panel: the control lives on the WordPress
-profile screen, both for your own profile and the edit-user screen admins
-see. Leave it blank to use the global limit, or enter a number to cap that
-one account.
+**Limit Per User** sets a concurrent-session limit on one account, leaving
+everyone else exactly as they were.
+
+## No extra settings screen
+
+There's no panel to hunt for. The control is a single number field on the
+WordPress profile screen — your own profile, and the edit-user screen admins
+see — under a **Loggedin** heading near the bottom of the page.
+
+Leave it blank to use whatever limit already applies. Enter a number to cap
+that one account. It saves with the profile itself, via the normal **Update
+Profile** button.
+
+## How the number is read
+
+<div class="table-wrap">
+
+| Value | What happens |
+| --- | --- |
+| Blank | No override — global or role limit applies |
+| `0` or negative | Same as blank; the stored value is removed |
+| `1` or more | That account is capped at this many sessions |
+
+</div>
+
+Zero would be indistinguishable from "no override" anyway, so the add-on
+deletes the row rather than leaving dead data in `usermeta`.
 
 ## Priority
 
 When several limit add-ons are active, per-user always wins:
-per-user → [per-role](/software/plugins/loggedin/limit-per-role) → global.
-A user with a per-user override uses that value regardless of any role
-limit. The change takes effect on their next login attempt, and saves are
-protected by a nonce and the `edit_user` capability.
+
+**per-user → [per-role](/software/plugins/loggedin/limit-per-role) → global.**
+
+An account with a per-user override uses that value regardless of any role
+limit. Only the number changes — your chosen login logic (block the new
+login, log out the oldest, or log out all) still governs what happens when
+the cap is reached.
+
+## Safe to hand out
+
+The change takes effect on the account's next login attempt, and saves are
+protected by a nonce and the `edit_user` capability, so nobody can raise
+their own limit through a crafted request.
+
+Managing caps for whole groups rather than individuals? Use
+[Limit Per Role](/software/plugins/loggedin/limit-per-role) for the bulk of
+your site and keep this add-on for the handful of accounts that are genuine
+exceptions.

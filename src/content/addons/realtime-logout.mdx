@@ -1,6 +1,8 @@
 ---
 name: Real-time Logout
 tagline: Make a forced logout feel instant on open tabs.
+seoTitle: "WordPress Real-time Logout — Instantly Sign Out Open Tabs"
+seoDescription: Bounce already-logged-out WordPress tabs straight back to the login screen instead of leaving them rendering as if signed in. Polling interval you control.
 summary: Polls the server on an interval so a session ended elsewhere bounces open tabs straight back to the login screen, instead of lingering until the next click.
 parent: loggedin
 location: Settings tab
@@ -12,28 +14,67 @@ docsUrl: https://docs.foxelabs.com/software/loggedin/addons/realtime-logout
 url: https://checkout.freemius.com/plugin/19616
 features:
   - Open tabs reload to wp-login within your polling interval
-  - Configurable refresh interval (60 seconds by default)
+  - Configurable refresh interval, 60 seconds by default
+  - Catches every ending — admin force-logout, logout elsewhere, session limit hit
   - Works on every host — simple polling, no WebSockets or sidecars
   - The polling script loads only for logged-in users
+faq:
+  - q: Why does a WordPress user still see the site after being logged out?
+    a: WordPress only checks the auth cookie when the browser makes a request. A tab that was already rendered keeps showing the signed-in page until the user clicks something. Real-time Logout closes that gap by asking the server, on an interval, whether the session is still alive.
+  - q: How do I force a WordPress logout to take effect immediately?
+    a: Install the free Loggedin plugin with the Real-time Logout add-on and set a refresh interval. Once a session ends — an admin force-logout, a logout on another device, or a hit session limit — every open tab hard-reloads to wp-login within that interval.
+  - q: What refresh interval should I use?
+    a: Sixty seconds is the default and the recommended floor. Each open tab makes one request per interval, so a five-second interval on a site with hundreds of concurrent users means tens of thousands of requests a minute. Shorten it only on small or single-team installs.
+  - q: Is Real-time Logout actually real-time?
+    a: It is polling, not WebSockets or push. That is deliberate — polling works on every WordPress host with no Node sidecar, no third-party realtime service and no firewall changes. At a 60-second interval the load is negligible.
+  - q: Does the polling script slow down my site for visitors?
+    a: No. The script is only enqueued when there is a logged-in user, on both the front end and the admin. Anonymous visitors are served nothing at all, so cached, logged-out traffic is completely unaffected.
+  - q: Does Real-time Logout keep idle sessions alive?
+    a: No. If you also run the Auto Logout add-on, its polling requests are checked for validity but never count as user activity, so a tab left open on an unattended screen still times out on schedule.
 ---
 
 ## What it does
 
-Without it, a browser tab that has already been logged out elsewhere keeps
-rendering as if authenticated until the user clicks something. **Real-time
-Logout** closes that gap: a small script polls the server on a fixed
-interval, and the moment the session is gone — a logout elsewhere, an admin
-force-logout, or a hit concurrent-session limit — the tab hard-reloads back
-to wp-login.
+Log a user out and WordPress stops honouring their session immediately — but
+the browser tab they left open doesn't know that. It keeps rendering the
+signed-in page until the user clicks something that makes a new request.
 
-## How it works
+**Real-time Logout** removes that lag. A small script asks the server, on an
+interval you set, whether the session is still valid. The moment it isn't,
+the tab hard-reloads and WordPress redirects to wp-login.
 
-Despite the name, this isn't WebSockets or push — it's deliberate polling,
-because polling works on every WordPress host with no sidecar service or
-firewall changes. At the recommended 60-second interval the load is
-negligible, and the script is only shipped to logged-in users.
+It catches every way a session can end: an admin using Force Logout or
+[Active Sessions](/software/plugins/loggedin/active-sessions), a logout on
+another device, a hit concurrent-session limit, or an idle timeout from
+[Auto Logout](/software/plugins/loggedin/auto-logout).
 
-It adds a **Real-time Logout** panel to the Loggedin settings tab where you
-set the refresh interval. Best paired with
-[Active Sessions](/software/plugins/loggedin/active-sessions) so an admin
-sign-out is both easy to trigger and quick to land.
+## Set the interval
+
+The add-on adds a **Real-time Logout** panel to the Loggedin settings tab
+with a single control: how often each open tab checks in. The default is 60
+seconds, which is also the recommended floor.
+
+Each open tab makes one request per interval, so the arithmetic is worth
+doing before you shorten it — a five-second interval across hundreds of
+concurrent users is tens of thousands of requests a minute. On a small team
+install where that load is irrelevant, go as low as you like.
+
+## Polling, on purpose
+
+Despite the name, this isn't WebSockets or server push. It's deliberate
+polling, because polling works on every WordPress host: no Node sidecar, no
+third-party realtime service, no firewall changes, nothing to keep running
+beside PHP.
+
+The check itself is one tiny request that answers active or not active, and
+the script is enqueued only when there's a logged-in user. Anonymous
+visitors get nothing — cached, logged-out traffic is untouched.
+
+## Where it fits
+
+On its own it makes admin action feel decisive rather than delayed. Paired
+with [Active Sessions](/software/plugins/loggedin/active-sessions), a
+sign-out is both easy to trigger and quick to land. Paired with
+[Auto Logout](/software/plugins/loggedin/auto-logout), an idle timeout
+reaches even a tab the browser has throttled — and those poll requests never
+count as activity, so nothing is kept alive by the checking itself.
