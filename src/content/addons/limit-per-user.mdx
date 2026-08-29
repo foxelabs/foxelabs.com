@@ -31,6 +31,15 @@ faq:
     a: On that user's next login attempt. Changing the number does not sign out sessions that already exist — it changes what happens the next time the account tries to sign in.
   - q: Can a non-admin raise their own session limit?
     a: No. Saving the field requires the edit_user capability and passes a nonce check, so an ordinary user cannot lift their own cap by crafting a request against their profile.
+screenshots:
+  - src: ./screenshots/limit-per-user/profile-field.png
+    tab: Profile field
+    alt: The Concurrent Sessions Limit field on the WordPress user profile screen, overriding the global login limit for one account
+    heading: No settings screen at all
+    body: The override lives on the profile screen an admin is already editing, under a Loggedin heading near the bottom of the page.
+    caption: Blank means "use the global limit" — and so does zero, which removes the stored value entirely.
+    crumb: Users → All Users → Edit
+
 ---
 
 ## What it does

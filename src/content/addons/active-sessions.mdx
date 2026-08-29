@@ -31,6 +31,29 @@ faq:
     a: No. It reads WordPress's own default session storage, so there are no extra tables to install or clean up. Sites that replace the session manager with a custom backend, such as some enterprise Redis setups, are not supported and see a notice on the tab.
   - q: How quickly does a forced sign-out take effect?
     a: The session token is destroyed immediately, but the user's already-open tabs keep rendering the cached page until their next request. Adding the Real-time Logout add-on shrinks that gap to your polling interval, 60 seconds by default.
+screenshots:
+  - src: ./screenshots/active-sessions/sessions-list.png
+    tab: Sessions list
+    alt: The Active Sessions tab in WordPress listing every user with a live login session, their session count, last login and last IP
+    heading: Everyone signed in, right now
+    body: One row per user with a live session — searchable by name or email, sortable by session count or last login, and openable for per-device detail.
+    caption: The list opens on last login, newest first — what an admin arriving on this screen is usually looking for.
+    crumb: Users → Loggedin → Sessions
+  - src: ./screenshots/active-sessions/session-detail.png
+    tab: Per-device detail
+    alt: The Active Sessions per-user modal showing each WordPress session with its device, IP address, login time and expiry
+    heading: Every device, listed separately
+    body: Device, the IP the session started from, when it signed in and when it expires — with a Sign out button on each session individually.
+    caption: Ending one session leaves the user's other devices untouched.
+    crumb: Users → Loggedin → Sessions
+  - src: ./screenshots/active-sessions/bulk-signout.png
+    tab: Bulk sign-out
+    alt: Bulk sign-out confirmation in the Active Sessions tab listing the WordPress users about to be logged out
+    heading: Clear many users at once
+    body: Tick rows in the list and sign them all out in one action. The confirmation names every account before anything happens.
+    caption: Every destroy-all path fires the core plugin's own action, so existing audit logging covers it.
+    crumb: Users → Loggedin → Sessions
+
 ---
 
 ## What it does

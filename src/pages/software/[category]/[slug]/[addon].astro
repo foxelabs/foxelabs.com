@@ -6,6 +6,7 @@ import Footer from '../../../../components/Footer.astro';
 import Button from '../../../../components/ui/Button.astro';
 import PricingCard from '../../../../components/ui/PricingCard.astro';
 import Faq from '../../../../components/ui/Faq.astro';
+import Screenshots from '../../../../components/ui/Screenshots.astro';
 import { Icon } from 'astro-icon/components';
 import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
 import { breadcrumbLd, softwareApplicationLd, faqLd } from '../../../../config/seo';
@@ -58,6 +59,7 @@ const pageTitle = `${data.seoTitle ?? `${data.name} — ${parent.data.name} Add-
 const metaDescription = data.seoDescription ?? data.summary;
 
 const catLabel = categoryMeta('oss', parent.data.category)?.label ?? 'Software';
+const shotUrls = data.screenshots.map((s) => s.src.src);
 const priceMatch = data.price?.match(/([\d.]+)/);
 const structuredData = [
   breadcrumbLd([
@@ -75,6 +77,7 @@ const structuredData = [
     operatingSystem: 'WordPress',
     offerPrice: priceMatch?.[1],
     sameAs: data.url ? [data.url] : undefined,
+    screenshot: shotUrls,
   }),
 ];
 if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
@@ -177,6 +180,19 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
         </div>
       </div>
     </section>
+
+    {data.screenshots.length > 0 && (
+      <section class="band band--alt" data-reveal>
+        <div class="container-x">
+          <Screenshots
+            id={`shots-${addon.id}`}
+            shots={data.screenshots}
+            heading={`${data.name} in the WordPress admin`}
+            lead={`Every screen ${data.name} adds, and where to find it.`}
+          />
+        </div>
+      </section>
+    )}
   </main>
   <Footer />
 </BaseLayout>

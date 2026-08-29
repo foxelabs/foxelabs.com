@@ -93,6 +93,8 @@ interface SoftwareArgs {
   ratingValue?: string; // e.g. '4.9'
   ratingCount?: string; // e.g. '110'
   sameAs?: string[];
+  /** Absolute URLs of product screenshots. */
+  screenshot?: string[];
 }
 
 /** SoftwareApplication node for a product page. */
@@ -108,6 +110,7 @@ export function softwareApplicationLd(a: SoftwareArgs) {
     publisher: { '@id': `${SITE.url}/#organization` },
   };
   if (a.sameAs?.length) node.sameAs = a.sameAs;
+  if (a.screenshot?.length) node.screenshot = a.screenshot.map(abs);
   if (a.offerPrice != null) {
     node.offers = {
       '@type': 'Offer',

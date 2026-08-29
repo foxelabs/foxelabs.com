@@ -34,6 +34,29 @@ faq:
     a: No. There is no cron job and no polling. A page view renews an activity timestamp at most once per quarter of the timeout and never more than once a minute, so a 20-minute timeout costs roughly one small database write per user per five minutes of browsing.
   - q: Does the WordPress heartbeat keep an idle session alive?
     a: No. The heartbeat fires every 15 to 60 seconds from any open admin tab, so counting it as activity would keep an unattended dashboard signed in forever. AJAX and REST requests are checked but never treated as activity. WP-CLI and cron are exempt entirely.
+screenshots:
+  - src: ./screenshots/auto-logout/settings.png
+    tab: Auto Logout panel
+    alt: The Auto Logout settings panel in WordPress with the idle timeout in minutes and the warning countdown in seconds
+    heading: Idle timeout and warning, in one panel
+    body: Turn idle logout on to seed a 15-minute timeout, then set how long a session may sit unused and how long the warning dialog appears first.
+    caption: Idle logout ships switched off — signing people out is a deliberate choice, not a side effect of activating the add-on.
+    crumb: Users → Loggedin → Settings
+  - src: ./screenshots/auto-logout/role-timeouts.png
+    tab: Per-role timeouts
+    alt: Per-role idle timeout rows in the Auto Logout panel, with a short timeout for administrators and a longer one for subscribers
+    heading: Five minutes for admins, an hour for subscribers
+    body: Add a row per role to override the global timeout. Roles you don't list keep the global value, and custom roles appear in the picker automatically.
+    caption: When a user holds several roles with rules, the shortest timeout applies.
+    crumb: Users → Loggedin → Settings
+  - src: ./screenshots/auto-logout/warning-dialog.png
+    tab: Warning countdown
+    alt: The Auto Logout warning dialog counting down before a WordPress user is signed out, with Stay signed in and Sign out now buttons
+    heading: What the user sees
+    body: A countdown dialog before the session ends. Stay signed in renews it and restarts the timer, Sign out now ends it immediately, and ignoring it signs them out at zero.
+    caption: Activity in one tab keeps every other tab alive, with no extra server requests.
+    crumb: Front end or wp-admin
+
 ---
 
 ## What it does

@@ -34,6 +34,29 @@ faq:
     a: The core plugin applies one limit site-wide. The Limit Per Role add-on sets separate caps per role — for example one session for subscribers and three for editors — and Limit Per User overrides the cap for individual accounts.
   - q: Does Loggedin slow down my site?
     a: No. The session check runs at login, not on every page view, so there is no front-end performance cost. The plugin is deliberately small — it does one job rather than bundling a full security suite.
+screenshots:
+  - src: ./screenshots/loggedin/general-settings.png
+    tab: General settings
+    alt: Loggedin general settings in the WordPress admin showing the active logins limit and the login logic options
+    heading: Pick a number, pick what happens next
+    body: Set the maximum active logins per account, then choose the behaviour at the limit — block the new login, end the oldest session, or end all of them.
+    caption: The whole core plugin is this one panel. Everything else is an add-on.
+    crumb: Users → Loggedin → Settings
+  - src: ./screenshots/loggedin/blocked-login.png
+    tab: What the user sees
+    alt: The WordPress login screen showing the message a user gets when they reach the concurrent login limit
+    heading: A clear message, not a silent failure
+    body: With Block New selected, a user who has reached the limit is told why the login was refused instead of being bounced back to an empty form.
+    caption: Choose Logout Oldest instead and the newest login always wins.
+    crumb: wp-login.php
+  - src: ./screenshots/loggedin/addons-tab.png
+    tab: Add-ons catalog
+    alt: The Loggedin Add-ons tab in WordPress listing the available premium add-ons
+    heading: Add only what you need
+    body: The Add-ons tab lists every first-party add-on with a button to buy it, manage its license, or open its page. The core plugin stays lean.
+    caption: Add-ons declare the core plugin as a requirement, so WordPress won't activate one without it.
+    crumb: Users → Loggedin → Add-ons
+
 ---
 
 ## What it does

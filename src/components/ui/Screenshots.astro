@@ -1,0 +1,243 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+export interface Shot {
+  src: ImageMetadata;
+  alt: string;
+  tab: string;
+  heading: string;
+  body: string;
+  caption?: string;
+  crumb?: string;
+}
+
+interface Props {
+  shots: Shot[];
+  /** Section heading. */
+  heading?: string;
+  /** Optional lead paragraph under the heading. */
+  lead?: string;
+  /** Unique per page — ids have to be stable when two galleries ever coexist. */
+  id?: string;
+  class?: string;
+}
+
+const {
+  shots,
+  heading = 'See it in the admin',
+  lead,
+  id = 'shots',
+  class: className = '',
+} = Astro.props;
+
+// A single shot doesn't need a tab bar — it's just a framed figure.
+const tabbed = shots.length > 1;
+---
+{/* Every panel ships in the HTML and only the inactive ones are hidden, so
+    crawlers and answer engines read every caption whichever tab is open. */}
+{shots.length > 0 && (
+  <div class={`shots ${className}`} data-shots={id}>
+    <div class="max-w-2xl mb-9">
+      <h2 style="font-size: var(--text-h2); font-weight: 800;" class="mb-4">{heading}</h2>
+      {lead && <p style="font-size: var(--text-lead); color: var(--ink-body);">{lead}</p>}
+    </div>
+
+    {tabbed && (
+      <div class="shots__tabs" role="tablist" aria-label={`${heading} — screens`}>
+        {shots.map((shot, i) => (
+          <button
+            type="button"
+            class="shots__tab"
+            role="tab"
+            id={`${id}-tab-${i}`}
+            aria-controls={`${id}-panel-${i}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+          >
+            {shot.tab}
+          </button>
+        ))}
+      </div>
+    )}
+
+    {shots.map((shot, i) => (
+      <div
+        class="shots__panel"
+        role={tabbed ? 'tabpanel' : undefined}
+        id={`${id}-panel-${i}`}
+        aria-labelledby={tabbed ? `${id}-tab-${i}` : undefined}
+        hidden={tabbed && i > 0}
+      >
+        <figure class="shots__figure">
+          <div class="shots__frame">
+            {shot.crumb && (
+              <div class="shots__chrome">
+                <span class="shots__mark" aria-hidden="true"></span>
+                <span class="shots__crumb">{shot.crumb}</span>
+              </div>
+            )}
+            <Image
+              src={shot.src}
+              alt={shot.alt}
+              widths={[640, 960, 1280]}
+              sizes="(min-width: 1024px) 60vw, 100vw"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          {shot.caption && <figcaption class="shots__caption">{shot.caption}</figcaption>}
+        </figure>
+
+        <div class="shots__copy">
+          <h3 style="font-size: var(--text-h3); font-weight: 800;">{shot.heading}</h3>
+          <p>{shot.body}</p>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+<style>
+  .shots__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .shots__tab {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    padding: 0.55rem 0.95rem;
+    border-radius: 999px;
+    cursor: pointer;
+    color: var(--ink-body);
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .shots__tab:hover { border-color: var(--border); }
+
+  .shots__tab[aria-selected='true'] {
+    background: var(--accent-btn);
+    border-color: var(--accent-btn);
+    color: var(--accent-on);
+  }
+
+  .shots__panel {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: start;
+  }
+
+  .shots__panel[hidden] { display: none; }
+
+  @media (min-width: 900px) {
+    .shots__panel { grid-template-columns: 1.55fr 1fr; }
+  }
+
+  .shots__figure { margin: 0; }
+
+  /* The frame is what makes differently-cropped captures read as one set. */
+  .shots__frame {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow:
+      0 2px 4px rgb(28 25 23 / 0.06),
+      0 24px 48px -20px rgb(28 25 23 / 0.28);
+  }
+
+  .shots__chrome {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.85rem;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .shots__mark {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    border-radius: 50%;
+    border: 1.5px solid var(--ink-dim);
+    opacity: 0.65;
+  }
+
+  .shots__crumb {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    color: var(--ink-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .shots__frame :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .shots__caption {
+    margin-top: 0.85rem;
+    font-size: 13.5px;
+    color: var(--ink-dim);
+    max-width: 60ch;
+  }
+
+  .shots__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .shots__copy p {
+    font-size: 15px;
+    color: var(--ink-body);
+    margin: 0;
+  }
+</style>
+
+<script>
+  // Progressive enhancement: without JS every panel is still in the DOM and the
+  // first one is visible, so the section degrades to a plain framed screenshot.
+  document.querySelectorAll<HTMLElement>('[data-shots]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('.shots__tab'));
+    if (tabs.length < 2) return;
+
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
+        if (panel) panel.hidden = !on;
+      });
+      if (focus) tab.focus();
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', (event) => {
+        const keys: Record<string, number> = {
+          ArrowRight: i + 1,
+          ArrowLeft: i - 1,
+          Home: 0,
+          End: tabs.length - 1,
+        };
+        const next = keys[event.key];
+        if (next === undefined) return;
+        event.preventDefault();
+        select(tabs[(next + tabs.length) % tabs.length], true);
+      });
+    });
+  });
+</script>

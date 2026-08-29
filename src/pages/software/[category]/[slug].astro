@@ -8,6 +8,7 @@ import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
 import Faq from '../../../components/ui/Faq.astro';
+import Screenshots from '../../../components/ui/Screenshots.astro';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
 
 export async function getStaticPaths() {
@@ -93,6 +94,7 @@ const structuredData = [
     ratingValue: ratingMatch?.[1],
     ratingCount: ratingMatch?.[2]?.replace(/,/g, ''),
     sameAs: [data.url, data.repo, data.websiteUrl].filter(Boolean) as string[],
+    screenshot: data.screenshots.map((s) => s.src.src),
   }),
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
@@ -275,6 +277,19 @@ const specs = [
         </div>
       </div>
     </section>
+
+    {data.screenshots.length > 0 && (
+      <section id="screenshots" class="band band--light scroll-mt-24" data-reveal>
+        <div class="container-x">
+          <Screenshots
+            id={`shots-${project.id}`}
+            shots={data.screenshots}
+            heading={`${data.name} in the WordPress admin`}
+            lead={`Everything ${data.name} adds to wp-admin, and where to find it.`}
+          />
+        </div>
+      </section>
+    )}
 
     {addons.length > 0 && (
       <section id="addons" class="band band--alt scroll-mt-24" data-reveal>

@@ -31,6 +31,22 @@ faq:
     a: No, it is the other way round. Per-user beats per-role, and per-role beats the global setting. If an account has a Limit Per User override, that number applies whatever its roles allow.
   - q: Does a role limit change what happens when the cap is hit?
     a: No. Only the number changes. Your Login Logic setting — block the new login, log out the oldest session, or log out all sessions — still decides the outcome when a user reaches their cap.
+screenshots:
+  - src: ./screenshots/limit-per-role/settings.png
+    tab: Role limits
+    alt: The Limit Per Role panel in WordPress with a different concurrent session limit set for administrators, editors and subscribers
+    heading: One row per registered role
+    body: Tick the roles you want to override and give each its own number. Roles you leave alone keep using the global limit, with nothing stored for them.
+    caption: Custom roles registered by another plugin or your theme appear in the list automatically.
+    crumb: Users → Loggedin → Settings
+  - src: ./screenshots/limit-per-role/multi-role.png
+    tab: Multi-role users
+    alt: A WordPress user holding both the Editor and Shop Manager roles, showing which per-role session limit applies
+    heading: Highest wins
+    body: An editor who is also a shop manager, with three sessions allowed for editors and five for shop managers, gets five.
+    caption: Deliberately permissive — a sibling role should never lock someone out of their own account.
+    crumb: Users → All Users
+
 ---
 
 ## What it does

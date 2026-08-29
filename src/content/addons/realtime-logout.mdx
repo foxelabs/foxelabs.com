@@ -31,6 +31,22 @@ faq:
     a: No. The script is only enqueued when there is a logged-in user, on both the front end and the admin. Anonymous visitors are served nothing at all, so cached, logged-out traffic is completely unaffected.
   - q: Does Real-time Logout keep idle sessions alive?
     a: No. If you also run the Auto Logout add-on, its polling requests are checked for validity but never count as user activity, so a tab left open on an unattended screen still times out on schedule.
+screenshots:
+  - src: ./screenshots/realtime-logout/settings.png
+    tab: Settings panel
+    alt: The Real-time Logout settings panel in WordPress with the refresh interval set in seconds
+    heading: One control — how often tabs check in
+    body: Sixty seconds by default, and the recommended floor. Each open tab makes one request per interval, so the arithmetic is worth doing before you shorten it.
+    caption: The panel sits on the Loggedin settings tab, directly under General Settings.
+    crumb: Users → Loggedin → Settings
+  - src: ./screenshots/realtime-logout/logged-out.png
+    tab: What the user sees
+    alt: A WordPress tab reloading to the wp-login screen after the session was ended on another device
+    heading: The tab bounces to wp-login
+    body: The moment the session is gone — a logout elsewhere, an admin force-logout, or a hit session limit — the tab hard-reloads and WordPress redirects to the login screen.
+    caption: Without the add-on, that tab keeps rendering as if signed in until the user clicks something.
+    crumb: Front end or wp-admin
+
 ---
 
 ## What it does

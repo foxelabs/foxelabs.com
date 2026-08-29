@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import type { ImageFunction } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 // Shared fields across both tracks.
@@ -19,10 +20,30 @@ const base = {
   faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
 };
 
+/** One captured screen. `src` is optimised by Astro, so width/height come for
+ *  free and the frame never shifts while the image loads. */
+const screenshot = (image: ImageFunction) =>
+  z.object({
+    src: image(),
+    // Full sentence describing the screen, with the page's keyword in it.
+    alt: z.string(),
+    // Short tab label, e.g. 'Sessions list'.
+    tab: z.string(),
+    // Heading + body shown beside the image.
+    heading: z.string(),
+    body: z.string(),
+    // Sentence under the frame — the most-read, most-quotable line on the page.
+    caption: z.string().optional(),
+    // wp-admin path on the frame's chrome bar, e.g. 'Users → Loggedin → Sessions'.
+    // Doubles as the answer to "where do I find this screen?".
+    crumb: z.string().optional(),
+  });
+
 // One collection, two shapes, discriminated on `track`.
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
-  schema: z.discriminatedUnion('track', [
+  // Function form so the schema can use the image() helper for screenshots.
+  schema: ({ image }) => z.discriminatedUnion('track', [
     // ---- Trading tools (MT5 EAs, journal, indicators) ----
     z.object({
       ...base,
@@ -90,6 +111,7 @@ const projects = defineCollection({
       rating: z.string().optional(),
       since: z.string().optional(),
       features: z.array(z.string()).default([]),
+      screenshots: z.array(screenshot(image)).default([]),
     }),
   ]),
 });
@@ -122,7 +144,7 @@ const blog = defineCollection({
 // Each gets its own page and is listed on the parent product page.
 const addons = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/addons' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     name: z.string(),
     tagline: z.string(),
     summary: z.string(),
@@ -147,6 +169,7 @@ const addons = defineCollection({
     // Q&A pairs rendered as a visible FAQ section + FAQPage JSON-LD (SEO rich
     // results + GEO: clean, quotable answers for AI answer engines).
     faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
+    screenshots: z.array(screenshot(image)).default([]),
     draft: z.boolean().default(false),
   }),
 });
