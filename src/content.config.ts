@@ -140,6 +140,13 @@ const addons = defineCollection({
     features: z.array(z.string()).default([]),
     // Iconify name shown on the parent project's add-on card, e.g. 'mingcute:group-line'.
     icon: z.string().optional(),
+    // SEO overrides (affect <title>/meta only, never visible copy).
+    // seoTitle is the keyword-first lead; templates append " | Foxe Labs".
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+    // Q&A pairs rendered as a visible FAQ section + FAQPage JSON-LD (SEO rich
+    // results + GEO: clean, quotable answers for AI answer engines).
+    faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),
     draft: z.boolean().default(false),
   }),
 });

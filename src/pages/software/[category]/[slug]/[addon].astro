@@ -5,9 +5,10 @@ import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
 import Button from '../../../../components/ui/Button.astro';
 import PricingCard from '../../../../components/ui/PricingCard.astro';
+import Faq from '../../../../components/ui/Faq.astro';
 import { Icon } from 'astro-icon/components';
 import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
-import { breadcrumbLd, softwareApplicationLd } from '../../../../config/seo';
+import { breadcrumbLd, softwareApplicationLd, faqLd } from '../../../../config/seo';
 
 export async function getStaticPaths() {
   const [addons, projects] = await Promise.all([
@@ -76,6 +77,7 @@ const structuredData = [
     sameAs: data.url ? [data.url] : undefined,
   }),
 ];
+if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
 ---
 <BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
@@ -132,6 +134,8 @@ const structuredData = [
             <article class="prose-foxe max-w-none">
               <Content />
             </article>
+
+            {data.faq.length > 0 && <Faq items={data.faq} />}
           </div>
 
           <aside class="lg:col-span-5">
