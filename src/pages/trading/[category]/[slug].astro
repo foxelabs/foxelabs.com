@@ -10,6 +10,7 @@ import { Icon } from 'astro-icon/components';
 import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
 import Faq from '../../../components/ui/Faq.astro';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
+import { accentFor, accentVars } from '../../../config/accents';
 
 export async function getStaticPaths() {
   const products = await getCollection(
@@ -23,6 +24,15 @@ export async function getStaticPaths() {
 }
 
 const { product } = Astro.props;
+
+// Same ordered sibling list the category grid uses, so this page's hue matches
+// the card that opened it.
+const siblingIds = (await getCollection(
+  'projects',
+  ({ data }) => !data.draft && data.track === 'trading' && data.category === product.data.category
+))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((p) => p.id);
 const { data } = product;
 const { Content } = await render(product);
 const cat = categoryMeta('trading', data.category);
@@ -59,10 +69,10 @@ const structuredData = [
 ---
 <BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
-  <main class="track-trading">
-    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">
+  <main id="main" class="track-trading" style={accentVars(accentFor(siblingIds, product.id))}>
+    <div class="band band--alt" style="padding-block: var(--space-section-sm);">
       <div class="container-x">
-        <a href={categoryPath('trading', data.category)} class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+        <a href={categoryPath('trading', data.category)} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
@@ -72,17 +82,17 @@ const structuredData = [
 
         <div class="flex items-center gap-3 mb-5">
           <span
-            class="font-mono text-[10px] px-2.5 py-1.5 rounded-full"
-            style="background: var(--gold-soft); color: var(--gold-deep); letter-spacing: 0.08em;"
+            class="lozenge"
+            style="background: var(--accent-soft); color: var(--accent-deep);"
           >
             {statusLabel[data.status] ?? data.status}
           </span>
-          <span class="font-mono text-[11px]" style="color: var(--ink-dim);">
+          <span class="text-[11px]" style="color: var(--ink-dim);">
             {data.market} · {data.platform}{data.version ? ` · ${data.version}` : ''}
           </span>
         </div>
 
-        <h1 style="font-size: var(--text-hero); font-weight: 800;" class="mb-4">
+        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-4">
           {data.name}
         </h1>
         <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">
@@ -92,18 +102,18 @@ const structuredData = [
     </div>
 
     {data.highlights.length > 0 && (
-      <section class="band band--invert band--glow" data-reveal>
+      <section class="band band--invert" data-reveal>
         <div class="container-x">
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
             {data.highlights.map((h) => (
               <div>
                 <div
-                  class="w-11 h-11 rounded-xl flex items-center justify-center mb-5"
+                  class="w-11 h-11 rounded-[8px] flex items-center justify-center mb-5"
                   style="background: var(--surface-invert-raised); border: 1px solid var(--border-invert);"
                 >
                   <Icon name={h.icon} width={20} height={20} style="color: var(--accent);" aria-hidden="true" />
                 </div>
-                <h3 style="font-size: 1.0625rem; font-weight: 800;" class="mb-2.5">{h.title}</h3>
+                <h3 style="font-size: 1.0625rem; font-weight: var(--fw-heading);" class="mb-2.5">{h.title}</h3>
                 <p class="text-[14.5px] m-0" style="color: var(--ink-invert-dim);">{h.body}</p>
               </div>
             ))}
@@ -121,7 +131,7 @@ const structuredData = [
               <ul class="list-none m-0 p-0 space-y-3 mb-12">
                 {data.features.map((f) => (
                   <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
-                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--gold-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     <span>{f}</span>
@@ -133,7 +143,6 @@ const structuredData = [
             <article class="prose-foxe max-w-none">
               <Content />
             </article>
-            <Faq items={data.faq} />
           </div>
 
           <aside class="lg:col-span-5">
@@ -187,7 +196,7 @@ const structuredData = [
                   {data.specs.map((s) => (
                     <div class="flex items-center justify-between gap-4 py-3 text-[14px]" style="border-bottom: 1px solid var(--border-soft);">
                       <dt style="color: var(--ink-body);">{s.label}</dt>
-                      <dd class="font-mono text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
+                      <dd class="text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -197,6 +206,16 @@ const structuredData = [
         </div>
       </div>
     </section>
+
+    {data.faq.length > 0 && (
+      <section class="band band--light" data-reveal style="border-top: 1px solid var(--border-soft);">
+        <div class="container-x">
+          <div class="max-w-3xl">
+            <Faq items={data.faq} bare />
+          </div>
+        </div>
+      </section>
+    )}
   </main>
   <Footer />
 </BaseLayout>

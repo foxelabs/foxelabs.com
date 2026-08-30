@@ -65,7 +65,9 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <link rel="icon" href="/favicon.ico" sizes="48x48" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="theme-color" content="#0d0d0f" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="alternate" type="application/rss+xml" title="Foxe Labs Blog" href="/rss.xml" />
+    <meta name="theme-color" content="#FFFFFF" />
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content={SITE.locale} />
@@ -106,6 +108,7 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <Analytics />
   </head>
   <body>
+    <a href="#main" class="skip-link">Skip to content</a>
     <slot />
 
     <script is:inline>

@@ -24,7 +24,7 @@ const qualifier = qParts.join(' · ');
 ---
 <div class={`card p-7 lg:sticky lg:top-24 ${className}`}>
   {badge && (
-    <span class="inline-block font-mono text-[10px] px-2.5 py-1.5 rounded-full mb-5" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+    <span class="inline-block lozenge mb-5" style="background: var(--accent-soft); color: var(--accent-deep);">
       {badge}
     </span>
   )}
@@ -32,7 +32,7 @@ const qualifier = qParts.join(' · ');
   {amount && (
     <div class="mb-6">
       {kicker && (
-        <p class="font-mono text-[11px] mb-1" style="color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase;">{kicker}</p>
+        <p class="text-[11px] mb-1" style="color: var(--ink-dim); text-transform: uppercase;">{kicker}</p>
       )}
       <div class="flex items-baseline gap-2 flex-wrap">
         <span class="font-display font-bold" style="font-size: clamp(2.75rem, 2rem + 2vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; color: var(--ink);">

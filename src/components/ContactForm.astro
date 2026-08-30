@@ -1,34 +1,52 @@
 ---
-const fieldClass =
-  'px-4 py-3 text-[15px] border rounded-xl outline-none transition-colors disabled:opacity-60 placeholder:text-[var(--ink-dim)]';
-const fieldStyle = 'border-color: var(--border); background: var(--surface); color: var(--ink);';
-const labelClass = 'font-mono text-[11px] uppercase';
-const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
+// ADS field + label classes live in global.css so every form matches.
+const fieldClass = 'field';
+const labelClass = 'field-label';
 ---
 <form data-contact-form class="w-full" novalidate>
   <div data-fields class="flex flex-col gap-5">
     <div class="grid sm:grid-cols-2 gap-5">
-      <div class="flex flex-col gap-2">
-        <label for="c-name" class={labelClass} style={labelStyle}>Name</label>
+      <div>
+        <label for="c-name" class={labelClass}>Name</label>
         <input
           id="c-name" type="text" name="name" required maxlength="120" placeholder="Jane Trader"
-          class={fieldClass} style={fieldStyle}
+          class={fieldClass}
         />
       </div>
-      <div class="flex flex-col gap-2">
-        <label for="c-email" class={labelClass} style={labelStyle}>Email</label>
+      <div>
+        <label for="c-email" class={labelClass}>Email</label>
         <input
           id="c-email" type="email" name="email" required placeholder="you@domain.com"
-          class={fieldClass} style={fieldStyle}
+          class={fieldClass}
         />
       </div>
     </div>
 
-    <div class="flex flex-col gap-2">
-      <label for="c-message" class={labelClass} style={labelStyle}>Message</label>
+    <div class="grid sm:grid-cols-2 gap-5">
+      <div>
+        <label for="c-subject" class={labelClass}>Subject</label>
+        <input
+          id="c-subject" type="text" name="subject" required maxlength="150" placeholder="Licensing question"
+          class={fieldClass}
+        />
+      </div>
+      <div>
+        <label for="c-license" class={labelClass}>
+          License key <span style="font-weight: var(--fw-body); color: var(--ink-dim);">(optional)</span>
+        </label>
+        <input
+          id="c-license" type="text" name="license" maxlength="120" placeholder="sk_a1b2c3d4e5f6"
+          autocomplete="off" spellcheck="false"
+          class={fieldClass}
+        />
+      </div>
+    </div>
+
+    <div>
+      <label for="c-message" class={labelClass}>Message</label>
       <textarea
         id="c-message" name="message" required rows="6" maxlength="5000" placeholder="What's on your mind?"
-        class={`${fieldClass} resize-y`} style={fieldStyle}
+        class={fieldClass}
       ></textarea>
     </div>
 
@@ -38,7 +56,7 @@ const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
 
     <button
       type="submit" data-submit
-      class="btn btn--primary self-start !py-3 !px-6 disabled:opacity-60 disabled:cursor-not-allowed"
+      class="btn btn--primary self-start !px-4 disabled:opacity-60 disabled:cursor-not-allowed"
     >
       <span data-label-text>Send message</span>
       <svg data-spinner class="hidden animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -48,7 +66,7 @@ const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
     </button>
   </div>
 
-  <div data-success class="hidden flex-col items-center text-center py-6">
+  <div data-success role="status" tabindex="-1" class="hidden flex-col items-center text-center py-6">
     <span data-success-mark class="inline-flex items-center justify-center rounded-full mb-5"
       style="width: 64px; height: 64px; background: color-mix(in srgb, var(--accent) 14%, transparent);">
       <svg width="34" height="34" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -57,12 +75,12 @@ const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
           stroke-linecap="round" stroke-linejoin="round" fill="none" />
       </svg>
     </span>
-    <p class="text-lg font-semibold mb-1.5" style="color: var(--ink);">Message sent — caught by the fox. 🦊</p>
-    <p class="text-sm m-0" style="color: var(--ink-body);">
-      It just landed in the inbox. Expect a reply within a day, IST fox time.
+    <p class="mb-1.5" style="font-size: var(--text-h4); font-weight: var(--fw-heading); color: var(--ink);">Message sent — caught by the fox. 🦊</p>
+    <p class="m-0" style="font-size: var(--text-ui); color: var(--ink-body);">
+      It just landed in the inbox. Expect a reply within one business day (IST).
     </p>
   </div>
-  <p data-error class="hidden mt-4 text-sm font-mono" style="color: var(--red);">
+  <p data-error role="alert" class="hidden mt-4 text-[14px]" style="color: var(--red);">
     Something went wrong. Try again or email support@foxelabs.com.
   </p>
 </form>
@@ -132,6 +150,8 @@ const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
       const payload = {
         name: form.querySelector('[name="name"]').value,
         email: form.querySelector('[name="email"]').value,
+        subject: form.querySelector('[name="subject"]').value,
+        license: form.querySelector('[name="license"]').value,
         message: form.querySelector('[name="message"]').value,
         company: form.querySelector('[name="company"]').value,
       };
@@ -145,6 +165,7 @@ const labelStyle = 'color: var(--ink-dim); letter-spacing: 0.12em;';
         if (!res.ok) throw new Error('request failed');
         fields.classList.add('hidden');
         success.classList.remove('hidden');
+        success.focus();
       } catch {
         errorEl.classList.remove('hidden');
         setLoading(false);

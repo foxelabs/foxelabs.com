@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { allowRequest } from '../../lib/rateLimit';
 
 export const prerender = false;
 
@@ -11,7 +12,11 @@ const json = (status: number, body: Record<string, unknown>) =>
     headers: { 'Content-Type': 'application/json' },
   });
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  if (!allowRequest(`waitlist:${clientAddress}`)) {
+    return json(429, { ok: false, error: 'Too many requests' });
+  }
+
   const apiKey = import.meta.env.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
   const audienceId =
     import.meta.env.RESEND_AUDIENCE_ID ?? process.env.RESEND_AUDIENCE_ID;
@@ -26,13 +31,17 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   let email: unknown;
+  let trap = '';
   try {
     const body = await request.json();
     email = body?.email;
+    // Honeypot: real users leave this empty.
+    trap = typeof body?.website === 'string' ? body.website.trim() : '';
   } catch {
     return json(400, { ok: false, error: 'Invalid JSON' });
   }
 
+  if (trap) return json(200, { ok: true });
   if (typeof email !== 'string' || !EMAIL_RE.test(email)) {
     return json(400, { ok: false, error: 'Invalid email' });
   }
@@ -47,9 +56,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (error) {
       console.error('[waitlist] resend error:', error);
-      const duplicate =
-        error.name === 'validation_error' ||
-        /already exists/i.test(error.message ?? '');
+      // Match the "already exists" message only — a generic validation_error
+      // means Resend rejected the address, not that it's a duplicate.
+      const duplicate = /already exists/i.test(error.message ?? '');
       if (duplicate) return json(200, { ok: true, duplicate: true });
       return json(502, {
         ok: false,

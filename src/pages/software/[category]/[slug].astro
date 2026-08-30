@@ -10,6 +10,7 @@ import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../con
 import Faq from '../../../components/ui/Faq.astro';
 import Screenshots from '../../../components/ui/Screenshots.astro';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
+import { accentFor, accentVars } from '../../../config/accents';
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -23,6 +24,15 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+
+// Same ordered sibling list the category grid uses, so this page's hue matches
+// the card that opened it.
+const siblingIds = (await getCollection(
+  'projects',
+  ({ data }) => !data.draft && data.track === 'oss' && data.category === project.data.category
+))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((p) => p.id);
 const { data } = project;
 const { Content } = await render(project);
 const cat = categoryMeta('oss', data.category);
@@ -30,6 +40,9 @@ const cat = categoryMeta('oss', data.category);
 // Add-ons that extend this project, ordered.
 const addons = (await getCollection('addons', (a) => !a.data.draft && a.data.parent === project.id))
   .sort((a, b) => a.data.order - b.data.order);
+
+// Ordered add-on ids, so a card here and the add-on's own page share a hue.
+const addonIds = addons.map((a) => a.id);
 
 // Build an install one-liner from whatever registry info is present.
 // Libraries carry install docs in their body/docs, so skip the box for them.
@@ -47,7 +60,7 @@ const DOCS_FALLBACK = 'https://docs.foxelabs.com';
 const docsUrl = data.docsUrl ?? DOCS_FALLBACK;
 const changelogUrl = data.changelogUrl ?? DOCS_FALLBACK;
 // Acquired projects point support at the new owner's channel; ours goes to /contact.
-const supportUrl = data.supportUrl ?? '/contact';
+const supportUrl = data.supportUrl ?? '/contact/';
 
 // Label + icon for the canonical registry listing button.
 const registryCta =
@@ -88,7 +101,9 @@ const structuredData = [
     name: data.name,
     description: data.summary,
     url: projectPath('oss', data.category, project.id),
-    applicationCategory: data.kind,
+    // Schema.org prefers its enumerated categories over freeform strings like
+    // "WordPress Plugin" — data.kind stays visible copy only.
+    applicationCategory: 'DeveloperApplication',
     operatingSystem: data.category === 'plugins' ? 'WordPress' : 'PHP',
     offerPrice: '0',
     ratingValue: ratingMatch?.[1],
@@ -109,12 +124,20 @@ const specs = [
   data.rating && { label: 'Rating', value: data.rating },
 ].filter(Boolean) as { label: string; value: string }[];
 ---
-<BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
+<BaseLayout
+  title={pageTitle}
+  description={metaDescription}
+  image={data.screenshots[0]?.src.src}
+  imageAlt={data.screenshots[0]?.alt}
+  imageWidth={data.screenshots[0]?.src.width}
+  imageHeight={data.screenshots[0]?.src.height}
+  jsonLd={structuredData}
+>
   <Nav />
-  <main class="track-oss">
-    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">
+  <main id="main" class="track-oss" style={accentVars(accentFor(siblingIds, project.id))}>
+    <div class="band band--alt" style="padding-block: var(--space-section-sm);">
       <div class="container-x">
-        <a href={categoryPath('oss', data.category)} class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+        <a href={categoryPath('oss', data.category)} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
@@ -123,22 +146,22 @@ const specs = [
         </a>
 
         <div class="flex items-center gap-3 mb-5 flex-wrap">
-          <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+          <span class="lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">
             {data.language}
           </span>
-          <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+          <span class="lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">
             Open source · {data.license}
           </span>
-          <span class="font-mono text-[11px]" style="color: var(--ink-dim);">{data.kind}</span>
+          <span class="text-[11px]" style="color: var(--ink-dim);">{data.kind}</span>
         </div>
 
         <div class="flex items-center gap-3 flex-wrap mb-4">
-          <h1 style="font-size: var(--text-hero); font-weight: 800;">{data.name}</h1>
+          <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);">{data.name}</h1>
           {addons.length > 0 && (
             <a
               href="#addons"
-              class="inline-flex items-center gap-1.5 font-mono text-[11px] px-3 py-1.5 rounded-full no-underline transition-colors"
-              style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.04em; border: 1px solid color-mix(in srgb, var(--accent-ink) 20%, transparent);"
+              class="inline-flex items-center gap-1.5 lozenge no-underline transition-colors"
+              style="background: var(--accent-soft); color: var(--accent-deep); border: 1px solid color-mix(in srgb, var(--accent-ink) 20%, transparent);"
             >
               <Icon name="mingcute:puzzled-line" width={13} height={13} aria-hidden="true" />
               {addons.length} add-on{addons.length > 1 ? 's' : ''}
@@ -156,7 +179,7 @@ const specs = [
           <div class="lg:col-span-7">
             {data.acquired && (
               <div
-                class="flex items-start gap-3 mb-12 p-5 rounded-2xl"
+                class="flex items-start gap-3 mb-12 p-5 rounded-[8px]"
                 style="background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 22%, transparent);"
                 role="note"
               >
@@ -202,7 +225,7 @@ const specs = [
                   {specs.map((s) => (
                     <div class="flex items-center justify-between gap-4 py-3 text-[14px]" style="border-bottom: 1px solid var(--border-soft);">
                       <dt style="color: var(--ink-body);">{s.label}</dt>
-                      <dd class="font-mono text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
+                      <dd class="text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
                     </div>
                   ))}
                 </dl>
@@ -210,8 +233,8 @@ const specs = [
 
               {install && (
                 <div class="mb-6">
-                  <p class="font-mono text-[11px] mb-2" style="color: var(--ink-dim); letter-spacing: 0.08em; text-transform: uppercase;">Install</p>
-                  <code class="block font-mono text-[13px] px-3 py-2.5 rounded-lg overflow-x-auto" style="background: var(--surface-invert); color: var(--ink-invert);">{install}</code>
+                  <p class="text-[11px] mb-2" style="color: var(--ink-dim); text-transform: uppercase;">Install</p>
+                  <code class="block font-code text-[13px] px-3 py-2.5 rounded-[4px] overflow-x-auto" style="background: var(--surface-invert); color: var(--ink-invert);">{install}</code>
                 </div>
               )}
 
@@ -255,14 +278,14 @@ const specs = [
               {addons.length > 0 && (
                 <a
                   href="#addons"
-                  class="addon-hint group flex items-center gap-3 mt-5 p-3.5 rounded-xl no-underline"
+                  class="addon-hint group flex items-center gap-3 mt-5 p-3.5 rounded-[8px] no-underline"
                   style="background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 18%, transparent);"
                 >
-                  <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style="background: var(--surface);">
+                  <span class="w-9 h-9 rounded-[4px] flex items-center justify-center shrink-0" style="background: var(--surface);">
                     <Icon name="mingcute:puzzled-line" width={18} height={18} style="color: var(--accent-ink);" aria-hidden="true" />
                   </span>
                   <span class="flex-1 min-w-0">
-                    <span class="block font-mono text-[10px] uppercase" style="color: var(--accent-deep); letter-spacing: 0.1em;">
+                    <span class="block font-code text-[10px] uppercase" style="color: var(--accent-deep);">
                       {addons.length} add-on{addons.length > 1 ? 's' : ''} available
                     </span>
                     <span class="block text-[13.5px] font-medium" style="color: var(--ink);">
@@ -296,7 +319,7 @@ const specs = [
         <div class="container-x">
           <div class="max-w-2xl mb-12">
             <Eyebrow class="mb-5">Add-ons</Eyebrow>
-            <h2 style="font-size: var(--text-h2); font-weight: 800;" class="mb-4">
+            <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
               Extend {data.name} when you need more.
             </h2>
             <p style="font-size: var(--text-lead); color: var(--ink-body);">
@@ -309,29 +332,30 @@ const specs = [
             {addons.map((addon) => (
               <a
                 href={addonPath('oss', data.category, project.id, addon.id)}
-                class="card card--hover p-7 flex flex-col group"
+                class="addon-card card card--hover p-7 flex flex-col group"
+                style={accentVars(accentFor(addonIds, addon.id))}
               >
                 <div class="flex items-center justify-between gap-3 mb-4">
-                  <div class="w-11 h-11 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
+                  <div class="w-11 h-11 rounded-[8px] flex items-center justify-center" style="background: var(--accent-soft);">
                     <Icon name={addon.data.icon ?? 'mingcute:puzzled-line'} width={21} height={21} style="color: var(--accent-ink);" aria-hidden="true" />
                   </div>
                   {addon.data.location && (
-                    <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full whitespace-nowrap" style="background: var(--surface-alt); color: var(--ink-dim); letter-spacing: 0.06em;">
+                    <span class="lozenge whitespace-nowrap" style="background: var(--surface-alt); color: var(--ink-dim);">
                       {addon.data.location}
                     </span>
                   )}
                 </div>
-                <h3 style="font-size: var(--text-h3); font-weight: 800;" class="mb-2 transition-colors group-hover:text-[var(--accent-ink)]">
+                <h3 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-2 transition-colors group-hover:text-[var(--accent-ink)]">
                   {addon.data.name}
                 </h3>
                 <p class="text-[15px] mb-6 flex-1" style="color: var(--ink-body);">{addon.data.summary}</p>
                 <div class="flex items-center justify-between gap-4">
-                  <span class="inline-flex items-center gap-1.5 font-mono text-[12px] font-medium" style="color: var(--accent-ink);">
+                  <span class="inline-flex items-center gap-1.5 text-[12px] font-medium" style="color: var(--accent-ink);">
                     Learn more
                     <span class="transition-transform group-hover:translate-x-0.5">→</span>
                   </span>
                   {addon.data.price && (
-                    <span class="font-mono text-[12px]" style="color: var(--ink);">{addon.data.price}</span>
+                    <span class="text-[12px]" style="color: var(--ink);">{addon.data.price}</span>
                   )}
                 </div>
               </a>
@@ -342,7 +366,7 @@ const specs = [
     )}
 
     {data.faq.length > 0 && (
-      <section class="band band--light" data-reveal>
+      <section class="band band--light" data-reveal style="border-top: 1px solid var(--border-soft);">
         <div class="container-x">
           <div class="max-w-3xl">
             <Faq items={data.faq} bare />
@@ -355,6 +379,12 @@ const specs = [
 </BaseLayout>
 
 <style>
+  /* Each add-on card carries its own --accent-*; the top rule surfaces the hue
+     it will keep on its own page. */
+  .addon-card {
+    border-top: 3px solid var(--accent-ink);
+  }
+
   .addon-hint {
     transition: transform 160ms ease, box-shadow 160ms ease;
   }

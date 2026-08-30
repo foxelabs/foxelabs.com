@@ -6,19 +6,37 @@ import ContactForm from '../components/ContactForm.astro';
 import Section from '../components/ui/Section.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import { Icon } from 'astro-icon/components';
-import { breadcrumbLd, SITE } from '../config/seo';
+import { abs, breadcrumbLd, SITE } from '../config/seo';
 
 const contactLd = {
   '@context': 'https://schema.org',
   '@type': 'ContactPage',
   name: 'Contact Foxe Labs',
-  url: `${SITE.url}/contact`,
+  url: abs('/contact'),
   mainEntity: {
     '@type': 'Organization',
     '@id': `${SITE.url}/#organization`,
     email: 'support@foxelabs.com',
   },
 };
+
+const channels = [
+  {
+    icon: 'mingcute:mail-line',
+    label: 'Email',
+    value: 'support@foxelabs.com',
+    href: 'mailto:support@foxelabs.com',
+    ink: 'var(--b500)',
+    soft: 'var(--b50)',
+  },
+  {
+    icon: 'mingcute:location-line',
+    label: 'Where we are',
+    value: 'Kerala, India — London & New York sessions',
+    ink: 'var(--acc-teal-bold)',
+    soft: 'var(--acc-teal-soft)',
+  },
+];
 
 const studioSocials = [
   { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
@@ -46,44 +64,54 @@ const founderSocials = [
   ]}
 >
   <Nav />
-  <main class="track-hub">
+  <main id="main" class="track-hub">
     <Section variant="alt">
       <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
         <div class="lg:col-span-5">
           <Eyebrow class="mb-5">Contact</Eyebrow>
-          <h1 style="font-size: var(--text-hero); font-weight: 800;" class="mb-5">
+          <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
             Say <span style="color: var(--accent-ink);">hello</span>.
           </h1>
-          <p class="mb-8" style="font-size: var(--text-lead); color: var(--ink-body);">
+          <p class="mb-8 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
             A plugin question, an EA idea, licensing, or a custom build — send it
             over. No ticket queues, no tier one: your message lands in the inbox
-            of the person who wrote the code.
+            of the team that wrote the code.
           </p>
 
           <!-- Terminal easter-egg -->
           <div
-            class="font-mono text-[12.5px] leading-[1.9] px-5 py-4 rounded-xl mb-8 overflow-x-auto"
-            style="background: var(--surface-invert); color: var(--ink-invert);"
+            class="font-code leading-[1.9] px-5 py-4 mb-8 overflow-x-auto"
+            style="background: var(--surface-invert); color: var(--ink-invert); font-size: var(--text-small); border-radius: var(--r-md);"
           >
-            <div><span style="color: var(--oss);">$</span> whoami</div>
+            <div><span style="color: var(--chart-up);">$</span> whoami</div>
             <div style="color: var(--ink-invert-dim);">→ the fox who answers the mail</div>
-            <div><span style="color: var(--gold);">$</span> uptime --replies</div>
+            <div><span style="color: var(--acc-yellow);">$</span> uptime --replies</div>
             <div style="color: var(--ink-invert-dim);">→ usually within a day. IST, fox time.</div>
           </div>
 
-          <div class="space-y-4 mb-9">
-            <a href="mailto:support@foxelabs.com" class="flex items-center gap-3 text-[15px] transition-colors hover:text-[var(--ink)]" style="color: var(--ink-body);">
-              <Icon name="mingcute:mail-line" width={17} height={17} style="color: var(--accent-ink);" aria-hidden="true" />
-              support@foxelabs.com
-            </a>
-            <p class="flex items-center gap-3 text-[15px] m-0" style="color: var(--ink-body);">
-              <Icon name="mingcute:location-line" width={17} height={17} style="color: var(--accent-ink);" aria-hidden="true" />
-              Kerala, India — London &amp; New York sessions
-            </p>
+          <div class="grid gap-3 mb-9">
+            {channels.map((c) => {
+              const Tag = c.href ? 'a' : 'div';
+              return (
+                <Tag
+                  href={c.href}
+                  class:list={['contact-row flex items-center gap-3 p-3', c.href && 'contact-row--link']}
+                  style={`--row-soft: ${c.soft}; --row-ink: ${c.ink}; font-size: var(--text-ui); color: var(--ink-body);`}
+                >
+                  <span class="w-9 h-9 shrink-0 flex items-center justify-center" style={`background: ${c.soft}; border-radius: var(--r-sm);`}>
+                    <Icon name={c.icon} width={17} height={17} style={`color: ${c.ink};`} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span class="block" style={`font-size: var(--text-small); color: ${c.ink}; font-weight: var(--fw-bold);`}>{c.label}</span>
+                    {c.value}
+                  </span>
+                </Tag>
+              );
+            })}
           </div>
 
           <div class="mb-7">
-            <p class="font-mono text-[11px] mb-3" style="color: var(--ink-dim); letter-spacing: 0.12em; text-transform: uppercase;">
+            <p class="mb-3" style="font-size: var(--text-small); color: var(--acc-purple-bold); font-weight: var(--fw-heading); text-transform: uppercase; letter-spacing: 0.06em;">
               The studio
             </p>
             <div class="flex flex-wrap gap-2">
@@ -92,7 +120,7 @@ const founderSocials = [
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="social-pill inline-flex items-center gap-1.5 font-mono text-[12px] px-3 py-1.5 rounded-full"
+                  class="social-pill inline-flex items-center gap-1.5 lozenge"
                   style={`--brand: ${s.brand};`}
                 >
                   <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
@@ -102,7 +130,7 @@ const founderSocials = [
           </div>
 
           <div>
-            <p class="font-mono text-[11px] mb-3" style="color: var(--ink-dim); letter-spacing: 0.12em; text-transform: uppercase;">
+            <p class="mb-3" style="font-size: var(--text-small); color: var(--acc-orange-bold); font-weight: var(--fw-heading); text-transform: uppercase; letter-spacing: 0.06em;">
               The human behind it
             </p>
             <div class="flex flex-wrap gap-2">
@@ -111,7 +139,7 @@ const founderSocials = [
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="social-pill inline-flex items-center gap-1.5 font-mono text-[12px] px-3 py-1.5 rounded-full"
+                  class="social-pill inline-flex items-center gap-1.5 lozenge"
                   style={`--brand: ${s.brand};`}
                 >
                   <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
@@ -129,10 +157,22 @@ const founderSocials = [
       </div>
     </Section>
   </main>
-  <Footer />
+  <Footer cta={false} />
 </BaseLayout>
 
 <style>
+  /* Contact channels: a soft tint per channel, deepening on hover. */
+  .contact-row {
+    background: var(--surface);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-md);
+    transition: border-color 180ms ease, background-color 180ms ease;
+  }
+  .contact-row--link:hover {
+    background: var(--row-soft);
+    border-color: var(--row-ink);
+  }
+
   /* Restrained, theme-aligned social pills */
   .social-pill {
     background: var(--surface-alt);
@@ -148,11 +188,11 @@ const founderSocials = [
   }
   .social-pill:hover {
     color: var(--ink);
-    border-color: var(--accent-ink);
+    border-color: var(--brand);
     transform: translateY(-2px);
   }
   .social-pill:hover .social-pill__icon {
-    color: var(--accent-ink);
+    color: var(--brand);
     transform: scale(1.1);
   }
   .social-pill:focus-visible {

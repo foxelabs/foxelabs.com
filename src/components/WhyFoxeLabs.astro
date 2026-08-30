@@ -1,13 +1,14 @@
 ---
 import Section from './ui/Section.astro';
 import Eyebrow from './ui/Eyebrow.astro';
+import { ACCENTS, accentVars } from '../config/accents';
 
 const items = [
   {
     n: '01',
-    title: 'Built by a trader.',
+    title: 'Built by traders.',
     body:
-      'Every product is built and traded live by the same person who wrote the code. No theory — only what survives the market.',
+      'Every product is built and traded live by the same team that wrote the code. No theory — only what survives the market.',
   },
   {
     n: '02',
@@ -23,16 +24,16 @@ const items = [
   },
   {
     n: '04',
-    title: 'The builder answers.',
+    title: 'The builders answer.',
     body:
-      'No outsourced help desk, no tier one. Your question goes straight to the person who wrote the code it\'s about.',
+      'No outsourced help desk, no tier one. Your question goes straight to the team that wrote the code it\'s about.',
   },
 ];
 ---
 <Section id="why" variant="alt">
   <div class="max-w-2xl mb-14">
     <Eyebrow class="mb-5">Why Foxe Labs</Eyebrow>
-    <h2 style="font-size: var(--text-h2); font-weight: 800;" class="mb-4">
+    <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
       Why buy from the people who trade it?
     </h2>
     <p style="font-size: var(--text-lead); color: var(--ink-body);">
@@ -41,13 +42,13 @@ const items = [
   </div>
 
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-    {items.map((item) => (
-      <div>
-        <p class="font-mono text-[12px] mb-4 pb-4" style="color: var(--gold-ink); letter-spacing: 0.1em; border-bottom: 1px solid var(--border);">
+    {items.map((item, i) => (
+      <div style={accentVars(ACCENTS[i % ACCENTS.length])}>
+        <p class="mb-4 pb-4" style="font-size: var(--text-ui); font-weight: var(--fw-bold); color: var(--accent-ink); border-bottom: 2px solid var(--accent-ink);">
           {item.n}
         </p>
-        <h3 style="font-size: 1.0625rem; font-weight: 800;" class="mb-2.5">{item.title}</h3>
-        <p class="text-[15px]" style="color: var(--ink-body);">{item.body}</p>
+        <h3 style="font-size: var(--text-h5); font-weight: var(--fw-heading);" class="mb-2.5">{item.title}</h3>
+        <p style="font-size: var(--text-ui); color: var(--ink-body);">{item.body}</p>
       </div>
     ))}
   </div>

@@ -5,7 +5,6 @@ import Hero from '../../components/Hero.astro';
 import TrustBar from '../../components/TrustBar.astro';
 import Products from '../../components/Products.astro';
 import WhyFoxeLabs from '../../components/WhyFoxeLabs.astro';
-import About from '../../components/About.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import Footer from '../../components/Footer.astro';
 import Section from '../../components/ui/Section.astro';
@@ -16,7 +15,7 @@ const faq = [
   {
     q: 'What trading software does Foxe Labs sell?',
     a:
-      'Gold Scalpel, an automated XAUUSD breakout scalper for MetaTrader 5, is live on the MQL5 Market for a one-time price with lifetime updates and a free Strategy Tester demo. Further expert advisors and trading tools are in development, with a waitlist open.',
+      'Gold Scalpel, an automated XAUUSD breakout scalper for MetaTrader 5, is published and available to buy on the MQL5 Market for a one-time price, with lifetime updates and a free Strategy Tester demo. TickerLog, our universal trading journal, is close to release and launches at tickerlog.io. Further expert advisors and tools are in development.',
   },
   {
     q: 'Do the expert advisors work with prop firm accounts?',
@@ -26,7 +25,12 @@ const faq = [
   {
     q: 'Can I test an EA before buying?',
     a:
-      'Yes. Gold Scalpel has a free demo for the MT5 Strategy Tester so you can backtest it on your own broker\'s data, and a live MQL5 signal tracks it on a real account.',
+      'Yes. Gold Scalpel has a free demo for the MT5 Strategy Tester, so you can backtest it on your own broker\'s data and spreads before you buy.',
+  },
+  {
+    q: 'What is TickerLog?',
+    a:
+      'TickerLog is a universal trading journal. It pulls closed trades straight from your account, reassembles partial fills into one readable position, and tags each trade by setup, session, and mistake so patterns surface from the data rather than from memory. It is launching soon at tickerlog.io — join the list for launch pricing.',
   },
   {
     q: 'Is any of this financial advice?',
@@ -48,12 +52,11 @@ const faq = [
   ]}
 >
   <Nav />
-  <main class="track-trading">
+  <main id="main" class="track-trading">
     <Hero />
     <TrustBar />
     <Products />
     <WhyFoxeLabs />
-    <About />
     <Section variant="alt">
       <div class="max-w-3xl mx-auto">
         <Faq items={faq} bare />

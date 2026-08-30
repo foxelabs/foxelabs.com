@@ -1,7 +1,9 @@
 ---
 interface Props {
   class?: string;
+  /** Overline colour, e.g. a category hue. Defaults to the accent token. */
+  color?: string;
 }
-const { class: className = '' } = Astro.props;
+const { class: className = '', color } = Astro.props;
 ---
-<p class={`eyebrow ${className}`}>// <slot /></p>
+<p class={`eyebrow ${className}`} style={color ? `color: ${color};` : undefined}><slot /></p>

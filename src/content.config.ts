@@ -1,6 +1,7 @@
 import { defineCollection, z } from 'astro:content';
 import type { ImageFunction } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { OSS_CATEGORIES, TRADING_CATEGORIES } from './config/tracks';
 
 // Shared fields across both tracks.
 const base = {
@@ -48,7 +49,7 @@ const projects = defineCollection({
     z.object({
       ...base,
       track: z.literal('trading'),
-      category: z.enum(['expert-advisors', 'tools']),
+      category: z.enum(TRADING_CATEGORIES),
       status: z.enum(['live', 'waitlist', 'coming-soon']).default('coming-soon'),
       market: z.string(),
       platform: z.string(),
@@ -77,7 +78,7 @@ const projects = defineCollection({
     z.object({
       ...base,
       track: z.literal('oss'),
-      category: z.enum(['plugins', 'libraries']),
+      category: z.enum(OSS_CATEGORIES),
       status: z.enum(['stable', 'beta', 'active', 'archived']).default('active'),
       // e.g. 'WordPress Plugin', 'PHP Library'
       kind: z.string(),
@@ -118,7 +119,7 @@ const projects = defineCollection({
 
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
-  schema: z.object({
+  schema: ({ image }) => z.object({
     title: z.string(),
     description: z.string(),
     seoTitle: z.string().optional(),
@@ -128,8 +129,8 @@ const blog = defineCollection({
     author: z.string().default('Foxe Labs'),
     tags: z.array(z.string()).default([]),
     // Featured image shown on listing cards and atop the single post.
-    // Path under /public (e.g. '/blog/my-cover.svg').
-    heroImage: z.string().optional(),
+    // Relative path, e.g. 'covers/my-cover.jpg' — optimised via astro:assets.
+    heroImage: image().optional(),
     heroImageAlt: z.string().optional(),
     // Which track a post belongs to (for filtering + hub feed). Optional.
     track: z.enum(['oss', 'trading']).optional(),

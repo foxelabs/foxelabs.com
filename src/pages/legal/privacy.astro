@@ -32,7 +32,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
   ]}
 >
   <Nav />
-  <main class="track-hub">
+  <main id="main" class="track-hub">
     <PageHeader
       eyebrow="Legal"
       title="Privacy Policy"
@@ -40,8 +40,8 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
       narrow
     />
     <Section reveal={false}>
-      <article class="prose-foxe max-w-3xl">
-        <p class="font-mono text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
+      <article class="prose-foxe prose-foxe--doc max-w-3xl">
+        <p class="text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
 
         <h2>1. Who is responsible</h2>
         <p>
@@ -55,7 +55,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
         <h2>2. What we collect, and why</h2>
         <h3>Contact form</h3>
         <p>
-          When you write to us through the <a href="/contact">contact page</a>, we
+          When you write to us through the <a href="/contact/">contact page</a>, we
           receive the name, email address, and message you submit. It is delivered to
           our inbox by <a href="https://resend.com" target="_blank" rel="noopener noreferrer">Resend</a>,
           our email delivery provider, and used only to reply to you.

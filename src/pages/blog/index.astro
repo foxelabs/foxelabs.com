@@ -1,12 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
-import Section from '../../components/ui/Section.astro';
-import PageHeader from '../../components/ui/PageHeader.astro';
-import { Icon } from 'astro-icon/components';
 import { breadcrumbLd, collectionPageLd } from '../../config/seo';
+import { accentVars, topicAccent } from '../../config/accents';
+import { topicOf } from '../../config/tracks';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
@@ -15,13 +15,12 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
-const readingTime = (body = '') =>
-  Math.max(1, Math.round(body.trim().split(/\s+/).length / 200));
+// Atlassian's blog leads with one large story plus a short stack of runners-up,
+// then a topic-filtered grid of everything.
+const [lead, ...rest] = posts;
+const runnersUp = rest.slice(0, 4);
 
-const trackMeta = {
-  oss:     { label: 'Software', soft: 'var(--oss-soft)',  deep: 'var(--oss-deep)' },
-  trading: { label: 'Trading',  soft: 'var(--gold-soft)', deep: 'var(--gold-deep)' },
-} as const;
+const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.track))))];
 ---
 <BaseLayout
   title="Blog — WordPress Development & Trading Notes | Foxe Labs"
@@ -40,79 +39,154 @@ const trackMeta = {
   ]}
 >
   <Nav />
-  <main class="track-hub">
-    <PageHeader
-      eyebrow="Writing"
-      title="From the studio"
-      lead="Notes on how we build — open-source software, expert advisor design, risk, and the occasional release."
-      narrow
-    />
+  <main id="main" class="track-hub">
+    {posts.length === 0 ? (
+      <section class="band"><div class="container-x"><p style="color: var(--ink-dim);">No posts yet — check back soon.</p></div></section>
+    ) : (
+      <>
+        <!-- Top section: one tinted band holding the page title, the lead story
+             and a 2x2 grid of runners-up beside it (atlassian.com/blog). -->
+        <section style="background: var(--surface-sunken); padding-block: var(--space-section);" data-reveal>
+          <div class="container-x">
+            <h1 style="font-size: var(--text-hero-sm); line-height: 1.2;">From the studio</h1>
+            <p class="mt-4 mb-0" style="font-size: var(--text-body); color: var(--ink-body);">
+              Notes on how we build — open-source software, expert advisor design, risk, and the occasional release.
+            </p>
 
-    <Section variant="light">
-      {posts.length === 0 ? (
-        <p style="color: var(--ink-dim);">No posts yet — check back soon.</p>
-      ) : (
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {posts.map((post) => {
-            const m = post.data.track ? trackMeta[post.data.track] : null;
-            return (
-              <a href={`/blog/${post.id}`} class="card card--hover flex flex-col overflow-hidden group">
-                <div class="relative overflow-hidden" style="aspect-ratio: 16 / 9; background: var(--surface-alt);">
-                  {post.data.heroImage ? (
-                    <img
+            <div class="grid lg:grid-cols-2 gap-8 mt-12">
+              <!-- Lead story -->
+              <a href={`/blog/${lead.id}/`} class="post-link group flex flex-col" style={accentVars(topicAccent(topicOf(lead.data.track)))}>
+                {lead.data.heroImage && (
+                  <Image
+                    src={lead.data.heroImage}
+                    alt={lead.data.heroImageAlt ?? ''}
+                    widths={[480, 768, 1152]}
+                    sizes="(max-width: 1024px) 100vw, 576px"
+                    loading="eager"
+                    fetchpriority="high"
+                    class="w-full h-auto block mb-5"
+                    style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md) var(--r-md) 0 0;"
+                  />
+                )}
+                <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(lead.data.track)}</span></p>
+                <h2 class="post-link__title mb-3" style="font-size: var(--text-h2); line-height: 1.125;">{lead.data.title}</h2>
+                <p class="m-0" style="font-size: var(--text-body); color: var(--ink-body);">{lead.data.description}</p>
+              </a>
+
+              <!-- Runners-up: 2x2, each with its own image -->
+              <div class="grid sm:grid-cols-2 gap-8">
+                {runnersUp.map((post) => (
+                  <a href={`/blog/${post.id}/`} class="post-link group flex flex-col" style={accentVars(topicAccent(topicOf(post.data.track)))}>
+                    {post.data.heroImage && (
+                      <Image
+                        src={post.data.heroImage}
+                        alt={post.data.heroImageAlt ?? ''}
+                        widths={[320, 560, 800]}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 272px"
+                        loading="lazy"
+                        class="w-full h-auto block mb-4"
+                        style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md) var(--r-md) 0 0;"
+                      />
+                    )}
+                    <p class="post-kicker mb-2">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(post.data.track)}</span></p>
+                    <h3 class="post-link__title" style="font-size: var(--text-h4); line-height: 1.25;">{post.data.title}</h3>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Latest by topic: pill filter over every post, newest first -->
+        <section class="band" data-reveal style="padding-block: var(--space-section-sm) var(--space-section);">
+          <div class="container-x">
+            <h2 class="mb-6" style="font-size: var(--text-h2);">Latest by topic</h2>
+
+            <div class="flex flex-wrap gap-2.5 mb-10" role="group" aria-label="Filter posts by topic">
+              {topics.map((t, i) => (
+                <button
+                  type="button"
+                  class="topic-tab"
+                  data-topic={t}
+                  aria-pressed={i === 0 ? 'true' : 'false'}
+                  style={t === 'All' ? '--accent-ink: var(--ink);' : accentVars(topicAccent(t))}
+                >
+                  {t !== 'All' && <span class="topic-tab__dot" aria-hidden="true"></span>}
+                  {t}
+                </button>
+              ))}
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-11">
+              {posts.map((post) => (
+                <a href={`/blog/${post.id}/`} class="post-link group flex flex-col" data-post-topic={topicOf(post.data.track)} style={accentVars(topicAccent(topicOf(post.data.track)))}>
+                  {post.data.heroImage && (
+                    <Image
                       src={post.data.heroImage}
                       alt={post.data.heroImageAlt ?? ''}
-                      width="1600"
-                      height="900"
+                      widths={[400, 640, 800]}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 368px"
                       loading="lazy"
-                      decoding="async"
-                      class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      class="w-full h-auto block mb-5"
+                      style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md) var(--r-md) 0 0;"
                     />
-                  ) : (
-                    <div class="absolute inset-0 flex items-center justify-center" style="background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);">
-                      <Icon name="mingcute:code-fill" width={28} height={28} style="color: var(--ink-dim);" aria-hidden="true" />
-                    </div>
                   )}
-                </div>
+                  <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(post.data.track)}</span></p>
+                  <h3 class="post-link__title mb-2.5" style="font-size: var(--text-h3);">{post.data.title}</h3>
+                  <p class="m-0" style="font-size: var(--text-ui); color: var(--ink-body);">{post.data.description}</p>
+                  <time class="mt-3" style="font-size: var(--text-small); color: var(--ink-dim);">{fmt(post.data.pubDate)}</time>
+                </a>
+              ))}
+            </div>
 
-                <div class="flex flex-col flex-1 p-6">
-                  <div class="flex items-center gap-3 mb-3">
-                    {m && (
-                      <span
-                        class="font-mono text-[10px] px-2.5 py-1 rounded-full"
-                        style={`background: ${m.soft}; color: ${m.deep}; letter-spacing: 0.08em;`}
-                      >
-                        {m.label}
-                      </span>
-                    )}
-                    <time class="font-mono text-[11px]" style="color: var(--ink-dim);">
-                      {fmt(post.data.pubDate)}
-                    </time>
-                    {readingTime(post.body) >= 3 && (
-                      <span class="font-mono text-[11px]" style="color: var(--ink-dim);">
-                        · {readingTime(post.body)} min
-                      </span>
-                    )}
-                  </div>
+            <p data-filter-status role="status" class="mt-2" style="color: var(--ink-dim);"></p>
+          </div>
+        </section>
 
-                  <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-2.5 transition-colors group-hover:text-[var(--accent-ink)]">
-                    {post.data.title}
-                  </h2>
-                  <p class="text-[14px] flex-1" style="color: var(--ink-body);">
-                    {post.data.description}
-                  </p>
-
-                  <span class="inline-flex items-center gap-1.5 mt-5 font-mono text-[12px] font-medium" style="color: var(--ink);">
-                    Read more
-                    <span class="transition-transform group-hover:translate-x-0.5">→</span>
-                  </span>
-                </div>
-              </a>
-            );
-          })}
-        </div>
-      )}
-    </Section>
+      </>
+    )}
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  /* Each card carries its topic's --accent-*, so the title picks up the same
+     hue as its kicker and its filter pill. */
+  .post-link__title {
+    transition: color 0.1s ease;
+  }
+  .post-link:hover .post-link__title {
+    color: var(--accent-ink);
+  }
+  /* A hairline in the topic hue under each cover image. Bottom corners are
+     square (radius only on top) so the hairline doesn't bend around a curve. */
+  .post-link img {
+    border-bottom: 3px solid var(--accent-ink);
+  }
+</style>
+
+<script is:inline>
+  const tabs = document.querySelectorAll('.topic-tab');
+  const cards = document.querySelectorAll('[data-post-topic]');
+  const status = document.querySelector('[data-filter-status]');
+  tabs.forEach((tab) =>
+    tab.addEventListener('click', () => {
+      const topic = tab.dataset.topic;
+      tabs.forEach((t) => t.setAttribute('aria-pressed', String(t === tab)));
+      let shown = 0;
+      cards.forEach((card) => {
+        const match = topic === 'All' || card.dataset.postTopic === topic;
+        card.hidden = !match;
+        if (match) shown++;
+      });
+      if (status) {
+        status.textContent =
+          shown === 0
+            ? 'Nothing under this topic yet.'
+            : topic === 'All'
+              ? ''
+              : `${shown} ${shown === 1 ? 'post' : 'posts'} in ${topic}.`;
+      }
+    })
+  );
+</script>

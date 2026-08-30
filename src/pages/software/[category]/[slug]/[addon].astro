@@ -10,6 +10,7 @@ import Screenshots from '../../../../components/ui/Screenshots.astro';
 import { Icon } from 'astro-icon/components';
 import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
 import { breadcrumbLd, softwareApplicationLd, faqLd } from '../../../../config/seo';
+import { accentFor, accentVars } from '../../../../config/accents';
 
 export async function getStaticPaths() {
   const [addons, projects] = await Promise.all([
@@ -34,6 +35,12 @@ export async function getStaticPaths() {
 }
 
 const { addon, parent } = Astro.props;
+
+// Same ordered list the plugin page's add-on grid uses, so this page keeps the
+// colour of the card that opened it.
+const siblingIds = (await getCollection('addons', (a) => !a.data.draft && a.data.parent === parent.id))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((a) => a.id);
 const { data } = addon;
 const { Content } = await render(addon);
 
@@ -61,6 +68,8 @@ const metaDescription = data.seoDescription ?? data.summary;
 const catLabel = categoryMeta('oss', parent.data.category)?.label ?? 'Software';
 const shotUrls = data.screenshots.map((s) => s.src.src);
 const priceMatch = data.price?.match(/([\d.]+)/);
+// "From $X" is tiered pricing — a flat Offer price would misstate it.
+const isFromPrice = /^from/i.test(data.price ?? '');
 const structuredData = [
   breadcrumbLd([
     { name: 'Home', path: '/' },
@@ -75,19 +84,28 @@ const structuredData = [
     url: addonPath('oss', parent.data.category, parent.id, addon.id),
     applicationCategory: 'WordPress Plugin',
     operatingSystem: 'WordPress',
-    offerPrice: priceMatch?.[1],
+    offerPrice: isFromPrice ? undefined : priceMatch?.[1],
+    offerLowPrice: isFromPrice ? priceMatch?.[1] : undefined,
     sameAs: data.url ? [data.url] : undefined,
     screenshot: shotUrls,
   }),
 ];
 if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
 ---
-<BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
+<BaseLayout
+  title={pageTitle}
+  description={metaDescription}
+  image={data.screenshots[0]?.src.src}
+  imageAlt={data.screenshots[0]?.alt}
+  imageWidth={data.screenshots[0]?.src.width}
+  imageHeight={data.screenshots[0]?.src.height}
+  jsonLd={structuredData}
+>
   <Nav />
-  <main class="track-oss">
-    <div class="band band--alt" style="padding-block: clamp(2.5rem, 5vw, 3.5rem);">
+  <main id="main" class="track-oss" style={accentVars(accentFor(siblingIds, addon.id))}>
+    <div class="band band--alt" style="padding-block: var(--space-section-sm);">
       <div class="container-x">
-        <a href={parentUrl} class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+        <a href={parentUrl} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" />
             <polyline points="12 19 5 12 12 5" />
@@ -96,20 +114,20 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
         </a>
 
         <div class="flex items-center gap-3 mb-5 flex-wrap">
-          <span class="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">
+          <span class="inline-flex items-center gap-1.5 lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">
             <Icon name="mingcute:puzzled-line" width={12} height={12} aria-hidden="true" />
             {parent.data.name} add-on
           </span>
         </div>
 
-        <h1 style="font-size: var(--text-hero); font-weight: 800;" class="mb-4">{data.name}</h1>
+        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-4">{data.name}</h1>
         <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">{data.tagline}</p>
 
         {meta.length > 0 && (
           <div class="flex flex-wrap gap-x-10 gap-y-3 mt-8">
             {meta.map((m) => (
               <div>
-                <p class="font-mono text-[10px] mb-1" style="color: var(--ink-dim); letter-spacing: 0.1em; text-transform: uppercase;">{m.label}</p>
+                <p class="text-[10px] mb-1" style="color: var(--ink-dim); text-transform: uppercase;">{m.label}</p>
                 <p class="text-[14px]" style="color: var(--ink);">{m.value}</p>
               </div>
             ))}
@@ -137,8 +155,6 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
             <article class="prose-foxe max-w-none">
               <Content />
             </article>
-
-            {data.faq.length > 0 && <Faq items={data.faq} />}
           </div>
 
           <aside class="lg:col-span-5">
@@ -158,13 +174,13 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
                   <Icon name="mingcute:book-2-line" width={16} height={16} aria-hidden="true" />
                   Documentation
                 </Button>
-                <Button href="/contact" variant="ghost" class="w-full justify-center gap-2">
+                <Button href="/contact/" variant="ghost" class="w-full justify-center gap-2">
                   <Icon name="mingcute:chat-1-line" width={16} height={16} aria-hidden="true" />
                   Get support
                 </Button>
               </div>
 
-              <div class="flex items-center gap-3.5 mt-6 p-4 rounded-xl" style="background: var(--accent-soft);">
+              <div class="flex items-center gap-3.5 mt-6 p-4 rounded-[8px]" style="background: var(--accent-soft);">
                 <Icon name="mingcute:shield-line" width={34} height={34} style="color: var(--accent-ink);" class="shrink-0" aria-hidden="true" />
                 <div>
                   <p class="text-[14px] font-semibold m-0" style="color: var(--ink);">7-day money-back guarantee</p>
@@ -190,6 +206,16 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
             heading={`${data.name} in the WordPress admin`}
             lead={`Every screen ${data.name} adds, and where to find it.`}
           />
+        </div>
+      </section>
+    )}
+
+    {data.faq.length > 0 && (
+      <section class="band band--light" data-reveal style="border-top: 1px solid var(--border-soft);">
+        <div class="container-x">
+          <div class="max-w-3xl">
+            <Faq items={data.faq} bare />
+          </div>
         </div>
       </section>
     )}

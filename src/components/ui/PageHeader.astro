@@ -12,11 +12,11 @@ interface Props {
 
 const { eyebrow, title, titleAccent, lead, narrow = false } = Astro.props;
 ---
-<section class="band band--alt" data-reveal style="padding-block: clamp(3rem, 6vw, 4.5rem);">
+<section class="band band--alt" data-reveal style="padding-block: var(--space-section-sm);">
   <div class="container-x">
     <div class={narrow ? 'max-w-3xl' : 'max-w-4xl'}>
       <Eyebrow class="mb-5">{eyebrow}</Eyebrow>
-      <h1 style="font-size: var(--text-hero); font-weight: 800;" class={lead ? 'mb-5' : ''}>
+      <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class={lead ? 'mb-5' : ''}>
         {title}
         {titleAccent && <span style="color: var(--accent-ink);">{titleAccent}</span>}
       </h1>

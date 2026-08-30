@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { allowRequest } from '../../lib/rateLimit';
 
 export const prerender = false;
 
@@ -14,7 +15,11 @@ const json = (status: number, body: Record<string, unknown>) =>
 const esc = (s: string) =>
   s.replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c] as string));
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
+  if (!allowRequest(`contact:${clientAddress}`)) {
+    return json(429, { ok: false, error: 'Too many requests' });
+  }
+
   const apiKey = import.meta.env.RESEND_API_KEY ?? process.env.RESEND_API_KEY;
   const to = import.meta.env.CONTACT_TO ?? process.env.CONTACT_TO ?? 'support@foxelabs.com';
   const from =
@@ -37,6 +42,9 @@ export const POST: APIRoute = async ({ request }) => {
 
   const name = typeof body.name === 'string' ? body.name.trim() : '';
   const email = typeof body.email === 'string' ? body.email.trim() : '';
+  const subject = typeof body.subject === 'string' ? body.subject.trim() : '';
+  // Optional — only present when the sender already owns a licence.
+  const license = typeof body.license === 'string' ? body.license.trim() : '';
   const message = typeof body.message === 'string' ? body.message.trim() : '';
   // Honeypot: real users leave this empty.
   const trap = typeof body.company === 'string' ? body.company.trim() : '';
@@ -44,6 +52,9 @@ export const POST: APIRoute = async ({ request }) => {
   if (trap) return json(200, { ok: true });
   if (!name || name.length > 120) return json(400, { ok: false, error: 'Invalid name' });
   if (!EMAIL_RE.test(email)) return json(400, { ok: false, error: 'Invalid email' });
+  if (!subject || subject.length > 150)
+    return json(400, { ok: false, error: 'Invalid subject' });
+  if (license.length > 120) return json(400, { ok: false, error: 'Invalid license key' });
   if (!message || message.length > 5000)
     return json(400, { ok: false, error: 'Invalid message' });
 
@@ -53,10 +64,21 @@ export const POST: APIRoute = async ({ request }) => {
       from,
       to,
       replyTo: email,
-      subject: `New contact form message from ${name}`,
-      text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+      subject: `[Contact] ${subject} — ${name}`,
+      text: [
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Subject: ${subject}`,
+        license ? `License key: ${license}` : null,
+        '',
+        message,
+      ]
+        .filter((line) => line !== null)
+        .join('\n'),
       html: `<p><strong>Name:</strong> ${esc(name)}</p>
 <p><strong>Email:</strong> ${esc(email)}</p>
+<p><strong>Subject:</strong> ${esc(subject)}</p>
+${license ? `<p><strong>License key:</strong> ${esc(license)}</p>` : ''}
 <p style="white-space:pre-wrap">${esc(message)}</p>`,
     });
 

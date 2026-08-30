@@ -2,7 +2,9 @@
 interface Props {
   href?: string;
   variant?: 'primary' | 'ghost' | 'invert';
-  arrow?: boolean;
+  size?: 'lg' | 'md' | 'sm';
+  /** true appends a forward arrow; 'back' prepends a left-pointing one. */
+  arrow?: boolean | 'back';
   type?: 'button' | 'submit';
   class?: string;
   [key: string]: unknown;
@@ -11,6 +13,7 @@ interface Props {
 const {
   href,
   variant = 'primary',
+  size = 'md',
   arrow = false,
   type = 'button',
   class: className = '',
@@ -18,7 +21,8 @@ const {
 } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
-const cls = `btn btn--${variant} ${className}`;
+const sizeClass = size === 'md' ? '' : ` btn--${size}`;
+const cls = `btn btn--${variant}${sizeClass} ${className}`;
 
 // External links (and mailto/tel) open in a new tab, unless the caller already
 // set target explicitly. rel guards against tab-nabbing on the new context.
@@ -35,12 +39,20 @@ const external =
   {...external}
   {...rest}
 >
-  <slot />
-  {arrow && (
+  {arrow === 'back' && (
     <span class="btn__arrow" aria-hidden="true">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="7" y1="17" x2="17" y2="7" />
-        <polyline points="8 7 17 7 17 16" />
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12" />
+        <polyline points="11 6 5 12 11 18" />
+      </svg>
+    </span>
+  )}
+  <slot />
+  {arrow === true && (
+    <span class="btn__arrow" aria-hidden="true">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12" />
+        <polyline points="13 6 19 12 13 18" />
       </svg>
     </span>
   )}

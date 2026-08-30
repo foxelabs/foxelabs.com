@@ -7,9 +7,10 @@ import { SITE } from '../config/seo';
 // pages render, so it can never drift from what is actually published.
 // Spec: https://llmstxt.org
 export const GET: APIRoute = async () => {
-  const [projects, posts] = await Promise.all([
+  const [projects, posts, addons] = await Promise.all([
     getCollection('projects', ({ data }) => !data.draft),
     getCollection('blog', ({ data }) => !data.draft),
+    getCollection('addons', ({ data }) => !data.draft),
   ]);
 
   const line = (name: string, path: string, note: string) =>
@@ -26,12 +27,21 @@ export const GET: APIRoute = async () => {
   const sections = [
     `# ${SITE.name}`,
     '',
-    '> A one-person software studio by Joel James, based in Kerala, India. Two tracks: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5.',
+    '> Foxe Labs (legally Foxe Labs LLP) is a small software studio based in Kerala, India. Two tracks: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5.',
     '',
-    'Everything on the software track is open source and free. Premium plugin add-ons are sold through Freemius with a 7-day money-back guarantee. Trading products are in development and available by waitlist.',
+    'Everything on the software track is open source and free. Premium plugin add-ons are sold through Freemius with a 7-day money-back guarantee. On the trading track, Gold Scalpel is live on the MQL5 Market; the remaining trading products are in development and available by waitlist.',
     '',
     '## WordPress plugins',
     ...byCategory('oss', 'plugins'),
+    '',
+    '## Plugin add-ons',
+    ...addons
+      .sort((a, b) => a.data.order - b.data.order)
+      .map((a) => {
+        const parent = projects.find((p) => p.id === a.data.parent);
+        const category = parent?.data.track === 'oss' ? parent.data.category : 'plugins';
+        return line(a.data.name, `/software/${category}/${a.data.parent}/${a.id}/`, a.data.summary);
+      }),
     '',
     '## PHP libraries',
     ...byCategory('oss', 'libraries'),

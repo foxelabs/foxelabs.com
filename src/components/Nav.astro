@@ -1,104 +1,440 @@
 ---
-import Button from './ui/Button.astro';
+import { getCollection } from 'astro:content';
+import { categoryList, categoryPath, projectPath, trackConfig, type Track } from '../config/tracks';
+import { accentFor, accentVars, categoryAccent } from '../config/accents';
 
-const links = [
-  { href: '/', label: 'Home' },
-  { href: '/software', label: 'Software' },
-  { href: '/trading', label: 'Trading' },
-  { href: '/blog', label: 'Blog' },
-  { href: '/about', label: 'About' },
+/** One link inside a mega-menu column. */
+interface MenuItem {
+  href: string;
+  label: string;
+  desc?: string;
+  /** Inline --accent-* rebinding, so hover paints the product's own hue. */
+  accent: string;
+}
+
+interface MenuColumn {
+  title: string;
+  href: string;
+  /** Category hue, so the heading reads as a group label and not another item. */
+  color: string;
+  items: MenuItem[];
+}
+
+/** A promo panel pinned to the right of a mega-menu. */
+interface MenuPromo {
+  eyebrow: string;
+  title: string;
+  body: string;
+  href: string;
+  cta: string;
+}
+
+interface NavLink {
+  href: string;
+  label: string;
+  columns?: MenuColumn[];
+  promo?: MenuPromo;
+}
+
+// Live products, so a new .mdx shows up in the menu without touching this file.
+const projects = (await getCollection('projects')).filter((p) => !p.data.draft);
+
+const productsIn = (track: Track, category: string): MenuItem[] => {
+  const inCategory = projects.filter(
+    (p) => p.data.track === track && p.data.category === category
+  );
+
+  // Hue comes from the canonical `order` sequence the category grid uses — not
+  // from the menu's own featured-first sort — so a product keeps one colour
+  // across the menu, its card, and its page.
+  const orderedIds = [...inCategory]
+    .sort((a, b) => a.data.order - b.data.order)
+    .map((p) => p.id);
+
+  return inCategory
+    .sort(
+      (a, b) =>
+        Number(b.data.featured) - Number(a.data.featured) ||
+        a.data.order - b.data.order ||
+        a.data.name.localeCompare(b.data.name)
+    )
+    .slice(0, 4)
+    .map((p) => ({
+      href: projectPath(track, category, p.id),
+      label: p.data.name,
+      desc: p.data.tagline,
+      accent: accentVars(accentFor(orderedIds, p.id)),
+    }));
+};
+
+/** Software / Trading both render as a mega-menu of their categories. */
+const trackMenu = (track: Track, promo: MenuPromo): NavLink => ({
+  href: `${trackConfig[track].basePath}/`,
+  label: trackConfig[track].label,
+  columns: categoryList(track).map(([slug, meta]) => ({
+    title: meta.label,
+    href: categoryPath(track, slug),
+    color: categoryAccent(slug).ink,
+    items: productsIn(track, slug),
+  })),
+  promo,
+});
+
+const links: NavLink[] = [
+  trackMenu('oss', {
+    eyebrow: 'Open source',
+    title: 'Every plugin and library in one place',
+    body: 'GPL-licensed WordPress plugins and PHP packages, maintained in the open.',
+    href: '/software/',
+    cta: 'Browse all software',
+  }),
+  trackMenu('trading', {
+    eyebrow: 'In development',
+    title: 'Join the trading waitlist',
+    body: 'Early access, launch pricing, and release notes for new expert advisors and tools.',
+    href: '/trading/#waitlist',
+    cta: 'Get early access',
+  }),
+  { href: '/blog/', label: 'Blog' },
+  { href: '/about/', label: 'About' },
 ];
 
 const path = Astro.url.pathname.replace(/\/+$/, '') || '/';
-const isActive = (href: string) => path === href || path.startsWith(href + '/');
+const isActive = (href: string) => {
+  const h = href.replace(/\/+$/, '') || '/';
+  return path === h || path.startsWith(h + '/');
+};
 ---
+<!-- Atlassian marketing header: 72px, NO bottom border — the bar only grows a
+     shadow once the page scrolls (data-nav-scrolled). Menu type is 16px.
+     Track items open a full-width mega-menu rather than a small dropdown. -->
 <header
-  class="track-hub sticky top-0 z-50 backdrop-blur-md"
-  style="background: color-mix(in srgb, var(--surface) 85%, transparent); border-bottom: 1px solid var(--border-soft); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);"
+  class="track-hub sticky top-0 z-50 transition-shadow"
+  data-nav-bar
+  style="background: var(--surface);"
 >
-  <div class="container-x flex items-center justify-between h-16">
-    <a href="/" class="flex items-center gap-2.5 font-display font-bold text-lg" style="color: var(--ink); letter-spacing: -0.02em;">
-      <img src="/fox.svg" alt="Foxe Labs" width="32" height="32" class="w-8 h-8 shrink-0" />
-      Foxe <span style="color: var(--ink-dim);">Labs</span>
+  <div class="container-x flex items-stretch h-[72px]">
+    <!-- Atlassian home lockup: mark + wordmark inline in the padded container,
+         aligned to the same gutter as the page content and the mega-menus. -->
+    <a href="/" class="flex items-center gap-2.5 shrink-0" aria-label="Foxe Labs — home">
+      <img src="/fox.svg" alt="" width="32" height="32" class="w-8 h-8 shrink-0" aria-hidden="true" />
+      <span
+        class="font-display text-[20px]"
+        style="color: var(--ink); font-weight: var(--fw-display); letter-spacing: -0.01em;"
+      >Foxe <span style="color: var(--ink-dim);">Labs</span></span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-8 text-sm font-medium" style="color: var(--ink-body);">
-      {links.map((l) => (
-        <a
-          href={l.href}
-          aria-current={isActive(l.href) ? 'page' : undefined}
-          class="transition-colors hover:text-[var(--ink)] relative h-16 flex items-center"
-          style={isActive(l.href)
-            ? 'color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px 0 0 var(--accent-ink);'
-            : undefined}
-        >{l.label}</a>
+    <nav
+      class="hidden md:flex items-stretch gap-1 ml-8 text-[16px]"
+      aria-label="Primary"
+      style="color: var(--ink); font-weight: var(--fw-medium);"
+    >
+      {links.map((l, i) => (
+        l.columns ? (
+          <!-- Split trigger: the label is a real link to the hub page; only the
+               caret button toggles the panel. Hover on either still opens it. -->
+          <div class="flex items-stretch" data-mega-root={`mega-${i}`}>
+            <a
+              href={l.href}
+              aria-current={isActive(l.href) ? 'page' : undefined}
+              class="flex items-center pl-4 pr-1 transition-colors hover:text-[var(--b400)]"
+              style={isActive(l.href) ? 'color: var(--b400);' : undefined}
+            >{l.label}</a>
+            <button
+              type="button"
+              data-mega-trigger={`mega-${i}`}
+              aria-expanded="false"
+              aria-controls={`mega-${i}`}
+              aria-label={`${l.label} menu`}
+              class="flex items-center pr-4 pl-1 transition-colors hover:text-[var(--b400)]"
+              style="background: none; border: none; color: inherit; font: inherit; padding-block: 0;"
+            >
+              <svg
+                class="mega-caret" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          <a
+            href={l.href}
+            aria-current={isActive(l.href) ? 'page' : undefined}
+            class="flex items-center px-4 transition-colors hover:text-[var(--b400)]"
+            style={isActive(l.href) ? 'color: var(--b400);' : undefined}
+          >{l.label}</a>
+        )
       ))}
     </nav>
 
-    <div class="flex items-center gap-3">
-      <Button
-        href="/contact"
-        variant={isActive('/contact') ? 'primary' : 'ghost'}
-        aria-current={isActive('/contact') ? 'page' : undefined}
-        class="hidden sm:inline-flex !py-2 !px-4"
-      >
-        Get in touch
-      </Button>
+    <div class="flex items-center gap-4 ml-auto pl-4">
+      <a
+        href="/contact/"
+        aria-current={isActive('/contact/') ? 'page' : undefined}
+        class="hidden sm:inline-flex items-center px-4 h-10 text-[14px]"
+        style="background: var(--b400); color: #fff; border-radius: var(--r-btn); font-weight: var(--fw-medium);"
+      >Contact</a>
       <button
         type="button"
         data-nav-toggle
-        aria-label="Toggle menu"
+        aria-label="Open menu"
         aria-expanded="false"
-        class="md:hidden p-2 rounded-lg"
-        style="color: var(--ink); border: 1px solid var(--border);"
+        class="md:hidden p-2"
+        style="color: var(--ink); border: 1px solid var(--border); border-radius: var(--r-btn);"
       >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <svg data-icon-open width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="3" y1="6" x2="21" y2="6" />
           <line x1="3" y1="12" x2="21" y2="12" />
           <line x1="3" y1="18" x2="21" y2="18" />
+        </svg>
+        <svg data-icon-close hidden width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="5" y1="5" x2="19" y2="19" />
+          <line x1="19" y1="5" x2="5" y2="19" />
         </svg>
       </button>
     </div>
   </div>
 
+  <!-- Mega-menus. One full-width panel per track, anchored to the header (not to
+       the trigger), so the columns line up with the page container. -->
+  {links.map((l, i) => l.columns && (
+    <div
+      id={`mega-${i}`}
+      data-mega-panel
+      hidden
+      class="mega-panel absolute left-0 right-0 top-full"
+      style="background: var(--surface); border-top: 1px solid var(--border-soft); box-shadow: var(--shadow-overlay);"
+    >
+      <div class="container-x py-8">
+        <div class="grid lg:grid-cols-12 gap-8 lg:gap-10">
+          <div class="lg:col-span-8 grid sm:grid-cols-2 gap-8">
+            {l.columns.map((col) => (
+              <div>
+                <a
+                  href={col.href}
+                  class="inline-flex items-center gap-1.5 mb-3 text-[13px] hover:underline"
+                  style={`color: ${col.color}; font-weight: var(--fw-heading); text-transform: uppercase; letter-spacing: 0.06em;`}
+                >
+                  {col.title}
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="9 18 15 12 9 6" />
+                  </svg>
+                </a>
+                <ul class="list-none m-0 p-0 space-y-0.5">
+                  {col.items.map((it) => (
+                    <li>
+                      <a
+                        href={it.href}
+                        class="mega-item block px-3 py-2 -mx-3"
+                        style={`border-radius: var(--r-md); ${it.accent}`}
+                      >
+                        <span class="mega-item__name block text-[15px]" style="color: var(--ink); font-weight: var(--fw-subhead);">{it.label}</span>
+                        {it.desc && (
+                          <span class="block mt-0.5 text-[13px] leading-snug" style="color: var(--ink-dim);">{it.desc}</span>
+                        )}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {l.promo && (
+            <div class="lg:col-span-4">
+              <div
+                class="h-full p-6 flex flex-col"
+                style="background: var(--surface-sunken); border-radius: var(--r-md);"
+              >
+                <p class="text-[12px] m-0" style="color: var(--accent-ink); font-weight: var(--fw-heading); text-transform: uppercase; letter-spacing: 0.06em;">
+                  {l.promo.eyebrow}
+                </p>
+                <p class="mt-3 mb-2 text-[17px]" style="color: var(--ink); font-weight: var(--fw-heading); letter-spacing: -0.01em;">
+                  {l.promo.title}
+                </p>
+                <p class="m-0 text-[14px] leading-relaxed" style="color: var(--ink-body);">
+                  {l.promo.body}
+                </p>
+                <a
+                  href={l.promo.href}
+                  class="mt-auto pt-4 inline-flex items-center gap-1.5 text-[14px] transition-colors hover:text-[var(--b500)]"
+                  style="color: var(--accent-ink); font-weight: var(--fw-medium);"
+                >
+                  {l.promo.cta}
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  ))}
+
   <div
     data-nav-menu
-    class="hidden md:hidden container-x pb-5 flex-col gap-1 text-sm"
-    style="color: var(--ink-body); border-top: 1px solid var(--border-soft);"
+    class="hidden md:hidden container-x pt-2 pb-5 flex-col gap-1 text-[16px]"
+    style="color: var(--ink); border-top: 1px solid var(--border-soft);"
   >
     {links.map((l) => (
-      <a
-        href={l.href}
-        aria-current={isActive(l.href) ? 'page' : undefined}
-        class="block py-2.5"
-        style={isActive(l.href) ? 'color: var(--ink); font-weight: 600;' : undefined}
-      >{l.label}</a>
+      <>
+        <a
+          href={l.href}
+          aria-current={isActive(l.href) ? 'page' : undefined}
+          class="block py-2.5"
+          style={isActive(l.href) ? 'color: var(--ink); font-weight: 600;' : undefined}
+        >{l.label}</a>
+        {l.columns && (
+          <div class="pl-4 pb-1 flex flex-col">
+            {l.columns.map((col) => (
+              <a href={col.href} class="block py-2 text-[13px]" style="color: var(--ink-dim);">{col.title}</a>
+            ))}
+          </div>
+        )}
+      </>
     ))}
     <a
-      href="/contact"
-      aria-current={isActive('/contact') ? 'page' : undefined}
-      class="block py-2.5 font-semibold"
-      style={isActive('/contact')
-        ? 'color: var(--accent-ink); box-shadow: inset 2px 0 0 0 var(--accent-ink); padding-left: 0.75rem;'
-        : 'color: var(--accent-ink);'}
-    >Get in touch</a>
+      href="/contact/"
+      aria-current={isActive('/contact/') ? 'page' : undefined}
+      class="block py-2.5 font-semibold sm:hidden"
+      style="color: var(--accent-ink);"
+    >Contact</a>
   </div>
 </header>
 
+<style>
+  /* Never a desktop-only utility here: `md:block` outranks [hidden]. */
+  .mega-panel { display: none; }
+  @media (min-width: 768px) {
+    .mega-panel:not([hidden]) { display: block; }
+  }
+
+  /* Each row carries its product's --accent-*, so hovering previews the colour
+     that page will open in. */
+  .mega-item {
+    transition: background-color 0.1s ease;
+  }
+  .mega-item:hover,
+  .mega-item:focus-visible {
+    background: var(--accent-soft);
+  }
+  .mega-item__name {
+    transition: color 0.1s ease;
+  }
+  .mega-item:hover .mega-item__name,
+  .mega-item:focus-visible .mega-item__name {
+    color: var(--accent-ink);
+  }
+
+  [data-mega-trigger][aria-expanded='true'] { color: var(--b400); }
+  [data-mega-trigger][aria-expanded='true'] .mega-caret { transform: rotate(180deg); }
+  .mega-caret { transition: transform 0.15s ease; }
+</style>
+
 <script is:inline>
+  const bar = document.querySelector('[data-nav-bar]');
+  if (bar) {
+    const sync = () => {
+      bar.style.boxShadow = window.scrollY > 4 ? 'var(--shadow-raised)' : 'none';
+    };
+    sync();
+    window.addEventListener('scroll', sync, { passive: true });
+  }
+
+  // Mega-menus: hover to open (with a small close delay so the pointer can
+  // travel from the trigger down into the panel), click to pin, Escape to close.
+  (function () {
+    const triggers = Array.from(document.querySelectorAll('[data-mega-trigger]'));
+    if (!triggers.length) return;
+
+    let openId = null;
+    let closeTimer = null;
+
+    const panelFor = (id) => document.getElementById(id);
+
+    const setOpen = (id) => {
+      if (openId === id) return;
+      if (openId) {
+        panelFor(openId).hidden = true;
+        document
+          .querySelector(`[data-mega-trigger="${openId}"]`)
+          .setAttribute('aria-expanded', 'false');
+      }
+      openId = id;
+      if (id) {
+        panelFor(id).hidden = false;
+        document.querySelector(`[data-mega-trigger="${id}"]`).setAttribute('aria-expanded', 'true');
+      }
+    };
+
+    const cancelClose = () => {
+      if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
+    };
+    const scheduleClose = () => {
+      cancelClose();
+      closeTimer = setTimeout(() => setOpen(null), 160);
+    };
+
+    triggers.forEach((t) => {
+      const id = t.getAttribute('data-mega-trigger');
+      const panel = panelFor(id);
+      // Hover-intent lives on the whole root (label link + caret button), so
+      // the label stays a plain navigating link.
+      const root = document.querySelector(`[data-mega-root="${id}"]`);
+
+      root.addEventListener('mouseenter', () => { cancelClose(); setOpen(id); });
+      root.addEventListener('mouseleave', scheduleClose);
+      t.addEventListener('focus', () => { cancelClose(); setOpen(id); });
+      t.addEventListener('click', () => {
+        cancelClose();
+        setOpen(openId === id ? null : id);
+      });
+
+      panel.addEventListener('mouseenter', cancelClose);
+      panel.addEventListener('mouseleave', scheduleClose);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || !openId) return;
+      const t = document.querySelector(`[data-mega-trigger="${openId}"]`);
+      setOpen(null);
+      t.focus();
+    });
+
+    // Any click or tab-out beyond the header closes the open panel.
+    document.addEventListener('click', (e) => {
+      if (openId && !e.target.closest('[data-nav-bar]')) setOpen(null);
+    });
+    document.addEventListener('focusin', (e) => {
+      if (openId && !e.target.closest('[data-nav-bar]')) setOpen(null);
+    });
+  })();
+
   const toggle = document.querySelector('[data-nav-toggle]');
   const menu = document.querySelector('[data-nav-menu]');
   if (toggle && menu) {
+    const iconOpen = toggle.querySelector('[data-icon-open]');
+    const iconClose = toggle.querySelector('[data-icon-close]');
+    const sync = (open) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      if (iconOpen) iconOpen.hidden = open;
+      if (iconClose) iconClose.hidden = !open;
+    };
     toggle.addEventListener('click', () => {
       const open = menu.classList.toggle('flex');
       menu.classList.toggle('hidden', !open);
-      toggle.setAttribute('aria-expanded', String(open));
+      sync(open);
     });
     menu.querySelectorAll('a').forEach((a) =>
       a.addEventListener('click', () => {
         menu.classList.add('hidden');
         menu.classList.remove('flex');
-        toggle.setAttribute('aria-expanded', 'false');
+        sync(false);
       })
     );
   }

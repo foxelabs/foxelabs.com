@@ -8,6 +8,7 @@ import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
 import { categoryList, categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
+import { accentFor, accentVars, categoryAccent } from '../../../config/accents';
 
 export async function getStaticPaths() {
   return categoryList('oss').map(([category, meta]) => ({
@@ -18,10 +19,15 @@ export async function getStaticPaths() {
 
 const { category, meta } = Astro.props;
 
+const catAccent = categoryAccent(category);
+
 const projects = (await getCollection(
   'projects',
   ({ data }) => !data.draft && data.track === 'oss' && data.category === category
 )).sort((a, b) => a.data.order - b.data.order);
+
+// Colour is positional, so the grid and each product page agree on the hue.
+const projectsIds = projects.map((p) => p.id);
 ---
 <BaseLayout
   title={`Open-Source ${meta.label} | Foxe Labs`}
@@ -41,17 +47,20 @@ const projects = (await getCollection(
   ]}
 >
   <Nav />
-  <main class="track-oss">
+  <main id="main" class="track-oss">
     <section class="band band--alt" data-reveal>
       <div class="container-x">
-        <a href="/software" class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-6 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+        <a href="/software/" class="inline-flex items-center gap-1.5 text-[11px] mb-6 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
           </svg>
           All software
         </a>
-        <Eyebrow class="mb-4">Software</Eyebrow>
-        <h1 style="font-size: var(--text-hero); font-weight: 800;">{meta.label}</h1>
+        <Eyebrow class="mb-4" color={catAccent.ink}>Software</Eyebrow>
+        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-4">{meta.label}</h1>
+        <p class="max-w-[560px] leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
+          {meta.description}
+        </p>
       </div>
     </section>
 
@@ -59,24 +68,28 @@ const projects = (await getCollection(
       {projects.length > 0 ? (
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((p) => (
-            <a href={projectPath('oss', p.data.category, p.id)} class="card card--hover p-7 flex flex-col">
+            <a
+              href={projectPath('oss', p.data.category, p.id)}
+              class="product-card card card--hover p-7 flex flex-col"
+              style={accentVars(accentFor(projectsIds, p.id))}
+            >
               <div class="flex items-center justify-between gap-2 mb-5">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">{p.data.language}</span>
+                  <span class="lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">{p.data.language}</span>
                   {p.data.acquired && (
-                    <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-ink); color: #fff; letter-spacing: 0.08em;">Acquired</span>
+                    <span class="lozenge" style="background: var(--accent-ink); color: #fff;">Acquired</span>
                   )}
                 </div>
-                <span class="font-mono text-[11px] whitespace-nowrap" style="color: var(--ink-dim);">{p.data.kind}</span>
+                <span class="whitespace-nowrap" style="font-size: var(--text-small); color: var(--ink-dim);">{p.data.kind}</span>
               </div>
-              <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-2">{p.data.name}</h2>
-              <p class="text-[15px] mb-6 flex-1" style="color: var(--ink-body);">{p.data.summary}</p>
-              <div class="font-mono text-[12px] flex flex-col gap-1 mb-5" style="color: var(--ink-dim);">
-                <span style="color: var(--accent-ink);">● Open source · GPL</span>
+              <h2 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-2">{p.data.name}</h2>
+              <p class="mb-6 flex-1" style="font-size: var(--text-ui); color: var(--ink-body);">{p.data.summary}</p>
+              <div class="flex flex-col gap-1 mb-5" style="font-size: var(--text-small); color: var(--ink-dim);">
+                <span style="color: var(--accent-ink); font-weight: var(--fw-medium);">● Open source · GPL</span>
                 {p.data.installs && <span>{p.data.installs}</span>}
                 {p.data.rating && <span>{p.data.rating}</span>}
               </div>
-              <span class="btn btn--ghost self-start !py-2 !px-4 !text-[13px]">View details
+              <span class="btn btn--ghost self-start">View details
                 <span class="btn__arrow" aria-hidden="true">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
                 </span>
@@ -86,14 +99,28 @@ const projects = (await getCollection(
         </div>
       ) : (
         <div class="card p-10 md:p-14 text-center max-w-2xl mx-auto">
-          <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-3">More on the way.</h2>
-          <p class="text-[15px] mb-8 max-w-md mx-auto" style="color: var(--ink-body);">
+          <h2 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-3">More on the way.</h2>
+          <p class="mb-8 max-w-md mx-auto" style="font-size: var(--text-ui); color: var(--ink-body);">
             We're adding {meta.label.toLowerCase()} here. In the meantime, explore the rest of our open-source work.
           </p>
-          <Button href="/software" variant="primary" arrow>All software</Button>
+          <Button href="/software/" variant="primary" arrow>All software</Button>
         </div>
       )}
     </Section>
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  /* Each card carries its own --accent-*; the top rule makes the hue readable
+     at a glance without tinting the whole card. */
+  .product-card {
+    border-top: 3px solid var(--accent-ink);
+  }
+  .product-card h2 {
+    transition: color 0.1s ease;
+  }
+  .product-card:hover h2 {
+    color: var(--accent-ink);
+  }
+</style>

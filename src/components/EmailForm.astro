@@ -10,15 +10,14 @@ const {
   tone = 'light',
 } = Astro.props;
 
-const inputStyle =
-  tone === 'invert'
-    ? 'border-color: var(--border-invert); background: rgba(255,255,255,0.04); color: var(--ink-invert);'
-    : 'border-color: var(--border); background: var(--surface); color: var(--ink);';
 
-const successColor = tone === 'invert' ? 'var(--accent)' : 'var(--accent-ink)';
+// --chart-up clears AA on the navy band, where --accent (b400) sits at ~3.2:1.
+const successColor = tone === 'invert' ? 'var(--chart-up)' : 'var(--accent-ink)';
 const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
 ---
 <form data-email-form id={id} class="w-full max-w-md" novalidate>
+  <!-- Honeypot: humans never see it; bots that fill it get a fake 200. -->
+  <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
   <div data-fields class="flex flex-col sm:flex-row gap-2.5">
     <input
       type="email"
@@ -26,17 +25,14 @@ const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
       required
       placeholder="you@domain.com"
       aria-label="Email address"
-      class:list={[
-        'flex-1 min-w-0 px-4 py-3 text-[15px] border outline-none transition-colors disabled:opacity-60',
-        'rounded-full placeholder:text-[var(--ink-dim)]',
-      ]}
-      style={inputStyle}
+      aria-describedby={`${id}-error`}
+      class:list={['field flex-1', tone === 'invert' && 'field--invert']}
     />
     <button
       type="submit"
       data-submit
       data-label={buttonLabel}
-      class="btn btn--primary shrink-0 justify-center !py-3 disabled:opacity-60 disabled:cursor-not-allowed"
+      class="btn btn--primary shrink-0 justify-center disabled:opacity-60 disabled:cursor-not-allowed"
     >
       <span data-label-text>{buttonLabel}</span>
       <svg data-spinner class="hidden animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -45,10 +41,10 @@ const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
       </svg>
     </button>
   </div>
-  <p data-success class="hidden mt-3 text-sm font-mono" style={`color: ${successColor};`}>
+  <p data-success role="status" tabindex="-1" class="hidden mt-3 text-[14px]" style={`color: ${successColor};`}>
     You're on the list!
   </p>
-  <p data-error class="hidden mt-3 text-sm font-mono" style={`color: ${errorColor};`}>
+  <p data-error id={`${id}-error`} role="alert" class="hidden mt-3 text-[14px]" style={`color: ${errorColor};`}>
     Something went wrong. Try again.
   </p>
 </form>
@@ -104,11 +100,15 @@ const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
           const res = await fetch('/api/waitlist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: input.value }),
+            body: JSON.stringify({
+              email: input.value,
+              website: form.querySelector('input[name="website"]').value,
+            }),
           });
           if (!res.ok) throw new Error('request failed');
           fields.classList.add('hidden');
           success.classList.remove('hidden');
+          success.focus();
         } catch {
           errorEl.classList.remove('hidden');
           setLoading(false);

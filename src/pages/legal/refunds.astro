@@ -32,7 +32,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
   ]}
 >
   <Nav />
-  <main class="track-hub">
+  <main id="main" class="track-hub">
     <PageHeader
       eyebrow="Legal"
       title="Refund Policy"
@@ -40,8 +40,8 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
       narrow
     />
     <Section reveal={false}>
-      <article class="prose-foxe max-w-3xl">
-        <p class="font-mono text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
+      <article class="prose-foxe prose-foxe--doc max-w-3xl">
+        <p class="text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
 
         <h2>1. The guarantee</h2>
         <p>
@@ -59,7 +59,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
         <p>Three ways, whichever is easier:</p>
         <ul>
           <li>
-            Use the <a href="/contact">contact form</a>, mentioning the product and
+            Use the <a href="/contact/">contact form</a>, mentioning the product and
             order (the Freemius receipt email has the order number).
           </li>
           <li>

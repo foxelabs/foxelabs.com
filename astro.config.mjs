@@ -12,11 +12,11 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [
     mdx(),
-    // Trailing slashes match the canonicals we emit; lastmod tells crawlers
-    // (and answer engines) when a page was last touched.
+    // Trailing slashes match the canonicals we emit. No lastmod: a build-time
+    // stamp marks every URL "changed" on every deploy, which teaches engines
+    // to ignore it.
     sitemap({
       changefreq: 'weekly',
-      lastmod: new Date(),
       serialize: (item) => ({
         ...item,
         priority: item.url === 'https://foxelabs.com/' ? 1.0
@@ -31,6 +31,8 @@ export default defineConfig({
     rehypePlugins: [
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
     ],
+    // Light code blocks, matching the Atlassian blog's light wash.
+    shikiConfig: { theme: 'github-light' },
   },
   vite: {
     plugins: [tailwindcss()],

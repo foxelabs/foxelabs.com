@@ -6,7 +6,7 @@ export const SITE = {
   url: 'https://foxelabs.com',
   // Square logo for Organization markup.
   logo: 'https://foxelabs.com/icon-512.png',
-  // Default share banner (1280×640).
+  // Default share banner (1200×630).
   banner: 'https://foxelabs.com/social-banner.jpg',
   twitter: '@foxelabs',
   locale: 'en_US',
@@ -32,11 +32,18 @@ export function organizationLd() {
     '@type': 'Organization',
     '@id': `${SITE.url}/#organization`,
     name: SITE.name,
+    legalName: 'Foxe Labs LLP',
     alternateName: 'FoxeLabs',
     url: SITE.url,
     logo: SITE.logo,
+    email: 'support@foxelabs.com',
+    address: {
+      '@type': 'PostalAddress',
+      addressRegion: 'Kerala',
+      addressCountry: 'IN',
+    },
     description:
-      'A one-person software studio building open-source WordPress tools and precision trading software.',
+      'A small software studio building open-source WordPress tools and precision trading software.',
     founder: { '@type': 'Person', name: SITE.founder },
     sameAs: [
       'https://x.com/foxelabs',
@@ -90,6 +97,9 @@ interface SoftwareArgs {
   applicationCategory: string;
   operatingSystem: string;
   offerPrice?: string; // '0' for free, or a number as string
+  /** "From $X" tiered pricing — emitted as an AggregateOffer lowPrice, which is
+   *  honest about tiers where a flat `price` would not be. */
+  offerLowPrice?: string;
   ratingValue?: string; // e.g. '4.9'
   ratingCount?: string; // e.g. '110'
   sameAs?: string[];
@@ -115,6 +125,12 @@ export function softwareApplicationLd(a: SoftwareArgs) {
     node.offers = {
       '@type': 'Offer',
       price: a.offerPrice,
+      priceCurrency: 'USD',
+    };
+  } else if (a.offerLowPrice != null) {
+    node.offers = {
+      '@type': 'AggregateOffer',
+      lowPrice: a.offerLowPrice,
       priceCurrency: 'USD',
     };
   }
@@ -152,7 +168,7 @@ export function articleLd(a: ArticleArgs) {
     author:
       a.authorName === SITE.name
         ? { '@id': `${SITE.url}/#organization` }
-        : { '@type': 'Person', name: a.authorName },
+        : { '@type': 'Person', name: a.authorName, url: abs('/about') },
     publisher: { '@id': `${SITE.url}/#organization` },
     mainEntityOfPage: abs(a.url),
   };

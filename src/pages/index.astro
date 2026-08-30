@@ -1,45 +1,45 @@
 ---
 import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Section from '../components/ui/Section.astro';
-import Eyebrow from '../components/ui/Eyebrow.astro';
 import Button from '../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
 import Faq from '../components/ui/Faq.astro';
 import { faqLd } from '../config/seo';
+import { topicOf } from '../config/tracks';
 
 // Activity feed = real published blog posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
   .slice(0, 3);
 
-const fmt = (d: Date) =>
-  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+// News-card fills, straight from the mockup (tokenised in global.css).
+const cardFills = ['var(--news-orange)', 'var(--news-blue)', 'var(--news-olive)'];
 
-const readingTime = (body = '') =>
-  Math.max(1, Math.round(body.trim().split(/\s+/).length / 200));
-
-const trackMeta = {
-  oss:     { label: 'Software',    ink: 'var(--oss-ink)',  soft: 'var(--oss-soft)',  deep: 'var(--oss-deep)' },
-  trading: { label: 'Trading',     ink: 'var(--gold-ink)', soft: 'var(--gold-soft)', deep: 'var(--gold-deep)' },
-} as const;
-
-// Conservative aggregates, summed from the plugins' public WordPress.org figures.
-// See src/pages/software/index.astro for the per-plugin breakdown.
+// Proof numerals on the bold accent cuts — the bright cuts fail contrast on
+// the blue band (yellow was ~1.7:1).
 const proof = [
-  { value: '110K+',  label: 'active installs' },
-  { value: '2.7M+',  label: 'downloads' },
-  { value: '2014',   label: 'shipping since' },
-  { value: 'In-house', label: 'designed & built' },
+  { value: '110K+',    label: 'active installs',  color: 'var(--acc-blue-bright)' },
+  { value: '2.7M+',    label: 'downloads',        color: 'var(--acc-green-bold)' },
+  { value: '2014',     label: 'shipping since',   color: 'var(--acc-yellow-bold)' },
+  { value: 'In-house', label: 'designed & built', color: 'var(--acc-purple-bold)' },
+];
+
+const ethos = [
+  { title: 'Risk-first',      body: 'Downside is designed in before upside — in code and in the markets.', tint: 'var(--acc-blue-bright)', icon: 'mingcute:time-line' },
+  { title: 'Open by default', body: 'Our source is public. Read it, fork it, trust it.',                   tint: 'var(--acc-green)',       icon: 'mingcute:code-fill' },
+  { title: 'Documented',      body: 'Clear docs and changelogs. Questions reach the team that wrote it.',  tint: 'var(--acc-yellow)',      icon: 'mingcute:document-line' },
+  { title: 'Built in-house',  body: 'Every project designed, built and supported under one roof.',         tint: 'var(--acc-purple)',      icon: 'mingcute:user-2-line' },
 ];
 
 const faq = [
   {
     q: 'What is Foxe Labs?',
     a:
-      'Foxe Labs is a one-person software studio run by Joel James from Kerala, India. It ships two things: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5. The plugins have been maintained since 2014 and run on over 110,000 active sites.',
+      'Foxe Labs is a small software studio based in Kerala, India. We ship two things: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5. The plugins have been maintained since 2014 and run on over 110,000 active sites.',
   },
   {
     q: 'Are the WordPress plugins free?',
@@ -54,279 +54,255 @@ const faq = [
   {
     q: 'How do I get support?',
     a:
-      'Free plugins are supported on their WordPress.org support forums, and anything else goes through the contact form or support@foxelabs.com. Messages reach the person who wrote the code — there are no support tiers to escalate through.',
+      'Free plugins are supported on their WordPress.org support forums, and anything else goes through the contact form or support@foxelabs.com. Messages reach the team that wrote the code — there are no support tiers to escalate through.',
   },
 ];
-
-// Small line-chart motif for the hero's trading half — rising trend with a soft area fill.
-const linePts: [number, number][] = [
-  [2, 40], [14, 33], [26, 36], [38, 25], [50, 28], [62, 17], [74, 19], [90, 7],
-];
-const lineD = 'M ' + linePts.map(([x, y]) => `${x} ${y}`).join(' L ');
-const areaD = `${lineD} L 90 48 L 2 48 Z`;
 ---
 <BaseLayout jsonLd={faqLd(faq)}>
   <Nav />
-  <main class="track-hub">
-    <!-- Brand hero -->
-    <section class="band band--alt overflow-hidden relative" data-reveal>
-      <!-- Faint dual-tone glow behind the hero card -->
-      <div
-        class="absolute inset-y-0 right-0 w-full lg:w-1/2 pointer-events-none"
-        aria-hidden="true"
-        style="background:
-          radial-gradient(ellipse 60% 50% at 72% 32%, color-mix(in srgb, var(--gold) 8%, transparent), transparent 70%),
-          radial-gradient(ellipse 50% 45% at 60% 75%, color-mix(in srgb, var(--oss) 6%, transparent), transparent 70%);"
-      ></div>
-      <div class="container-x relative">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+  <main id="main" class="track-hub">
+    <!-- Hero: white ground, copy left, flat tinted illustration cards right -->
+    <section class="band overflow-hidden" data-reveal style="background: var(--surface); padding-block: var(--space-section-lg);">
+      <div class="container-x">
+        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
           <div class="lg:col-span-7">
-            <Eyebrow class="mb-6">lines of code · lines on the chart</Eyebrow>
-            <h1 style="font-size: var(--text-hero); font-weight: 800;" class="mb-6">
-              Engineering <span style="color: var(--oss-ink);">in the open</span> —
-              and <span style="color: var(--gold-ink);">in the markets</span>.
+            <span
+              class="inline-block mb-6 text-[13px]"
+              style="background: var(--b50); color: var(--b500); font-weight: var(--fw-bold); border-radius: var(--r-sm); padding: 6px 12px;"
+            >Lines of code · lines on the chart</span>
+            <h1 style="font-size: var(--text-hero);" class="mb-6">
+              Engineering in the open — and <span style="color: var(--acc-blue-bright);">in the markets</span>.
             </h1>
-            <p class="mb-9 max-w-[540px]" style="font-size: var(--text-lead); color: var(--ink-body);">
-              Foxe Labs is a one-person software studio. Open-source tools with a
+            <p class="mb-9 max-w-[540px] leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
+              Foxe Labs is a small software studio. Open-source tools with a
               decade-long track record, and the same engineering discipline brought
               to trading software.
             </p>
-            <div class="flex flex-wrap gap-3">
-              <Button href="/software" variant="primary" arrow>Open-source software</Button>
-              <Button href="/trading" variant="ghost" arrow>Trading tools</Button>
+            <div class="flex flex-wrap items-center gap-4">
+              <Button href="/software/" variant="primary" size="lg">Explore software</Button>
+              <Button href="/trading/" variant="ghost" size="lg" arrow>Trading tools</Button>
             </div>
           </div>
 
-          <!-- Signature dual-craft card: two disciplines, one studio -->
+          <!-- Flat illustration composition: three tinted cards + two shapes -->
           <div class="lg:col-span-5">
-            <div class="card card--invert overflow-hidden" style="padding: 0;">
-              <!-- Software half -->
-              <div class="p-6 md:p-7">
-                <div class="flex items-center justify-between mb-4">
-                  <span class="font-mono text-[11px]" style="color: var(--oss); letter-spacing: 0.06em;">
-                    ~/foxe-labs · software
-                  </span>
-                  <Icon name="mingcute:code-fill" width={15} height={15} style="color: var(--oss);" aria-hidden="true" />
+            <div class="relative mx-auto max-w-[420px] lg:h-[400px] grid gap-4 lg:block">
+              <!-- Software card -->
+              <div
+                class="lg:absolute lg:top-0 lg:left-6 lg:w-[240px] lg:h-[170px] p-5"
+                style="background: var(--b50); border-radius: var(--r-md);"
+              >
+                <div class="w-9 h-9 flex items-center justify-center mb-3.5" style="background: var(--acc-blue-bright); border-radius: var(--r-md);">
+                  <Icon name="mingcute:code-fill" width={18} height={18} style="color: #fff;" aria-hidden="true" />
                 </div>
-                <div class="font-mono text-[12.5px] leading-[1.9]" style="color: var(--ink-invert);">
-                  <div><span style="color: var(--oss);">$</span> composer require foxelabs/wp-queue-process</div>
-                  <div style="color: var(--ink-invert-dim);"><span style="color: var(--oss);">✓</span> installed · shipping since 2014</div>
-                </div>
+                <div class="h-[9px] w-[80%] mb-2" style="background: var(--b100); border-radius: var(--r-sm);"></div>
+                <div class="h-[9px] w-[55%]" style="background: var(--b100); border-radius: var(--r-sm);"></div>
+                <p class="mt-3.5 text-[12px]" style="color: var(--b500); font-weight: var(--fw-bold);">110K+ installs</p>
               </div>
 
-              <!-- Trading half -->
-              <div class="p-6 md:p-7" style="border-top: 1px solid var(--border-invert);">
-                <div class="flex items-center justify-between mb-4">
-                  <span class="font-mono text-[11px]" style="color: var(--gold); letter-spacing: 0.06em;">
-                    XAUUSD · trading
-                  </span>
-                  <Icon name="mynaui:chart-line-solid" width={15} height={15} style="color: var(--gold);" aria-hidden="true" />
+              <!-- Trading card -->
+              <div
+                class="lg:absolute lg:top-[104px] lg:right-0 lg:w-[240px] p-5"
+                style="background: var(--acc-yellow-soft); border-radius: var(--r-md);"
+              >
+                <div class="w-9 h-9 flex items-center justify-center mb-3.5" style="background: var(--acc-yellow); border-radius: var(--r-md);">
+                  <Icon name="mynaui:chart-line-solid" width={18} height={18} style="color: #fff;" aria-hidden="true" />
                 </div>
-                <svg viewBox="0 0 92 50" class="w-full h-auto" style="max-height: 76px; color: var(--gold);" role="img" aria-label="Illustrative line chart with a rising trend">
-                  <defs>
-                    <linearGradient id="trade-fill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="currentColor" stop-opacity="0.28" />
-                      <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <path d={areaD} fill="url(#trade-fill)" />
-                  <path d={lineD} fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                  {linePts.map(([x, y]) => (
-                    <circle cx={x} cy={y} r="1.4" fill="currentColor" />
-                  ))}
+                <svg viewBox="0 0 100 44" class="w-full h-auto" style="max-height: 64px;" preserveAspectRatio="none" role="img" aria-label="Illustrative rising trend line">
+                  <path d="M 2 38 L 18 30 L 34 33 L 50 22 L 66 25 L 82 12 L 98 5" fill="none" stroke="var(--acc-yellow-bold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
+                  <circle cx="98" cy="5" r="3.4" fill="var(--acc-yellow)" vector-effect="non-scaling-stroke" />
                 </svg>
+                <p class="mt-3 text-[12px]" style="color: var(--acc-yellow-bold); font-weight: var(--fw-bold);">XAUUSD · risk-first</p>
               </div>
+
+              <!-- Trust card -->
+              <div
+                class="lg:absolute lg:bottom-0 lg:left-0 lg:w-[216px] p-[18px] flex flex-col gap-2.5"
+                style="background: var(--acc-green-soft); border-radius: var(--r-md);"
+              >
+                {['Open source · GPL', 'Shipping since 2014', 'Built in-house'].map((line) => (
+                  <div class="flex items-center gap-2.5">
+                    <span class="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style="background: var(--acc-green);">
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8 4 4 6-8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                    </span>
+                    <span class="text-[13px]" style="color: var(--acc-green-bold); font-weight: var(--fw-bold);">{line}</span>
+                  </div>
+                ))}
+              </div>
+
+              <!-- Decorative shapes -->
+              <div class="hidden lg:block absolute top-[44px] right-[64px] w-11 h-11 rounded-full" style="background: var(--acc-purple);" aria-hidden="true"></div>
+              <svg class="hidden lg:block absolute bottom-[10px] right-[26px]" width="34" height="28" viewBox="0 0 34 28" style="transform: rotate(18deg);" aria-hidden="true">
+                <polygon points="17,0 34,28 0,28" fill="var(--acc-red-bright)" />
+              </svg>
             </div>
-            <p class="mt-3 text-center font-mono text-[10px]" style="color: var(--ink-dim);">
-              Illustrative — not a performance claim.
-            </p>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Proof strip -->
-    <section class="band band--invert" data-reveal style="padding-block: 3.5rem;">
+    <!-- Proof strip: flat blue tint band -->
+    <section class="band band--sky" data-reveal style="padding-block: var(--space-section-sm);">
       <div class="container-x">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
           {proof.map((s) => (
-            <div class="pl-5" style="border-left: 2px solid var(--border-invert);">
-              <p class="font-display font-bold" style="font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem); color: var(--ink-invert); line-height: 1;">{s.value}</p>
-              <p class="font-mono text-[11px] mt-2" style="color: var(--ink-invert-dim); letter-spacing: 0.06em;">{s.label}</p>
+            <div>
+              <p class="font-display" style={`font-size: clamp(2rem, 1.4rem + 1.9vw, 2.75rem); font-weight: var(--fw-display); letter-spacing: -0.03em; color: ${s.color}; line-height: 1;`}>{s.value}</p>
+              <p class="text-[14px] mt-2.5" style="color: var(--ink-body); font-weight: var(--fw-medium);">{s.label}</p>
             </div>
           ))}
         </div>
-        <p class="mt-9 pt-6 text-center font-mono text-[11px]" style="border-top: 1px solid var(--border-invert); color: var(--ink-invert-dim); letter-spacing: 0.08em;">
+        <p class="mt-9 text-center text-[13px]" style="color: var(--ink-body);">
           Public on WordPress.org · Packagist · GitHub — open source since 2014
         </p>
       </div>
     </section>
 
-    <!-- Two tracks -->
+    <!-- Two tracks: flat tinted cards, centred intro -->
     <Section variant="light">
-      <div class="max-w-2xl mb-14">
-        <Eyebrow class="mb-5">Two tracks</Eyebrow>
-        <h2 style="font-size: var(--text-h2); font-weight: 800;" class="mb-4">
-          One studio, two disciplines.
-        </h2>
-        <p style="font-size: var(--text-lead); color: var(--ink-body);">
-          The same person, the same standards — pointed at two different problems.
+      <div class="text-center max-w-[680px] mx-auto mb-13">
+        <h2 class="mb-4">One studio, two disciplines.</h2>
+        <p style="font-size: var(--text-lead-sm); color: var(--ink-body);">
+          The same team, the same standards — pointed at two different problems.
           Open-source software is the proof of how we build; trading is where that
           discipline goes next.
         </p>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-6">
+      <div class="grid md:grid-cols-2 gap-7">
         <!-- Software -->
-        <div class="track-oss card card--hover p-8 flex flex-col" style="border-color: var(--accent-soft);">
-          <div class="flex items-center justify-between mb-6">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
-              <Icon name="mingcute:code-fill" width={24} height={24} style="color: var(--accent-ink);" aria-hidden="true" />
-            </div>
-            <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">OPEN SOURCE · GPL</span>
+        <div class="p-9 flex flex-col gap-4" style="background: var(--b50); border-radius: var(--r-md);">
+          <div class="w-12 h-12 flex items-center justify-center" style="background: var(--acc-blue-bright); border-radius: 10px;">
+            <Icon name="mingcute:code-fill" width={24} height={24} style="color: #fff;" aria-hidden="true" />
           </div>
-          <h3 style="font-size: var(--text-h3); font-weight: 800;" class="mb-3">Software</h3>
-          <p class="text-[15px] mb-5" style="color: var(--ink-body);">
+          <h3>Software</h3>
+          <p class="m-0" style="font-size: var(--text-body); color: var(--ink-body);">
             WordPress plugins and PHP libraries — open source and GPL-licensed, documented,
-            and shipped for years. Paid Pro addons and new apps join the same shelf.
+            and shipped for years. Paid Pro add-ons and new apps join the same shelf.
           </p>
-          <ul class="list-none m-0 p-0 mb-7 space-y-2 text-[14px]" style="color: var(--ink-body);">
-            <li><a href="/software/plugins/404-to-301" class="transition-colors hover:text-[var(--accent-ink)]">· 404 to 301 — 100,000+ installs</a></li>
-            <li><a href="/software/plugins/loggedin" class="transition-colors hover:text-[var(--accent-ink)]">· Loggedin — session control</a></li>
-            <li><a href="/software/libraries" class="transition-colors hover:text-[var(--accent-ink)]">· PHP libraries on Packagist</a></li>
+          <ul class="list-none m-0 p-0 flex flex-col gap-2.5" style="font-size: var(--text-ui); color: var(--ink); font-weight: var(--fw-medium);">
+            {[
+              ['/software/plugins/404-to-301/', '404 to 301 — 100,000+ installs'],
+              ['/software/plugins/loggedin/', 'Loggedin — session control'],
+              ['/software/libraries/', 'PHP libraries on Packagist'],
+            ].map(([href, label]) => (
+              <li class="flex items-center gap-2">
+                <span class="w-[7px] h-[7px] rounded-full shrink-0" style="background: var(--acc-blue-bright);"></span>
+                <a href={href} class="transition-colors hover:text-[var(--b500)]">{label}</a>
+              </li>
+            ))}
           </ul>
-          <Button href="/software" variant="primary" arrow class="mt-auto self-start">Explore software</Button>
+          <Button href="/software/" variant="primary" class="mt-auto self-start">Explore software</Button>
         </div>
 
         <!-- Trading -->
-        <div class="track-trading card card--hover p-8 flex flex-col" style="border-color: var(--accent-soft);">
-          <div class="flex items-center justify-between mb-6">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-soft);">
-              <Icon name="mynaui:chart-candlestick-solid" width={24} height={24} style="color: var(--accent-ink);" aria-hidden="true" />
-            </div>
-            <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;">NEW · IN DEVELOPMENT</span>
+        <div class="p-9 flex flex-col gap-4" style="background: var(--acc-yellow-soft); border-radius: var(--r-md);">
+          <div class="w-12 h-12 flex items-center justify-center" style="background: var(--acc-yellow); border-radius: 10px;">
+            <Icon name="mynaui:chart-line-solid" width={24} height={24} style="color: #fff;" aria-hidden="true" />
           </div>
-          <h3 style="font-size: var(--text-h3); font-weight: 800;" class="mb-3">Trading</h3>
-          <p class="text-[15px] mb-5" style="color: var(--ink-body);">
+          <h3>Trading</h3>
+          <p class="m-0" style="font-size: var(--text-body); color: var(--ink-body);">
             Expert advisors, a universal trading journal, and precision utilities for
             prop firm and serious retail traders. Engineered risk-first.
           </p>
-          <ul class="list-none m-0 p-0 mb-7 space-y-2 text-[14px]" style="color: var(--ink-body);">
-            <li><a href="/trading/expert-advisors/gold-scalpel" class="transition-colors hover:text-[var(--accent-ink)]">· Gold Scalpel — MT5 expert advisor</a></li>
-            <li><a href="/trading#waitlist" class="transition-colors hover:text-[var(--accent-ink)]">· TickerLog — universal journal</a></li>
-            <li><a href="/trading/tools" class="transition-colors hover:text-[var(--accent-ink)]">· Session tools — MT5 indicators</a></li>
+          <ul class="list-none m-0 p-0 flex flex-col gap-2.5" style="font-size: var(--text-ui); color: var(--ink); font-weight: var(--fw-medium);">
+            {[
+              ['/trading/expert-advisors/gold-scalpel/', 'Gold Scalpel — MT5 expert advisor'],
+              ['/trading/tools/tickerlog/', 'TickerLog — universal journal'],
+              ['/trading/tools/', 'Session tools — MT5 indicators'],
+            ].map(([href, label]) => (
+              <li class="flex items-center gap-2">
+                <span class="w-[7px] h-[7px] rounded-full shrink-0" style="background: var(--acc-yellow);"></span>
+                <a href={href} class="transition-colors hover:text-[var(--acc-yellow-bold)]">{label}</a>
+              </li>
+            ))}
           </ul>
-          <Button href="/trading" variant="primary" arrow class="mt-auto self-start">Explore trading</Button>
+          <!-- Mockup pairs the yellow field with an ink button, not a blue one. -->
+          <a href="/trading/" class="btn btn--ink mt-auto self-start">Explore trading</a>
         </div>
       </div>
     </Section>
 
-    <!-- Ethos strip -->
-    <Section variant="sunken">
-      <Eyebrow class="mb-8">How we build</Eyebrow>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-        {[
-          ['01', 'Risk-first', 'Downside is designed in before upside — in code and in the markets.'],
-          ['02', 'Open by default', 'Our source is public. Read it, fork it, trust it.'],
-          ['03', 'Documented', 'Clear docs and changelogs. Questions reach the person who wrote it.'],
-          ['04', 'Built in-house', 'Every project designed, built and supported by the same pair of hands.'],
-        ].map(([n, title, body]) => (
+    <!-- Ethos: coloured icon squares on the sunken band -->
+    <Section variant="alt">
+      <h2 class="mb-11">How we build</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {ethos.map((e) => (
           <div>
-            <p class="font-mono text-[12px] mb-4 pb-4" style="color: var(--accent-ink); letter-spacing: 0.1em; border-bottom: 1px solid var(--border);">
-              {n}
-            </p>
-            <h3 style="font-size: 1.0625rem; font-weight: 800;" class="mb-2.5">{title}</h3>
-            <p class="text-[14px]" style="color: var(--ink-body);">{body}</p>
+            <div class="w-10 h-10 flex items-center justify-center mb-4" style={`background: ${e.tint}; border-radius: var(--r-md);`}>
+              <Icon name={e.icon} width={20} height={20} style="color: #fff;" aria-hidden="true" />
+            </div>
+            <h3 class="mb-2" style="font-size: var(--text-h5); line-height: 1.3; font-weight: var(--fw-subhead); letter-spacing: -0.008em;">{e.title}</h3>
+            <p style="font-size: var(--text-ui); color: var(--ink-body);">{e.body}</p>
           </div>
         ))}
       </div>
     </Section>
 
-    <!-- Activity feed -->
+    <!-- Blog feed: solid-colour news cards -->
     {posts.length > 0 && (
-      <Section variant="alt">
+      <Section variant="light">
         <div class="flex items-end justify-between gap-6 mb-10">
-          <div>
-            <Eyebrow class="mb-3">Latest from the studio</Eyebrow>
-            <h2 style="font-size: var(--text-h2); font-weight: 800;">What's new</h2>
-          </div>
-          <Button href="/blog" variant="ghost" arrow class="hidden sm:inline-flex shrink-0 !py-2 !px-4 !text-[13px]">Read the blog</Button>
+          <h2>Latest from the studio</h2>
+          <Button href="/blog/" variant="ghost" arrow class="hidden sm:inline-flex shrink-0">Read the blog</Button>
         </div>
 
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {posts.map((post) => {
-            const m = post.data.track ? trackMeta[post.data.track] : null;
-            return (
-              <a href={`/blog/${post.id}`} class="card card--hover flex flex-col overflow-hidden group">
-                <div class="relative overflow-hidden" style="aspect-ratio: 16 / 9; background: var(--surface-alt);">
-                  {post.data.heroImage ? (
-                    <img
-                      src={post.data.heroImage}
-                      alt={post.data.heroImageAlt ?? ''}
-                      width="1600"
-                      height="900"
-                      loading="lazy"
-                      decoding="async"
-                      class="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <div class="absolute inset-0 flex items-center justify-center" style="background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);">
-                      <Icon name="mingcute:code-fill" width={28} height={28} style="color: var(--ink-dim);" aria-hidden="true" />
-                    </div>
-                  )}
-                  <span
-                    class="absolute top-3 left-3 font-mono text-[10px] px-2.5 py-1 rounded-full"
-                    style={m
-                      ? `background: ${m.soft}; color: ${m.deep}; letter-spacing: 0.08em;`
-                      : 'background: var(--surface); border: 1px solid var(--border); color: var(--ink-dim); letter-spacing: 0.08em;'}
-                  >
-                    {m ? m.label : 'Writing'}
-                  </span>
-                </div>
-
-                <div class="flex flex-col flex-1 p-6">
-                  <div class="flex items-center gap-2 mb-3 font-mono text-[11px]" style="color: var(--ink-dim);">
-                    <time>{fmt(post.data.pubDate)}</time>
-                    {readingTime(post.body) >= 3 && <span>· {readingTime(post.body)} min read</span>}
-                  </div>
-                  <h3 style="font-size: var(--text-h3); font-weight: 800;" class="mb-2.5 transition-colors group-hover:text-[var(--accent-ink)]">
-                    {post.data.title}
-                  </h3>
-                  <p class="text-[14px] flex-1" style="color: var(--ink-body);">
-                    {post.data.description}
-                  </p>
-                  <span class="inline-flex items-center gap-1.5 mt-5 font-mono text-[12px] font-medium" style="color: var(--ink);">
-                    Read more
-                    <span class="transition-transform group-hover:translate-x-0.5">→</span>
-                  </span>
-                </div>
-              </a>
-            );
-          })}
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post, i) => (
+            <a
+              href={`/blog/${post.id}/`}
+              class="card card--solid flex flex-col group"
+              style={`--card-fill: ${cardFills[i % cardFills.length]};`}
+            >
+              {post.data.heroImage && (
+                <Image
+                  src={post.data.heroImage}
+                  alt={post.data.heroImageAlt ?? ''}
+                  widths={[400, 640, 800]}
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
+                  loading="lazy"
+                  class="w-full h-[220px] object-cover block"
+                />
+              )}
+              <div class="flex flex-col flex-1 gap-3 p-6">
+                <span
+                  class="self-start text-[13px]"
+                  style={`background: #fff; color: ${cardFills[i % cardFills.length]}; font-weight: var(--fw-bold); border-radius: 20px; padding: 4px 14px;`}
+                >{topicOf(post.data.track)}</span>
+                <h3 class="flex-1" style="font-size: var(--text-h4); line-height: 1.24; font-weight: var(--fw-heading); letter-spacing: -0.014em; color: #fff;">{post.data.title}</h3>
+                <span class="inline-flex items-center gap-[7px] text-[15px]">
+                  Read more
+                  <span class="transition-transform group-hover:translate-x-0.5">→</span>
+                </span>
+              </div>
+            </a>
+          ))}
         </div>
 
         <div class="mt-8 sm:hidden">
-          <Button href="/blog" variant="ghost" arrow class="!py-2 !px-4 !text-[13px]">Read the blog</Button>
+          <Button href="/blog/" variant="ghost" arrow>Read the blog</Button>
         </div>
       </Section>
     )}
 
-    <!-- Maker teaser -->
-    <section class="band band--invert" data-reveal>
-      <div class="container-x">
-        <div class="max-w-2xl">
-          <Eyebrow class="mb-4">A studio of one, by design</Eyebrow>
-          <p class="mb-8" style="font-size: var(--text-lead); color: var(--ink-invert);">
+    <!-- Maker band: navy, flat, white button on the right -->
+    <section class="band band--invert" data-reveal style="padding-block: var(--space-section);">
+      <div class="container-x flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-12">
+        <div class="max-w-[660px]">
+          <h2 class="mb-3.5" style="font-size: var(--text-h2);">A small studio, by design.</h2>
+          <p style="font-size: var(--text-lead-sm); color: var(--ink-invert-dim);">
             Every project — plugin, library or EA — is designed, built and supported
             in-house. The open-source work is the proof of how we build; the trading
             track is where that discipline goes next.
           </p>
-          <Button href="/about" variant="invert" arrow>About Foxe Labs</Button>
         </div>
+        <a href="/about/" class="btn btn--white shrink-0 self-start">About Foxe Labs</a>
       </div>
     </section>
-    <Section variant="alt">
-      <div class="max-w-3xl mx-auto">
+
+    <!-- FAQ -->
+    <Section variant="light">
+      <div class="max-w-[800px] mx-auto">
         <Faq items={faq} bare />
       </div>
     </Section>

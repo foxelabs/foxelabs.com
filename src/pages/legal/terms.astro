@@ -32,7 +32,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
   ]}
 >
   <Nav />
-  <main class="track-hub">
+  <main id="main" class="track-hub">
     <PageHeader
       eyebrow="Legal"
       title="Terms of Service"
@@ -40,8 +40,8 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
       narrow
     />
     <Section reveal={false}>
-      <article class="prose-foxe max-w-3xl">
-        <p class="font-mono text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
+      <article class="prose-foxe prose-foxe--doc max-w-3xl">
+        <p class="text-[12px]" style="color: var(--ink-dim);">Last updated: {updated}</p>
 
         <h2>1. Who we are</h2>
         <p>
@@ -75,9 +75,11 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
           </li>
         </ul>
         <p>
-          Our trading software (expert advisors and trading tools) is currently in
-          development and available by waitlist only. When it launches, product-specific
-          terms will apply and will be presented at purchase.
+          Our trading software (expert advisors and trading tools) is sold through the
+          MQL5 Market where listed as live (for example, Gold Scalpel); the MQL5 Market's
+          own purchase terms apply to those sales. Products still in development are
+          available by waitlist only, and product-specific terms will be presented at
+          purchase when they launch.
         </p>
 
         <h2>3. Accounts and license keys</h2>
@@ -107,7 +109,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
           charges without affecting the current period.
         </p>
         <p>
-          Refunds are covered by our <a href="/legal/refunds">Refund Policy</a> — in
+          Refunds are covered by our <a href="/legal/refunds/">Refund Policy</a> — in
           short, a 7-day no-questions-asked money-back guarantee on paid plugin
           purchases.
         </p>
@@ -175,7 +177,7 @@ const updated = new Date(updatedIso + 'T00:00:00Z').toLocaleDateString('en-US', 
         <p>
           Questions about these Terms? Email
           <a href="mailto:support@foxelabs.com">support@foxelabs.com</a> or use the
-          <a href="/contact">contact page</a>.
+          <a href="/contact/">contact page</a>.
         </p>
       </article>
     </Section>

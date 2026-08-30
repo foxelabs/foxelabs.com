@@ -1,129 +1,182 @@
 @import 'tailwindcss';
 
 @import '@fontsource-variable/bricolage-grotesque';
-@import '@fontsource/ibm-plex-sans/400.css';
-@import '@fontsource/ibm-plex-sans/500.css';
-@import '@fontsource/ibm-plex-sans/600.css';
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/500.css';
 
+/* ===========================================================================
+   Atlassian Design System — single source of truth.
+   One brand hue (blue) sitewide: the software/trading split no longer carries
+   colour. The accent hues below are ADS's illustration/lozenge palette only —
+   status chips, category dots, news card fills — never a track identity.
+   Per-item colour comes from config/accents.ts, which rebinds the --accent-
+   tokens for a subtree. The old per-track aliases (--oss and --gold) are gone:
+   both resolved to the same blue, so anything styled "per track" silently
+   rendered identically.
+   =========================================================================== */
 :root {
-  /* Warm neutral ramp — stone-tinted, never pure grey */
-  --stone-0:   #FFFFFF;
-  --stone-50:  #FAF9F7;
-  --stone-100: #F7F5F2;
-  --stone-200: #EDE9E3;
-  --stone-300: #D6D3D1;
-  --stone-500: #6B6560;  /* AA (5.28:1) on --surface-alt at small sizes */
-  --stone-600: #52504B;
-  --stone-900: #1C1917;
+  /* ---- Neutrals ----
+     Atlassian's marketing/blog surfaces run on a NEUTRAL near-black (#101214),
+     not the bluish product navy (#172B4D). Text, borders and greys below are
+     de-blued to match; only --n1100 stays navy, since the dark bands are meant
+     to read blue. */
+  --n0:    #FFFFFF;
+  --n100:  #F7F7F8;
+  --n200:  #F1F1F2;
+  --n300:  #E3E3E5;
+  --n400:  #DFDFE2;
+  --n500:  #B6B6BA;
+  --n600:  #7A7B80;
+  --n700:  #5E6166;   /* dim / captions */
+  --n800:  #3D4045;   /* body copy */
+  --n900:  #26282C;
+  --n1000: #101214;   /* headings + primary text — the near-black */
+  --n1100: #091E42;   /* navy, dark bands only */
 
-  /* Bronze/brass ramp (Trading track). NOTE: var still named --gold for historical
-     reasons; the values below are bronze/muted-ochre — Trading is bronze now. */
-  --gold:      #CA9A1E;  /* bright accent — strokes/text on DARK only (white text fails on it) */
-  --gold-ink:  #92710E;  /* text/link on light AND dark fill w/ white label */
-  --gold-deep: #6B520A;  /* hover / pressed */
-  --gold-soft: #F5EDD2;  /* tinted surface */
+  /* ---- ADS brand blue ---- */
+  --b50:  #E9F2FF;
+  --b100: #CCE0FF;
+  --b200: #85B8FF;
+  --b400: #0C66E4;   /* primary */
+  --b500: #0055CC;   /* hovered */
+  --b700: #05389E;   /* pressed */
 
-  /* Trading family — analogous neighbours of the bronze, for tinted surfaces,
-     category chips and gradient washes. Same hue arc, so the track still reads
-     as one colour at a glance. -ink values are all AA on white. */
-  --amber-ink:  #B45309;  /* warm amber, one step toward orange */
-  --amber-deep: #78350F;  /* small text on --amber-soft */
-  --amber-soft: #FDF0D5;
-  --amber:      #F59E0B;  /* dark bands only */
-  --clay-ink:   #9A3412;  /* burnt clay, far end of the arc */
-  --clay-deep:  #7C2D12;
-  --clay-soft:  #FCE9DC;
-  --clay:       #FB923C;  /* dark bands only */
+  /* ---- ADS accent hues — illustration, lozenges, card fills. Not brand. ---- */
+  --acc-blue-bright: #1868DB;  /* illustration blue from the mockup */
+  --acc-red-bright:  #F87168;
+  --acc-green:  #22A06B;  --acc-green-bold:  #216E4E;  --acc-green-soft:  #DCFFF1;
+  --acc-yellow: #FCA700;  --acc-yellow-bold: #7F5F01;  --acc-yellow-soft: #FFF7D6;
+  --acc-orange: #C75300;  --acc-orange-bold: #A54800;  --acc-orange-soft: #FFF3EB;
+  --acc-purple: #BF63F3;  --acc-purple-bold: #803FA5;  --acc-purple-soft: #F3F0FF;
+  --acc-red:    #C9372C;  --acc-red-bold:    #AE2E24;  --acc-red-soft:    #FFECEB;
+  --acc-teal:   #1D7F8C;  --acc-teal-bold:   #164555;  --acc-teal-soft:   #E7F9FF;
 
-  /* Deep forest green ramp (Software track). NOTE: var still named --oss. */
-  --oss:       #22C55E;  /* bright accent — dots/strokes on DARK only (white text fails on it) */
-  --oss-ink:   #15803D;  /* text on light AND button fill w/ white label */
-  --oss-deep:  #166534;  /* hover, pill text on soft */
-  --oss-soft:  #DCFCE7;  /* tinted surface / badges */
+  /* ---- Semantic surfaces ---- */
+  --surface:        var(--n0);
+  --surface-alt:    var(--n200);
+  --surface-sunken: var(--n100);
+  --surface-brand:  var(--b50);
+  --surface-invert: var(--n1100);
+  --surface-invert-raised: #1D2B4D;
 
-  /* Software family — analogous neighbours of the forest green. Same job as the
-     trading family above. -ink values are all AA on white. */
-  --teal-ink:  #0F766E;  /* cooler neighbour */
-  --teal-deep: #115E59;  /* small text on --teal-soft */
-  --teal-soft: #D7F3EF;
-  --teal:      #2DD4BF;  /* dark bands only */
-  --moss-ink:  #4D7C0F;  /* warmer/olive neighbour */
-  --moss-deep: #3F6212;
-  --moss-soft: #E8F5D0;
-  --moss:      #A3E635;  /* dark bands only */
+  /* ---- Semantic ink ---- */
+  --ink:            var(--n1000);
+  --ink-body:       var(--n800);
+  --ink-dim:        var(--n700);
+  --ink-invert:     #FFFFFF;
+  --ink-invert-dim: #C7CDD4;
 
-  /* Semantic accent — defaults to neutral ink (the common/hub brand). Per-track wrappers
-     below remap it, so .eyebrow / .btn--primary / accent bits theme automatically per page. */
-  --accent:     var(--ink-invert-dim);
-  --accent-ink: var(--stone-900);
-  --accent-deep:var(--stone-900);
-  --accent-soft:var(--stone-200);
-  --accent-btn: var(--stone-900);   /* neutral ink fill with a white label */
-  --accent-on:  #FFFFFF;            /* text color that sits ON --accent-btn */
+  --border:      var(--n400);
+  --border-soft: var(--n200);
+  --border-bold: var(--n600);
+  --border-invert: #344563;
 
-  /* Companion accents — the two analogous neighbours of the current track's hue.
-     Used for gradient washes, per-item category tints and chart series, never for
-     primary buttons. On the hub these resolve to the two TRACK colours instead, so
-     the hub reads colourful by showing both tracks rather than owning a third hue. */
-  --accent-2:      var(--ink-invert-dim);
-  --accent-2-ink:  var(--oss-ink);
-  --accent-2-deep: var(--oss-deep);
-  --accent-2-soft: var(--oss-soft);
-  --accent-3:      var(--ink-invert-dim);
-  --accent-3-ink:  var(--gold-ink);
-  --accent-3-deep: var(--gold-deep);
-  --accent-3-soft: var(--gold-soft);
+  /* ADS form fields. The input border is its own, darker ramp than --border:
+     ADS uses color.border.input (#8590A2) so a field reads as interactive. */
+  --field-bg:          var(--n0);
+  --field-bg-hover:    var(--n100);
+  --field-bg-disabled: rgba(9, 30, 66, 0.03);
+  --field-border:      #8590A2;
+  --field-border-focus: #388BFF;
+  --field-border-danger: #E2483D;
+  --field-ink:         var(--n1000);
+  --field-ink-placeholder: var(--n600);
+  --field-ink-disabled: rgba(9, 30, 66, 0.31);
+  --field-h:           40px;
 
-  /* Semantic surface roles */
-  --surface:        var(--stone-0);
-  --surface-alt:    var(--stone-100);
-  --surface-invert: var(--stone-900);
-  --surface-invert-raised: #262220;  /* cards sitting on --surface-invert */
-  --surface-sunken: var(--stone-50);
+  /* ---- Brand / accent semantics. Every track resolves here. ---- */
+  --accent:      var(--b400);
+  --accent-ink:  var(--b400);
+  --accent-deep: var(--b500);
+  --accent-soft: var(--b50);
+  --accent-btn:  var(--b400);
+  --accent-press: var(--b700);
+  --accent-on:   #FFFFFF;
 
-  /* Semantic ink roles */
-  --ink:            var(--stone-900);
-  --ink-body:       var(--stone-600);
-  --ink-dim:        var(--stone-500);
-  --ink-invert:     #F5F3F0;
-  --ink-invert-dim: #A8A29E;
+  /* Companion slots resolve to ADS accent hues — decoration, never identity. */
+  --accent-2:      var(--acc-green);
+  --accent-2-ink:  var(--acc-green-bold);
+  --accent-2-deep: var(--acc-green-bold);
+  --accent-2-soft: var(--acc-green-soft);
+  --accent-3:      var(--acc-purple);
+  --accent-3-ink:  var(--acc-purple-bold);
+  --accent-3-deep: var(--acc-purple-bold);
+  --accent-3-soft: var(--acc-purple-soft);
+  /* Homepage news-card fills (from the marketing mockup). */
+  --news-orange: var(--acc-orange);
+  --news-blue:   #1558BC;
+  --news-olive:  #4C6B1F;
 
-  --border:        var(--stone-300);
-  --border-soft:   var(--stone-200);
-  --border-invert: #332F2C;
+  --green: var(--acc-green-bold);
+  --red:   var(--acc-red);
+  --red-invert: #F87168;
+  --chart-up:   #4BCE97;
+  --chart-down: #F87168;
 
-  --green: #047857;  /* success — kept cooler/distinct from --oss-ink #15803D (software accent) */
-  --red:   #B91C1C;
-  --red-invert: #F87171;  /* error text on dark (invert) surfaces */
-
-  /* Bright variants for chart marks on dark (invert) surfaces only. */
-  --chart-up:   #34D399;
-  --chart-down: #F87171;
-
+  /* Bricolage Grotesque runs the whole site — headings at its heaviest cut
+     (variable axis tops out at 800), body copy at 400 off the same axis. */
   --font-display: 'Bricolage Grotesque Variable', system-ui, sans-serif;
-  --font-body:    'IBM Plex Sans', system-ui, sans-serif;
+  --font-body:    var(--font-display);
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
-  /* Fluid type scale */
-  --text-hero: clamp(2.25rem, 1.35rem + 4.3vw, 3.75rem);
-  --text-h2:   clamp(1.75rem, 1.25rem + 2.2vw, 2.5rem);
-  --text-h3:   clamp(1.125rem, 1.05rem + 0.5vw, 1.375rem);
-  --text-lead: clamp(1rem, 0.95rem + 0.35vw, 1.125rem);
+  /* ---- ADS type scale ----
+     heading.xxlarge…xxsmall + body large/default/small. Marketing hero sits one
+     step above ADS xxlarge because the product scale tops out at 35px. Weights
+     are ADS's: 500 on display sizes, 600 below — the old 800 is gone. */
+  --text-hero:   clamp(2.25rem, 1.6rem + 2.8vw, 3.5rem);  /* 36 → 56 */
+  --text-hero-sm: clamp(2rem, 1.6rem + 1.6vw, 2.5rem);    /* 32 → 40 — blog/post titles */
+  --text-h1:     2.1875rem;   /* 35 / 40 */
+  --text-h2:     1.8125rem;   /* 29 / 32 */
+  --text-h3:     1.5rem;      /* 24 / 28 */
+  --text-h4:     1.25rem;     /* 20 / 24 */
+  --text-h5:     1rem;        /* 16 / 20 */
+  --text-h6:     0.875rem;    /* 14 / 16 */
+  --text-lead:   1.25rem;     /* marketing lead paragraph, 20/28 */
+  --text-lead-sm: 1.0625rem;  /* 17/26 — hero + long-form intro copy */
+  --text-body:   1rem;        /* 16 / 24 — marketing body */
+  --text-ui:     0.875rem;    /* 14 / 20 — product/UI body */
+  --text-small:  0.75rem;     /* 12 / 16 */
 
-  /* Rhythm */
-  --space-section: clamp(4rem, 7vw, 5.6rem);
+  --fw-display: 800;   /* Bricolage's heaviest — its variable axis is 200–800 */
+  --fw-heading: 800;
+  --fw-subhead: 700;   /* h5/h6 and small UI titles */
+  --fw-body:    400;
+  --fw-medium:  500;
+  --fw-bold:    600;
+
+  /* ---- ADS 4px space scale ---- */
+  --space-025: 2px;
+  --space-050: 4px;
+  --space-100: 8px;
+  --space-150: 12px;
+  --space-200: 16px;
+  --space-250: 20px;
+  --space-300: 24px;
+  --space-400: 32px;
+  --space-500: 40px;
+  --space-600: 48px;
+  --space-800: 64px;
+  --space-1000: 80px;
+
+  --space-section: clamp(3.5rem, 6vw, 5rem);
+  --space-section-sm: clamp(2.5rem, 5vw, 3.5rem);
+  --space-section-lg: clamp(4rem, 7vw, 5.75rem);
   --container: 1200px;
   --container-pad: 24px;
 
-  --r-card: 24px;
-  --r-md:   12px;
-  --r-sm:   8px;
-  --r-pill: 999px;
+  /* ---- ADS radius ---- */
+  --r-sm:      4px;    /* border.radius.100 */
+  --r-btn:     4px;
+  --r-md:      8px;    /* border.radius.200 */
+  --r-card:    8px;
+  --r-card-lg: 16px;   /* marketing news cards */
+  --r-pill:    999px;
 
-  --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px -8px rgba(28, 25, 23, 0.12);
-  --shadow-card-hover: 0 2px 4px rgba(28, 25, 23, 0.06), 0 16px 32px -12px rgba(28, 25, 23, 0.18);
+  /* ---- ADS elevation ---- */
+  --shadow-raised:  0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31);
+  --shadow-overlay: 0 8px 12px rgba(9, 30, 66, 0.15), 0 0 1px rgba(9, 30, 66, 0.31);
+  --shadow-card: var(--shadow-raised);
+  --shadow-card-hover: var(--shadow-overlay);
 }
 
 /* Element defaults live in @layer base so Tailwind utilities (in the
@@ -138,7 +191,7 @@
     color: var(--ink-body);
     font-family: var(--font-body);
     font-size: 16px;
-    line-height: 1.625;
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -160,27 +213,49 @@
   button { font-family: inherit; cursor: pointer; }
   input, textarea, select { font-family: inherit; }
 
-  /* Headings opt out of the body's antialiased smoothing: on macOS it thins
-     the strokes enough that 800 reads closer to 600. */
-  h1, h2, h3, h4 {
+  /* ADS heading scale — 500 on display sizes, 600 below. Sizes live here so
+     page markup does not have to restate them. */
+  h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    font-weight: 800;
     -webkit-font-smoothing: auto;
     -moz-osx-font-smoothing: auto;
     color: var(--ink);
-    letter-spacing: -0.02em;
-    line-height: 1.08;
     margin: 0;
   }
+  h1 { font-size: var(--text-h1); line-height: 1.1;  font-weight: var(--fw-display); letter-spacing: -0.025em; }
+  h2 { font-size: var(--text-h2); line-height: 1.12; font-weight: var(--fw-display); letter-spacing: -0.022em; }
+  h3 { font-size: var(--text-h3); line-height: 1.18; font-weight: var(--fw-display); letter-spacing: -0.018em; }
+  h4 { font-size: var(--text-h4); line-height: 1.24; font-weight: var(--fw-heading); letter-spacing: -0.014em; }
+  h5 { font-size: var(--text-h5); line-height: 1.3;  font-weight: var(--fw-subhead); letter-spacing: -0.008em; }
+  h6 { font-size: var(--text-h6); line-height: 1.35; font-weight: var(--fw-subhead); }
 }
 
 .font-display { font-family: var(--font-display); }
 .font-body    { font-family: var(--font-body); }
-.font-mono    { font-family: var(--font-mono); }
+.font-code    { font-family: var(--font-mono); }  /* real code / terminal only */
+
+/* Keyboard users skip the header + mega-menus straight to <main>. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--surface);
+  color: var(--accent-ink);
+  padding: var(--space-100) var(--space-200);
+  border-radius: var(--r-sm);
+  font-weight: var(--fw-bold);
+}
+.skip-link:focus-visible {
+  left: var(--space-100);
+  top: var(--space-100);
+}
 
 html { scroll-behavior: smooth; }
 
-:where(a, button, input, textarea, select):focus-visible {
+/* .field draws its own ADS focus (border thicken via inset shadow) — the
+   global outline on top would double the indicator. */
+:where(a, button, input, textarea, select):not(.field):focus-visible {
   outline: 2px solid var(--accent-ink);
   outline-offset: 2px;
   border-radius: var(--r-sm);
@@ -212,7 +287,6 @@ html { scroll-behavior: smooth; }
   [data-reveal] { opacity: 1; transform: none; transition: none; }
   [data-reveal] .grid > .card { opacity: 1; transform: none; transition: none; }
   .trend-line { stroke-dashoffset: 0 !important; animation: none !important; }
-  .marquee-track { animation: none !important; }
   .animate-fox-sniff { animation: none !important; }
 }
 
@@ -249,8 +323,8 @@ html { scroll-behavior: smooth; }
 /* ---- Section bands ---- */
 .band { padding-block: var(--space-section); }
 .band--light  { background: var(--surface); }
-.band--alt    { background: var(--surface-alt); }
-.band--sunken { background: var(--surface-sunken); }
+.band--alt    { background: var(--surface-sunken); }
+.band--sky    { background: var(--surface-brand); }
 .band--invert {
   background: var(--surface-invert);
   color: var(--ink-invert-dim);
@@ -258,198 +332,332 @@ html { scroll-behavior: smooth; }
 .band--invert h1,
 .band--invert h2,
 .band--invert h3,
-.band--invert h4 { color: var(--ink-invert); }
+.band--invert h4,
+.band--invert h5,
+.band--invert h6 { color: var(--ink-invert); }
 
-/* ---- Buttons ---- */
+/* ---- Buttons — ADS: 4px radius, 500 weight, 32/40px heights, no lift ---- */
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  border: 1px solid transparent;
-  border-radius: var(--r-pill);
-  padding: 11px 22px;
-  font-size: 14px;
-  font-weight: 600;
+  justify-content: center;
+  gap: var(--space-100);
+  border: none;
+  border-radius: var(--r-btn);
+  padding: 0 var(--space-150);
+  height: 40px;
+  font-family: var(--font-body);
+  font-size: var(--text-ui);
+  font-weight: var(--fw-medium);
   line-height: 1;
-  transition: background-color 0.15s ease, border-color 0.15s ease,
-              color 0.15s ease, transform 0.15s ease;
+  transition: background-color 0.1s ease, color 0.1s ease;
 }
-.btn:active { transform: translateY(1px); }
+.btn--sm { height: 32px; font-size: var(--text-ui); }
+.btn--lg {
+  height: 48px;
+  padding: 0 var(--space-300);
+  font-size: var(--text-body);
+}
+.btn--lg .btn__arrow svg { width: 16px; height: 16px; }
 
+/* Buttons read the accent tokens rather than the blue ramp directly, so a
+   subtree that rebinds --accent-* (a product page, a coloured card) recolours
+   its buttons with it. The defaults are the same blue, so nothing else moves. */
 .btn--primary {
   background: var(--accent-btn);
   color: var(--accent-on);
 }
-.btn--primary:hover { filter: brightness(0.94); }
+.btn--primary:hover  { background: var(--accent-deep); }
+.btn--primary:active { background: var(--accent-press); }
 
+/* ADS "subtle" button: no border, neutral wash on hover. */
 .btn--ghost {
   background: transparent;
-  border-color: var(--border);
-  color: var(--ink);
+  color: var(--accent-ink);
 }
-.btn--ghost:hover { background: var(--surface-alt); border-color: var(--stone-500); }
+.btn--ghost:hover  { background: rgba(9, 30, 66, 0.06); color: var(--accent-deep); }
+.btn--ghost:active { background: rgba(9, 30, 66, 0.14); color: var(--accent-press); }
 
 .btn--invert {
-  background: transparent;
-  border-color: var(--border-invert);
+  background: rgba(255, 255, 255, 0.14);
   color: var(--ink-invert);
 }
-.btn--invert:hover { background: rgba(255, 255, 255, 0.06); }
+.btn--invert:hover { background: rgba(255, 255, 255, 0.22); }
 
+/* Ink button — pairs with tinted fields where blue would clash (mockup). */
+.btn--ink {
+  background: var(--ink);
+  color: #FFFFFF;
+}
+.btn--ink:hover  { background: var(--n900); }
+.btn--ink:active { background: var(--n800); }
+
+/* Solid white button for the navy bands. */
+.btn--white {
+  background: #FFFFFF;
+  color: var(--surface-invert);
+}
+.btn--white:hover  { background: rgba(255, 255, 255, 0.88); }
+.btn--white:active { background: var(--b100); }
+
+/* ADS buttons carry a plain chevron/arrow inline — no circular badge. */
 .btn__arrow {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  margin-right: -8px;
-  border-radius: var(--r-pill);
-  background: rgba(28, 25, 23, 0.14);
+  background: none;
+  width: auto;
+  height: auto;
+  margin: 0;
 }
-.btn--invert .btn__arrow { background: rgba(255, 255, 255, 0.12); }
 
-/* ---- Cards ---- */
+/* ---- Form fields — ADS TextField/TextArea: 40px, 4px radius, 14px type.
+   Focus thickens the border with an inset shadow rather than a real 2px
+   border, so nothing reflows on focus. ---- */
+.field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: var(--field-h);
+  padding: 0 var(--space-100);
+  background: var(--field-bg);
+  color: var(--field-ink);
+  border: 1px solid var(--field-border);
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: var(--text-ui);
+  line-height: 20px;
+  outline: none;
+  transition: background-color 0.1s ease, border-color 0.1s ease, box-shadow 0.1s ease;
+}
+.field::placeholder { color: var(--field-ink-placeholder); }
+.field:hover:not(:disabled):not(:focus) { background: var(--field-bg-hover); }
+.field:focus,
+.field:focus-visible {
+  background: var(--field-bg);
+  border-color: var(--field-border-focus);
+  box-shadow: inset 0 0 0 1px var(--field-border-focus);
+}
+.field:disabled {
+  background: var(--field-bg-disabled);
+  color: var(--field-ink-disabled);
+  cursor: not-allowed;
+}
+.field[aria-invalid='true'] {
+  border-color: var(--field-border-danger);
+  box-shadow: inset 0 0 0 1px var(--field-border-danger);
+}
+
+/* Multi-line fields grow instead of sitting at the fixed control height. */
+textarea.field {
+  height: auto;
+  min-height: 96px;
+  padding: var(--space-100);
+  resize: vertical;
+}
+
+/* On the inverted band the field keeps ADS's structure but flips its ramp. */
+.field--invert {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ink-invert);
+  border-color: var(--border-invert);
+}
+.field--invert::placeholder { color: var(--ink-invert-dim); }
+.field--invert:hover:not(:disabled):not(:focus) { background: rgba(255, 255, 255, 0.12); }
+.field--invert:focus,
+.field--invert:focus-visible {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--b200);
+  box-shadow: inset 0 0 0 1px var(--b200);
+}
+
+/* ADS Form label: 12px/600, subtlest ink, 4px above its control. */
+.field-label {
+  display: block;
+  margin-bottom: var(--space-050);
+  font-family: var(--font-body);
+  font-size: var(--text-small);
+  font-weight: var(--fw-bold);
+  line-height: 16px;
+  color: var(--ink-dim);
+}
+.field-label--invert { color: var(--ink-invert-dim); }
+
+/* ---- Cards — ADS raised elevation, 8px radius, no hover lift ---- */
 .card {
   background: var(--surface);
-  border: 1px solid var(--border);
   border-radius: var(--r-card);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  box-shadow: var(--shadow-raised);
+  border: none;
+  transition: background-color 0.1s ease, box-shadow 0.1s ease;
 }
 .card--hover:hover {
-  box-shadow: var(--shadow-card-hover);
-  transform: translateY(-2px);
+  background: var(--n100);
+  box-shadow: var(--shadow-raised);
+  transform: none;
 }
 .card--invert {
   background: var(--surface-invert-raised);
-  border-color: var(--border-invert);
   box-shadow: none;
 }
 
-/* ---- Eyebrow ---- */
-.eyebrow {
-  font-family: var(--font-mono);
+/* ---- Lozenge — ADS status chip. Small, 3px radius, uppercase, 600. ---- */
+.lozenge {
+  display: inline-block;
+  background: var(--b50);
+  color: var(--b500);
+  border-radius: 3px;
+  padding: 2px var(--space-050);
+  font-family: var(--font-body);
   font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
+  font-weight: var(--fw-bold);
+  line-height: 16px;
+  letter-spacing: 0;
   text-transform: uppercase;
-  color: var(--accent-ink);
 }
-.band--invert .eyebrow { color: var(--accent); }
 
-/* ---- Per-track accent scoping ---- */
-/* Hub / common shell — neutral ink accent, so the two tracks (forest green + copper)
-   stay the only saturated colours on the site. Home <main>, About, Contact, Nav
-   and Footer wear this. Bare --accent is consumed only by eyebrows/labels on dark
-   bands, hence the light value; everything else uses the ink ramp. */
-.track-hub {
-  --accent:      var(--ink-invert-dim);
-  --accent-ink:  var(--stone-900);
-  --accent-deep: var(--stone-900);
-  --accent-soft: var(--stone-200);
-  --accent-btn:  var(--stone-900);
-  --accent-on:   #FFFFFF;
-  /* Hub companions = the two tracks themselves. */
-  --accent-2:      var(--oss);
-  --accent-2-ink:  var(--oss-ink);
-  --accent-2-deep: var(--oss-deep);
-  --accent-2-soft: var(--oss-soft);
-  --accent-3:      var(--gold);
-  --accent-3-ink:  var(--gold-ink);
-  --accent-3-deep: var(--gold-deep);
-  --accent-3-soft: var(--gold-soft);
+/* ---- Overline (was .eyebrow) — ADS uses body font, not mono ---- */
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--text-ui);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--b400);
 }
-/* On the hub's dark bands the neutral ink button would vanish (black on black) —
-   flip it to a white fill with dark text. Track bands keep their coloured fills. */
-.track-hub .band--invert {
-  --accent-btn: var(--ink-invert);
-  --accent-on:  var(--stone-900);
-}
-.track-oss {
-  --accent:     var(--oss);
-  --accent-ink: var(--oss-ink);
-  --accent-deep:var(--oss-deep);
-  --accent-soft:var(--oss-soft);
-  --accent-btn: var(--oss-ink);   /* dark fill so a white label passes AA */
-  --accent-on:  #FFFFFF;
-  --accent-2:      var(--teal);
-  --accent-2-ink:  var(--teal-ink);
-  --accent-2-deep: var(--teal-deep);
-  --accent-2-soft: var(--teal-soft);
-  --accent-3:      var(--moss);
-  --accent-3-ink:  var(--moss-ink);
-  --accent-3-deep: var(--moss-deep);
-  --accent-3-soft: var(--moss-soft);
-}
+.band--invert .eyebrow { color: var(--b200); }
+
+/* ---- Track scoping is now a no-op ----
+   One brand hue sitewide. These classes stay in the markup (~20 files) but no
+   longer remap anything, so software, trading and the hub read identically. */
+.track-hub,
+.track-oss,
 .track-trading {
-  --accent:     var(--gold);
-  --accent-ink: var(--gold-ink);
-  --accent-deep:var(--gold-deep);
-  --accent-soft:var(--gold-soft);
-  --accent-btn: var(--gold-ink);   /* dark bronze fill so a white label passes AA */
-  --accent-on:  #FFFFFF;
-  --accent-2:      var(--amber);
-  --accent-2-ink:  var(--amber-ink);
-  --accent-2-deep: var(--amber-deep);
-  --accent-2-soft: var(--amber-soft);
-  --accent-3:      var(--clay);
-  --accent-3-ink:  var(--clay-ink);
-  --accent-3-deep: var(--clay-deep);
-  --accent-3-soft: var(--clay-soft);
+  --accent:      var(--b400);
+  --accent-ink:  var(--b400);
+  --accent-deep: var(--b500);
+  --accent-soft: var(--b50);
+  --accent-btn:  var(--b400);
+  --accent-press: var(--b700);
+  --accent-on:   #FFFFFF;
+}
+.track-hub .band--invert,
+.track-oss .band--invert,
+.track-trading .band--invert {
+  --accent-btn: #FFFFFF;
+  --accent-on:  var(--surface-invert);
+  /* Hover/press stay light too — without these the white button hovered to
+     --b500 with navy text (~2.5:1). */
+  --accent-deep: rgba(255, 255, 255, 0.88);
+  --accent-press: var(--b100);
 }
 
-/* ---- Tone helpers ---- */
-/* Shift a single card/element onto a companion hue from the same family. Because
-   they remap the semantic vars locally, everything inside (icon wells, chips,
-   ghost buttons, markers) re-themes with no extra markup. */
+/* Tone helpers now shift only the decorative accent hue, never the brand. */
 .tone-2 {
-  --accent-ink:  var(--accent-2-ink);
-  --accent-deep: var(--accent-2-deep);
-  --accent-soft: var(--accent-2-soft);
-  --accent-btn:  var(--accent-2-ink);
-  --accent:      var(--accent-2);
+  --accent-ink:  var(--acc-green-bold);
+  --accent-deep: var(--acc-green-bold);
+  --accent-soft: var(--acc-green-soft);
+  --accent:      var(--acc-green);
 }
 .tone-3 {
-  --accent-ink:  var(--accent-3-ink);
-  --accent-deep: var(--accent-3-deep);
-  --accent-soft: var(--accent-3-soft);
-  --accent-btn:  var(--accent-3-ink);
-  --accent:      var(--accent-3);
+  --accent-ink:  var(--acc-purple-bold);
+  --accent-deep: var(--acc-purple-bold);
+  --accent-soft: var(--acc-purple-soft);
+  --accent:      var(--acc-purple);
 }
 
-/* ---- Coloured washes ---- */
-/* A light band that fades from the track's tinted surfaces into the page instead
-   of sitting flat. Two offset radial pools (core hue + companion) keep it from
-   looking like a single blunt gradient. */
-.band--wash {
-  background:
-    radial-gradient(115% 85% at 8% -15%,
-      color-mix(in oklab, var(--accent-soft) 80%, transparent) 0%, transparent 62%),
-    radial-gradient(95% 75% at 98% 5%,
-      color-mix(in oklab, var(--accent-2-soft) 65%, transparent) 0%, transparent 58%),
-    linear-gradient(180deg, var(--surface-alt) 0%, var(--surface) 100%);
+/* ---- Flat tinted panel ---- */
+.tile {
+  background: var(--accent-soft);
+  border-radius: var(--r-md);
+  padding: var(--space-300);
 }
 
-/* Dark bands are where the bright accents are legible, so this is where colour
-   gets to be saturated — a soft glow bleeding up from the band edges. */
-.band--invert.band--glow {
-  background:
-    radial-gradient(80% 120% at 15% 100%,
-      color-mix(in oklab, var(--accent) 14%, transparent) 0%, transparent 60%),
-    radial-gradient(70% 100% at 90% 0%,
-      color-mix(in oklab, var(--accent-2) 10%, transparent) 0%, transparent 55%),
-    var(--surface-invert);
+/* ---- Marketing news card: one solid fill, image on top ---- */
+.card--solid {
+  background: var(--card-fill, var(--b400));
+  border: none;
+  border-radius: var(--r-card-lg);
+  box-shadow: none;
+  overflow: hidden;
+  color: #FFFFFF;
 }
+.card--solid h1, .card--solid h2, .card--solid h3, .card--solid h4 { color: #FFFFFF; }
+.card--solid:hover { box-shadow: var(--shadow-overlay); }
+.card--solid .lozenge {
+  background: #FFFFFF;
+  color: var(--card-fill, var(--b400));
+}
+
+
+/* ---- Blog: Atlassian article kicker + topic filter pills ---- */
+/* "Article in Software" — 11px, 500, uppercase, hairline tracking. */
+.post-kicker {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin: 0;
+}
+
+
+/* Post meta: dark ink lozenge naming the topic ("Published in · Software"). */
+.term-lozenge {
+  display: inline-block;
+  background: var(--ink);
+  color: #FFFFFF;
+  border-radius: 3px;
+  padding: 1px 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  line-height: 18px;
+  transition: background-color 0.1s ease;
+}
+.term-lozenge:hover { background: var(--accent-ink); }
+
+/* Pill tabs above the post grid: neutral fill, ink fill when selected. */
+.topic-tab {
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 8px 24px;
+  background: var(--n200);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--fw-medium);
+  line-height: 1.4;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+.topic-tab:hover { background: var(--n300); }
+.topic-tab[aria-pressed='true'] {
+  background: var(--accent-ink);
+  color: #FFFFFF;
+}
+/* Unselected pills carry a dot in their topic's hue, so the mapping is legible
+   before you click anything. */
+.topic-tab__dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border-radius: 999px;
+  background: var(--accent-ink);
+  vertical-align: middle;
+}
+.topic-tab[aria-pressed='true'] .topic-tab__dot { background: #FFFFFF; }
 
 }
 
 /* Rendered Markdown (blog posts, product bodies) */
 .prose-foxe {
-  color: var(--ink-body);
-  font-size: 1.0625rem;
-  line-height: 1.75;
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1.5;
 }
-.prose-foxe > * + * { margin-top: 1.1em; }
+.prose-foxe > * + * { margin-top: 1.5em; }
 .prose-foxe h2,
 .prose-foxe h3 {
   margin-bottom: 0.2em;
@@ -457,17 +665,39 @@ html { scroll-behavior: smooth; }
   color: var(--ink);
   letter-spacing: -0.01em;
 }
-/* Each h2 opens a new section (e.g. a method) — a hairline rule and generous
-   space above it give the reader a clear break between them. */
+/* Section heads run at the same size as the post title, with space above and
+   no rule — the size break alone marks the section. */
 .prose-foxe h2 {
-  font-size: 1.6rem;
-  font-weight: 800;
-  margin-top: 2.75em;
-  padding-top: 1.75em;
-  border-top: 1px solid var(--border-soft);
+  font-size: clamp(1.75rem, 1.45rem + 1.2vw, 2.5rem);
+  font-weight: var(--fw-display);
+  margin-top: 2em;
+  line-height: 1.15;
 }
-.prose-foxe h3 { font-size: 1.25rem; font-weight: 800; margin-top: 1.9em; }
-.prose-foxe strong { color: var(--ink); font-weight: 600; }
+.prose-foxe h3 { font-size: var(--text-h3); font-weight: var(--fw-display); margin-top: 1.75em; }
+
+/* Long-form documents (terms, privacy, refunds) are a list of numbered clauses,
+   not a handful of chapter breaks — the blog's 40px section heads are far too
+   loud across a dozen of them. Step the whole heading scale down one rung. */
+.prose-foxe--doc h2 {
+  font-size: var(--text-h3);
+  font-weight: var(--fw-heading);
+  margin-top: 2.25em;
+  line-height: 1.2;
+}
+.prose-foxe--doc h3 {
+  font-size: var(--text-h4);
+  font-weight: var(--fw-heading);
+  margin-top: 1.75em;
+}
+.prose-foxe--doc h4 {
+  font-size: var(--text-h5);
+  font-weight: var(--fw-subhead);
+  margin-top: 1.5em;
+  margin-bottom: 0.2em;
+}
+/* The first clause head sits right under the page lead — no extra gap needed. */
+.prose-foxe--doc > h2:first-child { margin-top: 0; }
+.prose-foxe strong { color: var(--ink); font-weight: var(--fw-subhead); }
 .prose-foxe a {
   color: var(--accent-ink);
   text-decoration: underline;
@@ -483,19 +713,22 @@ html { scroll-behavior: smooth; }
 .prose-foxe code {
   font-family: var(--font-mono);
   font-size: 0.85em;
-  background: var(--surface-alt);
-  border: 1px solid var(--border-soft);
+  background: rgba(5, 21, 36, 0.06);
+  border: none;
   border-radius: 4px;
   padding: 0.1em 0.35em;
   color: var(--ink);
 }
+/* Code blocks sit on a light neutral wash, like the Atlassian blog's. The
+   Shiki theme paints the token colours; this owns the surface. */
 .prose-foxe pre {
-  background: var(--surface-invert);
-  color: var(--ink-invert);
+  background: rgba(5, 21, 36, 0.06) !important;
+  color: var(--ink);
   border-radius: var(--r-md);
-  padding: 1.1em;
+  padding: 12px 16px;
   overflow-x: auto;
-  font-size: 0.9rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
 }
 .prose-foxe pre code {
   background: none;
@@ -542,10 +775,10 @@ html { scroll-behavior: smooth; }
   font-weight: 500;
 }
 /* Highlight the recommended (last) column so it reads as the answer. */
-.prose-foxe thead th:last-child { color: var(--oss-deep); }
+.prose-foxe thead th:last-child { color: var(--accent-deep); }
 .prose-foxe tbody td:last-child {
-  background: color-mix(in srgb, var(--oss-soft) 45%, transparent);
-  color: var(--oss-deep);
+  background: color-mix(in srgb, var(--accent-soft) 45%, transparent);
+  color: var(--accent-deep);
   font-weight: 600;
 }
 .prose-foxe tbody tr:last-child td { border-bottom: none; }

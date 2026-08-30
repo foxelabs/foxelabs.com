@@ -2,55 +2,57 @@
 import Section from './ui/Section.astro';
 import Eyebrow from './ui/Eyebrow.astro';
 import Button from './ui/Button.astro';
+import { ACCENTS, accentVars, categoryAccent } from '../config/accents';
 
+// Categories, not products. TickerLog is a product inside Trading Tools and
+// lives on its own page — it was listed here as if it were a third category.
 const products = [
   {
     title: 'Expert Advisors',
     description:
-      'Battle-tested MQL5 EAs for XAUUSD and prop firm accounts. ICT/SMC-based strategies with rigorous risk controls.',
+      'Automated MQL5 strategies for XAUUSD and prop firm accounts, engineered risk-first. Gold Scalpel is live on the MQL5 Market.',
     badge: 'Live now',
-    href: '/trading/expert-advisors',
+    href: '/trading/expert-advisors/',
     icon: 'bot',
-    featured: true,
-    tone: '',
-  },
-  {
-    title: 'TickerLog',
-    description:
-      'A universal trading journal that syncs with your broker, analyzes your patterns, and helps you trade better.',
-    badge: 'Coming soon',
-    href: '#waitlist',
-    icon: 'book',
-    tone: 'tone-2',
+    accent: categoryAccent('expert-advisors'),
   },
   {
     title: 'Trading Tools',
     description:
-      'Indicators, dashboards, and utilities for TradingView Pine Script and MT5. Built for precision.',
-    badge: 'Coming soon',
-    href: '/trading/tools',
+      'TickerLog, our universal trading journal, plus the indicators and dashboards we build for our own desks.',
+    badge: 'Launching soon',
+    href: '/trading/tools/',
+    icon: 'book',
+    accent: categoryAccent('tools'),
+  },
+  {
+    title: 'Custom builds',
+    description:
+      'A strategy of your own that needs coding properly, or a tool that does not exist yet. Tell us what you are trading.',
+    badge: 'By request',
+    href: '/contact/',
     icon: 'chart',
-    tone: 'tone-3',
+    accent: ACCENTS[4],
   },
 ];
 ---
 <Section id="products" variant="light">
   <div class="max-w-2xl mb-14">
     <Eyebrow class="mb-5">What we're building</Eyebrow>
-    <h2 style="font-size: var(--text-h2); font-weight: 800;" class="mb-4">
+    <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
       Small, sharp tools — each built deep.
     </h2>
     <p style="font-size: var(--text-lead); color: var(--ink-body);">
-      Not a platform that tries to do everything. Three products, each solving one
+      Not a platform that tries to do everything. Focused tools, each solving one
       real problem we hit on a live account.
     </p>
   </div>
 
   <div class="grid md:grid-cols-3 gap-6">
     {products.map((p) => (
-      <article class={`card card--hover p-7 flex flex-col ${p.tone}`} style={p.featured ? 'border-color: var(--accent);' : ''}>
+      <article class="category-card card card--hover p-7 flex flex-col" style={accentVars(p.accent)}>
         <div
-          class="w-11 h-11 rounded-xl flex items-center justify-center mb-6"
+          class="w-11 h-11 rounded-[8px] flex items-center justify-center mb-6"
           style="background: var(--accent-soft);"
         >
           <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -60,16 +62,16 @@ const products = [
           </svg>
         </div>
 
-        <h3 style="font-size: var(--text-h3); font-weight: 800;" class="mb-3">{p.title}</h3>
-        <p class="text-[15px] mb-7 flex-1" style="color: var(--ink-body);">{p.description}</p>
+        <h3 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-3">{p.title}</h3>
+        <p class="mb-7 flex-1" style="font-size: var(--text-ui); color: var(--ink-body);">{p.description}</p>
 
         <div class="flex items-center justify-between gap-4">
-          <Button href={p.href} variant="ghost" arrow class="!py-2 !px-4 !text-[13px]">
+          <Button href={p.href} variant="ghost" arrow size="sm">
             Details
           </Button>
           <span
-            class="font-mono text-[10px] px-2.5 py-1.5 rounded-full whitespace-nowrap"
-            style="background: var(--accent-soft); color: var(--accent-deep); letter-spacing: 0.08em;"
+            class="lozenge whitespace-nowrap"
+            style="background: var(--accent-soft); color: var(--accent-deep);"
           >
             {p.badge}
           </span>
@@ -78,3 +80,24 @@ const products = [
     ))}
   </div>
 </Section>
+
+<style>
+  /* Same top-rule treatment the software hub and product grids use. */
+  .category-card {
+    position: relative;
+    border-top: 3px solid var(--accent-ink);
+  }
+  /* Stretched link: the Details button's hit area covers the whole card, so
+     the card is clickable anywhere while the button stays the visible cue. */
+  .category-card :global(a.btn)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .category-card h3 {
+    transition: color 0.1s ease;
+  }
+  .category-card:hover h3 {
+    color: var(--accent-ink);
+  }
+</style>

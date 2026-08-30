@@ -8,6 +8,7 @@ import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
 import { categoryList, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
+import { accentFor, accentVars, categoryAccent } from '../../../config/accents';
 
 export async function getStaticPaths() {
   return categoryList('trading').map(([category, meta]) => ({
@@ -18,10 +19,15 @@ export async function getStaticPaths() {
 
 const { category, meta } = Astro.props;
 
+const catAccent = categoryAccent(category);
+
 const products = (await getCollection(
   'projects',
   ({ data }) => !data.draft && data.track === 'trading' && data.category === category
 )).sort((a, b) => a.data.order - b.data.order);
+
+// Colour is positional, so the grid and each product page agree on the hue.
+const productsIds = products.map((p) => p.id);
 
 const statusLabel: Record<string, string> = {
   live: 'Live now',
@@ -47,17 +53,20 @@ const statusLabel: Record<string, string> = {
   ]}
 >
   <Nav />
-  <main class="track-trading">
+  <main id="main" class="track-trading">
     <section class="band band--alt" data-reveal>
       <div class="container-x">
-        <a href="/trading" class="inline-flex items-center gap-1.5 font-mono text-[11px] mb-6 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
+        <a href="/trading/" class="inline-flex items-center gap-1.5 text-[11px] mb-6 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="19" y1="12" x2="5" y2="12" /><polyline points="12 19 5 12 12 5" />
           </svg>
           All trading
         </a>
-        <Eyebrow class="mb-4">Trading</Eyebrow>
-        <h1 style="font-size: var(--text-hero); font-weight: 800;">{meta.label}</h1>
+        <Eyebrow class="mb-4" color={catAccent.ink}>Trading</Eyebrow>
+        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-4">{meta.label}</h1>
+        <p class="max-w-[560px] leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
+          {meta.description}
+        </p>
       </div>
     </section>
 
@@ -65,14 +74,18 @@ const statusLabel: Record<string, string> = {
       {products.length > 0 ? (
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((p) => (
-            <a href={projectPath('trading', p.data.category, p.id)} class="card card--hover p-7 flex flex-col">
+            <a
+              href={projectPath('trading', p.data.category, p.id)}
+              class="product-card card card--hover p-7 flex flex-col"
+              style={accentVars(accentFor(productsIds, p.id))}
+            >
               <div class="flex items-center justify-between mb-5">
-                <span class="font-mono text-[10px] px-2.5 py-1.5 rounded-full" style="background: var(--gold-soft); color: var(--gold-deep); letter-spacing: 0.08em;">{statusLabel[p.data.status] ?? p.data.status}</span>
-                <span class="font-mono text-[11px]" style="color: var(--ink-dim);">{p.data.platform}</span>
+                <span class="lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">{statusLabel[p.data.status] ?? p.data.status}</span>
+                <span style="font-size: var(--text-small); color: var(--ink-dim);">{p.data.platform}</span>
               </div>
-              <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-2">{p.data.name}</h2>
-              <p class="text-[15px] mb-6 flex-1" style="color: var(--ink-body);">{p.data.summary}</p>
-              <span class="btn btn--ghost self-start !py-2 !px-4 !text-[13px]">View details
+              <h2 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-2">{p.data.name}</h2>
+              <p class="mb-6 flex-1" style="font-size: var(--text-ui); color: var(--ink-body);">{p.data.summary}</p>
+              <span class="btn btn--ghost self-start">View details
                 <span class="btn__arrow" aria-hidden="true">
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="8 7 17 7 17 16"/></svg>
                 </span>
@@ -82,14 +95,26 @@ const statusLabel: Record<string, string> = {
         </div>
       ) : (
         <div class="card p-10 md:p-14 text-center max-w-2xl mx-auto">
-          <h2 style="font-size: var(--text-h3); font-weight: 800;" class="mb-3">In development.</h2>
-          <p class="text-[15px] mb-8 max-w-md mx-auto" style="color: var(--ink-body);">
+          <h2 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-3">In development.</h2>
+          <p class="mb-8 max-w-md mx-auto" style="font-size: var(--text-ui); color: var(--ink-body);">
             {meta.label} are on the way. Join the waitlist and you'll be first to know when they ship.
           </p>
-          <Button href="/trading#waitlist" variant="primary" arrow>Join the waitlist</Button>
+          <Button href="/trading/#waitlist" variant="primary" arrow>Join the waitlist</Button>
         </div>
       )}
     </Section>
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  .product-card {
+    border-top: 3px solid var(--accent-ink);
+  }
+  .product-card h2 {
+    transition: color 0.1s ease;
+  }
+  .product-card:hover h2 {
+    color: var(--accent-ink);
+  }
+</style>

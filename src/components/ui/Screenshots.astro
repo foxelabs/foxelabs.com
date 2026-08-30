@@ -39,7 +39,7 @@ const tabbed = shots.length > 1;
 {shots.length > 0 && (
   <div class={`shots ${className}`} data-shots={id}>
     <div class="max-w-2xl mb-9">
-      <h2 style="font-size: var(--text-h2); font-weight: 800;" class="mb-4">{heading}</h2>
+      <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">{heading}</h2>
       {lead && <p style="font-size: var(--text-lead); color: var(--ink-body);">{lead}</p>}
     </div>
 
@@ -90,7 +90,7 @@ const tabbed = shots.length > 1;
         </figure>
 
         <div class="shots__copy">
-          <h3 style="font-size: var(--text-h3); font-weight: 800;">{shot.heading}</h3>
+          <h3 style="font-size: var(--text-h3); font-weight: var(--fw-heading);">{shot.heading}</h3>
           <p>{shot.body}</p>
         </div>
       </div>
@@ -107,11 +107,11 @@ const tabbed = shots.length > 1;
   }
 
   .shots__tab {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.02em;
-    padding: 0.55rem 0.95rem;
-    border-radius: 999px;
+    font-family: var(--font-body);
+    font-size: var(--text-ui);
+    font-weight: var(--fw-medium);
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--r-pill);
     cursor: pointer;
     color: var(--ink-body);
     background: var(--surface);
@@ -144,12 +144,12 @@ const tabbed = shots.length > 1;
   /* The frame is what makes differently-cropped captures read as one set. */
   .shots__frame {
     border: 1px solid var(--border);
-    border-radius: 14px;
+    border-radius: var(--r-card-lg);
     overflow: hidden;
-    background: #fff;
+    background: var(--surface);
     box-shadow:
-      0 2px 4px rgb(28 25 23 / 0.06),
-      0 24px 48px -20px rgb(28 25 23 / 0.28);
+      0 2px 4px rgba(9, 30, 66, 0.06),
+      0 24px 48px -20px rgba(9, 30, 66, 0.28);
   }
 
   .shots__chrome {
@@ -171,9 +171,8 @@ const tabbed = shots.length > 1;
   }
 
   .shots__crumb {
-    font-family: var(--font-mono);
+    font-family: var(--font-mono); /* wp-admin path — reads as a real breadcrumb */
     font-size: 10.5px;
-    letter-spacing: 0.03em;
     color: var(--ink-dim);
     white-space: nowrap;
     overflow: hidden;

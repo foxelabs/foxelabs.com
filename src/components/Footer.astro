@@ -1,6 +1,19 @@
 ---
 import { Icon } from 'astro-icon/components';
 
+interface Props {
+  /** Hide the "Let's build something" band — e.g. on /contact, where it just repeats the page. */
+  cta?: boolean;
+  ctaHeading?: string;
+  ctaBody?: string;
+}
+
+const {
+  cta = true,
+  ctaHeading = 'Learn how we can help you build better.',
+  ctaBody = 'Questions about a plugin, a licence, or an expert advisor — ask and get a straight answer from the team that wrote the code.',
+} = Astro.props;
+
 const socials = [
   { href: 'https://x.com/foxelabs',        label: 'Foxe Labs on X',        icon: 'mingcute:social-x-line' },
   { href: 'https://github.com/foxelabs',   label: 'Foxe Labs on GitHub',   icon: 'mingcute:github-line' },
@@ -13,103 +26,141 @@ const columns = [
   {
     title: 'Software',
     links: [
-      { href: '/software/plugins', label: 'WordPress Plugins' },
-      { href: '/software/libraries', label: 'PHP Libraries' },
-      { href: '/software', label: 'All software' },
+      { href: '/software/plugins/', label: 'WordPress Plugins' },
+      { href: '/software/libraries/', label: 'PHP Libraries' },
+      { href: '/software/', label: 'All software' },
     ],
   },
   {
     title: 'Trading',
     links: [
-      { href: '/trading/expert-advisors', label: 'Expert Advisors' },
-      { href: '/trading/tools', label: 'Trading Tools' },
-      { href: '/trading#waitlist', label: 'Waitlist' },
+      { href: '/trading/expert-advisors/', label: 'Expert Advisors' },
+      { href: '/trading/tools/', label: 'Trading Tools' },
+      { href: '/trading/#waitlist', label: 'Waitlist' },
     ],
   },
   {
     title: 'Company',
     links: [
-      { href: '/about', label: 'About' },
-      { href: '/blog', label: 'Blog' },
+      { href: '/about/', label: 'About' },
+      { href: '/blog/', label: 'Blog' },
       { href: 'https://docs.foxelabs.com', label: 'Documentation' },
     ],
   },
   {
-    title: 'Legal',
+    title: 'Support',
     links: [
-      { href: '/legal/terms', label: 'Terms of Service' },
-      { href: '/legal/privacy', label: 'Privacy Policy' },
-      { href: '/legal/refunds', label: 'Refund Policy' },
+      { href: '/contact/', label: 'Contact us' },
+      { href: '/contact/', label: 'Report an issue' },
     ],
   },
 ];
 
+const legal = [
+  { href: '/legal/terms/', label: 'Terms of Service' },
+  { href: '/legal/privacy/', label: 'Privacy Policy' },
+  { href: '/legal/refunds/', label: 'Refund Policy' },
+];
+
 const year = new Date().getFullYear();
+const isExternal = (href: string) => href.startsWith('http');
 ---
-<footer class="track-hub band--invert" style="padding-block: 4rem 2.5rem; border-top: 1px solid var(--border-invert);">
-  <div class="container-x">
-    <div class="grid md:grid-cols-12 gap-10 mb-12">
-      <div class="md:col-span-4">
-        <a href="/" class="flex items-center gap-2.5 font-display font-bold text-lg" style="color: var(--ink-invert); letter-spacing: -0.02em;">
-          <img src="/fox-white.svg" alt="Foxe Labs" width="32" height="32" class="w-8 h-8 shrink-0" />
-          Foxe <span style="color: var(--ink-invert-dim);">Labs</span>
-        </a>
-        <p class="mt-2 font-mono text-[12px]" style="color: var(--ink-invert-dim); letter-spacing: 0.04em;">
-          Lines of code, lines on the chart.
+{cta && (
+  <!-- Atlassian's "Learn how we can help you achieve more." band: one heading,
+       one button, sitting directly above the footer on the same sunken surface. -->
+  <section class="track-hub" style="background: var(--surface-sunken); border-top: 1px solid var(--border-soft);">
+    <div class="container-x" style="padding-block: var(--space-section);">
+      <div class="max-w-[720px] mx-auto text-center">
+        <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display); color: var(--ink);" class="mb-4">
+          {ctaHeading}
+        </h2>
+        <p class="mx-auto mb-8 max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">
+          {ctaBody}
         </p>
-        <p class="mt-4 text-[14px] max-w-[320px]" style="color: var(--ink-invert-dim);">
-          Open-source software and trading tools, built in-house.
-        </p>
-
-        <ul class="list-none m-0 p-0 mt-6 flex items-center gap-3">
-          {socials.map((s) => (
-            <li>
-              <a
-                href={s.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={s.label}
-                class="flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:text-[var(--ink-invert)]"
-                style="border: 1px solid var(--border-invert); color: var(--ink-invert-dim);"
-              >
-                <Icon name={s.icon} width={17} height={17} aria-hidden="true" />
-              </a>
-            </li>
-          ))}
-        </ul>
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a href="/contact/" class="btn btn--lg btn--primary">Contact us</a>
+          <a
+            href="/software/"
+            class="btn btn--lg transition-colors hover:bg-[var(--n200)]"
+            style="color: var(--ink); border: 1px solid var(--border); background: transparent;"
+          >Browse the software</a>
+        </div>
       </div>
+    </div>
+  </section>
+)}
 
+<!-- Atlassian footer: brand row on top, a compact link grid under it, then a
+     thin bottom bar carrying copyright, legal links, and socials. -->
+<footer class="track-hub" style="background: var(--surface-sunken); border-top: 1px solid var(--border); padding-block: 3rem 2rem;">
+  <div class="container-x">
+    <a
+      href="/"
+      class="inline-flex items-center gap-2.5 font-display font-bold text-lg"
+      style="color: var(--ink); letter-spacing: -0.02em;"
+    >
+      <img src="/fox.svg" alt="Foxe Labs" width="30" height="30" class="w-[30px] h-[30px] shrink-0" />
+      Foxe <span style="color: var(--ink-body);">Labs</span>
+    </a>
+
+    <nav
+      aria-label="Footer"
+      class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8"
+    >
       {columns.map((col) => (
-        <div class="md:col-span-2">
-          <p class="font-mono text-[11px] mb-4" style="color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;">
+        <div>
+          <p class="m-0 mb-3 text-[14px]" style="color: var(--ink); font-weight: var(--fw-subhead);">
             {col.title}
           </p>
-          <ul class="list-none m-0 p-0 space-y-2.5 text-[14px]" style="color: var(--ink-invert-dim);">
+          <ul class="list-none m-0 p-0 space-y-2 text-[14px]" style="color: var(--ink-body);">
             {col.links.map((l) => (
               <li>
                 <a
                   href={l.href}
-                  target={l.href.startsWith('http') ? '_blank' : undefined}
-                  rel={l.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  class="transition-colors hover:text-[var(--ink-invert)]"
+                  target={isExternal(l.href) ? '_blank' : undefined}
+                  rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
+                  class="transition-colors hover:text-[var(--ink)] hover:underline"
                 >{l.label}</a>
               </li>
             ))}
           </ul>
         </div>
       ))}
-    </div>
+    </nav>
 
     <div
-      class="flex flex-col md:flex-row items-center justify-between gap-4 pt-8"
-      style="border-top: 1px solid var(--border-invert);"
+      class="mt-10 pt-6 flex flex-col lg:flex-row lg:items-center gap-5"
+      style="border-top: 1px solid var(--border);"
     >
-      <p class="font-mono text-[11px] m-0" style="color: var(--ink-invert-dim); letter-spacing: 0.06em;">
-        © {year} Foxe Labs LLP · Kerala, India
-      </p>
-      <p class="text-[12px] m-0 md:text-right md:whitespace-nowrap" style="color: var(--ink-invert-dim);">
-        Software provided as-is. Trading carries risk — not financial advice.
-      </p>
+      <ul class="list-none m-0 p-0 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]" style="color: var(--ink-body);">
+        <li class="m-0 text-[12px]">© {year} Foxe Labs LLP · Kerala, India</li>
+        {legal.map((l) => (
+          <li>
+            <a href={l.href} class="transition-colors hover:text-[var(--ink)] hover:underline">{l.label}</a>
+          </li>
+        ))}
+      </ul>
+
+      <ul class="list-none m-0 p-0 flex items-center gap-2 lg:ml-auto">
+        {socials.map((s) => (
+          <li>
+            <a
+              href={s.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={s.label}
+              class="flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:text-[var(--ink)] hover:border-[var(--border-bold)]"
+              style="border: 1px solid var(--border); color: var(--ink-body);"
+            >
+              <Icon name={s.icon} width={16} height={16} aria-hidden="true" />
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
+
+    <p class="mt-6 m-0 text-[12px]" style="color: var(--ink-dim);">
+      Software provided as-is. Trading carries risk — not financial advice.
+    </p>
   </div>
 </footer>

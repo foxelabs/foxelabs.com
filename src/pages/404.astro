@@ -5,6 +5,34 @@ import Footer from '../components/Footer.astro';
 import Section from '../components/ui/Section.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import Button from '../components/ui/Button.astro';
+import { Icon } from 'astro-icon/components';
+import { ACCENTS, categoryAccent, accentVars } from '../config/accents';
+
+// A dead end is the one page where signposting matters more than apology, so
+// the three ways out get a hue each rather than a row of identical buttons.
+const exits = [
+  {
+    href: '/software',
+    label: 'Software',
+    body: 'WordPress plugins and PHP libraries, open source and maintained.',
+    icon: 'mingcute:code-fill',
+    accent: categoryAccent('plugins'),
+  },
+  {
+    href: '/trading',
+    label: 'Trading',
+    body: 'Expert advisors and the tools we build for our own desks.',
+    icon: 'mynaui:chart-candlestick-solid',
+    accent: categoryAccent('expert-advisors'),
+  },
+  {
+    href: '/blog',
+    label: 'Blog',
+    body: 'Notes on how we build — software, risk, and the occasional release.',
+    icon: 'mingcute:book-2-line',
+    accent: ACCENTS[2],
+  },
+];
 ---
 <BaseLayout
   title="Page Not Found — Foxe Labs"
@@ -12,7 +40,7 @@ import Button from '../components/ui/Button.astro';
   noindex
 >
   <Nav />
-  <main class="track-hub">
+  <main id="main" class="track-hub">
     <Section variant="light">
       <div class="max-w-2xl mx-auto text-center py-6">
         <!-- The fox, on the hunt -->
@@ -25,37 +53,67 @@ import Button from '../components/ui/Button.astro';
           </div>
           <span
             class="absolute -top-1 -right-1 font-display font-bold text-lg w-9 h-9 rounded-full flex items-center justify-center rotate-6"
-            style="background: var(--accent-btn); color: var(--accent-on); box-shadow: var(--shadow-card);"
+            style="background: var(--acc-orange-bold); color: #fff; box-shadow: var(--shadow-card);"
           >?</span>
         </div>
 
-        <Eyebrow class="mb-5">Error 404 · page not found</Eyebrow>
-        <h1 style="font-size: var(--text-hero); font-weight: 800;" class="mb-5">
-          Even the fox couldn't <span style="color: var(--accent-ink);">sniff this one out</span>.
+        <Eyebrow class="mb-5" color="var(--acc-orange-bold)">Error 404 · page not found</Eyebrow>
+        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
+          Even the fox couldn't <span style="color: var(--acc-orange-bold);">sniff this one out</span>.
         </h1>
-        <p class="mb-8" style="font-size: var(--text-lead); color: var(--ink-body);">
+        <p class="mb-8 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
           This page doesn't exist. It either moved, never shipped, or got
           liquidated on a bad trade. Either way — nothing to see here.
         </p>
 
         <!-- Mono easter-egg: one joke per craft -->
         <div
-          class="inline-block text-left font-mono text-[12.5px] leading-[1.9] px-5 py-4 rounded-xl mb-9 max-w-full overflow-x-auto"
-          style="background: var(--surface-invert); color: var(--ink-invert);"
+          class="inline-block text-left font-code leading-[1.9] px-5 py-4 mb-9 max-w-full overflow-x-auto"
+          style="background: var(--surface-invert); color: var(--ink-invert); font-size: var(--text-small); border-radius: var(--r-md);"
         >
-          <div><span style="color: var(--oss);">$</span> find / -name "this-page"</div>
+          <div><span style="color: var(--chart-up);">$</span> find / -name "this-page"</div>
           <div style="color: var(--ink-invert-dim);">→ 0 results. Not even in the git history.</div>
-          <div><span style="color: var(--gold);">$</span> backtest --url ./404</div>
+          <div><span style="color: var(--acc-yellow);">$</span> backtest --url ./404</div>
           <div style="color: var(--ink-invert-dim);">→ max drawdown: 100%. Position closed.</div>
         </div>
 
-        <div class="flex flex-wrap justify-center gap-3">
-          <Button href="/" variant="primary" arrow>Back to safety</Button>
-          <Button href="/software" variant="ghost" arrow>Software</Button>
-          <Button href="/trading" variant="ghost" arrow>Trading</Button>
+        <!-- The terminal block above is inline-block, so the button needs its own
+             block-level line or it flows alongside it. -->
+        <div>
+          <Button href="/" variant="primary" size="lg" arrow="back">Back to safety</Button>
+        </div>
+
+        <p class="mt-14 mb-5" style="font-size: var(--text-ui); font-weight: var(--fw-bold); color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em;">
+          Or pick up a different scent
+        </p>
+        <div class="grid sm:grid-cols-3 gap-4 text-left">
+          {exits.map((e) => (
+            <a href={e.href} class="exit-card card card--hover p-5 flex flex-col" style={accentVars(e.accent)}>
+              <span class="w-10 h-10 mb-4 flex items-center justify-center" style="background: var(--accent-soft); border-radius: var(--r-sm);">
+                <Icon name={e.icon} width={20} height={20} style="color: var(--accent-ink);" aria-hidden="true" />
+              </span>
+              <span class="exit-card__label block mb-1.5" style="font-size: var(--text-h5); font-weight: var(--fw-heading); color: var(--ink);">
+                {e.label}
+              </span>
+              <span class="block" style="font-size: var(--text-ui); color: var(--ink-body);">{e.body}</span>
+            </a>
+          ))}
         </div>
       </div>
     </Section>
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  /* Same top-rule treatment the product and category grids use. */
+  .exit-card {
+    border-top: 3px solid var(--accent-ink);
+  }
+  .exit-card__label {
+    transition: color 0.1s ease;
+  }
+  .exit-card:hover .exit-card__label {
+    color: var(--accent-ink);
+  }
+</style>
