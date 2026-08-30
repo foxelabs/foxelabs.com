@@ -34,18 +34,11 @@ faq:
 screenshots:
   - src: ./screenshots/limit-per-role/settings.png
     tab: Role limits
-    alt: The Limit Per Role panel in WordPress with a different concurrent session limit set for administrators, editors and subscribers
-    heading: One row per registered role
-    body: Tick the roles you want to override and give each its own number. Roles you leave alone keep using the global limit, with nothing stored for them.
-    caption: Custom roles registered by another plugin or your theme appear in the list automatically.
+    alt: The Limit Per Role panel in WordPress with a separate concurrent session limit set for administrators and editors
+    heading: One row per role you want to override
+    body: Add a row, pick the role and give it its own number. Roles you leave out keep using the global limit, and a user holding several roles with limits gets the highest of them.
+    caption: Custom roles registered by another plugin or your theme appear in the picker automatically.
     crumb: Users → Loggedin → Settings
-  - src: ./screenshots/limit-per-role/multi-role.png
-    tab: Multi-role users
-    alt: A WordPress user holding both the Editor and Shop Manager roles, showing which per-role session limit applies
-    heading: Highest wins
-    body: An editor who is also a shop manager, with three sessions allowed for editors and five for shop managers, gets five.
-    caption: Deliberately permissive — a sibling role should never lock someone out of their own account.
-    crumb: Users → All Users
 
 ---
 

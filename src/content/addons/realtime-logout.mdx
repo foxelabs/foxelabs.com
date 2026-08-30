@@ -36,7 +36,7 @@ screenshots:
     tab: Settings panel
     alt: The Real-time Logout settings panel in WordPress with the refresh interval set in seconds
     heading: One control — how often tabs check in
-    body: Sixty seconds by default, and the recommended floor. Each open tab makes one request per interval, so the arithmetic is worth doing before you shorten it.
+    body: How often each open tab pings the server to check whether the session is still active. Sixty seconds is the recommended floor — each check is one HTTP request per open tab, so the arithmetic is worth doing before you shorten it.
     caption: The panel sits on the Loggedin settings tab, directly under General Settings.
     crumb: Users → Loggedin → Settings
   - src: ./screenshots/realtime-logout/logged-out.png
