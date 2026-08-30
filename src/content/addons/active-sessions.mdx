@@ -34,9 +34,9 @@ faq:
 screenshots:
   - src: ./screenshots/active-sessions/sessions-list.png
     tab: Sessions list
-    alt: The Active Sessions tab in WordPress listing every user with a live login session, their session count, last login and last IP
+    alt: The Active Sessions tab in WordPress listing every user with a live login session, with the appearance panel open showing sort, density and column options
     heading: Everyone signed in, right now
-    body: One row per user with a live session — searchable by name or email, sortable by session count or last login, and openable for per-device detail.
+    body: One row per user with a live session — searchable by name or email, sortable by session count or last login, and openable for per-device detail. The appearance panel sets the sort, the row density and which columns show.
     caption: The list opens on last login, newest first — what an admin arriving on this screen is usually looking for.
     crumb: Users → Loggedin → Sessions
   - src: ./screenshots/active-sessions/session-detail.png
@@ -48,9 +48,9 @@ screenshots:
     crumb: Users → Loggedin → Sessions
   - src: ./screenshots/active-sessions/bulk-signout.png
     tab: Bulk sign-out
-    alt: Bulk sign-out confirmation in the Active Sessions tab listing the WordPress users about to be logged out
+    alt: Two rows ticked in the Active Sessions list with the bulk bar showing the selected count and a Sign out all action
     heading: Clear many users at once
-    body: Tick rows in the list and sign them all out in one action. The confirmation names every account before anything happens.
+    body: Tick rows in the list and sign them all out in one action. The bar along the bottom keeps count of what is selected before anything happens.
     caption: Every destroy-all path fires the core plugin's own action, so existing audit logging covers it.
     crumb: Users → Loggedin → Sessions
 
