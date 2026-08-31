@@ -31,8 +31,14 @@ export default defineConfig({
     rehypePlugins: [
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
     ],
-    // Light code blocks, matching the Atlassian blog's light wash.
-    shikiConfig: { theme: 'github-light' },
+    // Two themes, emitted together. `defaultColor: false` makes Shiki write
+    // --shiki-light and --shiki-dark custom properties on every token instead
+    // of a colour, so global.css can pick a set per theme without a second
+    // build or a flash on load.
+    shikiConfig: {
+      themes: { light: 'github-light', dark: 'github-dark' },
+      defaultColor: false,
+    },
   },
   vite: {
     plugins: [tailwindcss()],

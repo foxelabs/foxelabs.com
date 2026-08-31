@@ -67,7 +67,23 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="Foxe Labs Blog" href="/rss.xml" />
-    <meta name="theme-color" content="#FFFFFF" />
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#161A1D" media="(prefers-color-scheme: dark)" />
+    {/* Runs before the first paint so a dark-theme visitor never sees a white
+        flash. It is deliberately inline and un-bundled for that reason. */}
+    <script is:inline>
+      (function () {
+        try {
+          const stored = localStorage.getItem('foxe-theme');
+          const theme =
+            stored ??
+            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {
+          document.documentElement.dataset.theme = 'light';
+        }
+      })();
+    </script>
     <meta property="og:type" content={ogType} />
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:locale" content={SITE.locale} />
@@ -109,6 +125,27 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
+
+    <script is:inline>
+      // The header button flips the theme and remembers the choice. Until
+      // someone chooses, the site follows the operating system.
+      (function () {
+        const root = document.documentElement;
+        const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+        document.addEventListener('click', function (event) {
+          const button = event.target.closest('[data-theme-toggle]');
+          if (!button) return;
+          const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+          root.dataset.theme = next;
+          if (meta) meta.setAttribute('content', next === 'dark' ? '#161A1D' : '#FFFFFF');
+          try {
+            localStorage.setItem('foxe-theme', next);
+          } catch (e) {
+            /* Private mode and blocked storage: the toggle still works for this page. */
+          }
+        });
+      })();
+    </script>
     <slot />
 
     <script is:inline>

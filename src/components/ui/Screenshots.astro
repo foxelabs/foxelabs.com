@@ -152,6 +152,32 @@ const tabbed = shots.length > 1;
       0 24px 48px -20px rgba(9, 30, 66, 0.28);
   }
 
+  /* Screenshots are captures of a light WordPress admin and cannot be retaken
+     dark. Rather than let them glare out of a dark page, the frame keeps a
+     white plate and a lighter border, so the light rectangle reads as the
+     product's own chrome rather than as a hole in the page. */
+  :global([data-theme='dark']) .shots__frame {
+    background: #FFFFFF;
+    border-color: var(--n500);
+    box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
+  }
+
+  /* The frame stays light all the way through in dark mode — a dark chrome bar
+     above a white screenshot would read as two unrelated pieces. These are the
+     light theme's own values, restated because the tokens have flipped. */
+  :global([data-theme='dark']) .shots__chrome {
+    background: #F1F1F2;
+    border-bottom-color: #E3E3E5;
+  }
+
+  :global([data-theme='dark']) .shots__crumb {
+    color: #5E6166;
+  }
+
+  :global([data-theme='dark']) .shots__mark {
+    border-color: #5E6166;
+  }
+
   .shots__chrome {
     display: flex;
     align-items: center;

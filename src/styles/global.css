@@ -179,6 +179,85 @@
   --shadow-card-hover: var(--shadow-overlay);
 }
 
+/* ===========================================================================
+   Dark theme — Atlassian's dark ramps, not an inversion of the light ones.
+   ADS publishes its own dark neutrals and a lighter blue ramp because
+   inverting light greys goes muddy and #0C66E4 loses contrast on dark. Both
+   raw ramps are redefined here rather than only the semantic tokens, since
+   page markup uses --b400 and --n100 directly in about thirty places.
+
+   Applied by [data-theme='dark'] on <html>, set before first paint by the
+   inline script in BaseLayout. Colour-scheme keeps form controls, scrollbars
+   and the like in step with the page.
+   =========================================================================== */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --n0:    #161A1D;   /* page surface */
+  --n100:  #1D2125;   /* raised surface */
+  --n200:  #22272B;   /* sunken / hovered */
+  --n300:  #2C333A;
+  --n400:  #38414A;   /* border */
+  --n500:  #454F59;
+  --n600:  #8C9BAB;   /* dimmest readable text */
+  --n700:  #9FADBC;
+  --n800:  #B6C2CF;   /* body copy */
+  --n900:  #C7D1DB;
+  --n1000: #DEE4EA;   /* headings */
+  --n1100: #0D1B33;
+
+  --b50:  #1C2B41;    /* soft fill on dark */
+  --b100: #09326C;
+  --b200: #388BFF;
+  --b400: #579DFF;    /* primary on dark */
+  --b500: #85B8FF;    /* hover moves lighter on dark, not darker */
+  --b700: #CCE0FF;
+
+  /* Bright blue stays at its light-theme value: it is a FILL that carries
+     white icons, and lightening it would drop that pairing below AA. The
+     hues below are text and lozenge colours, which do have to lighten. */
+  --acc-blue-bright: #1868DB;
+  --acc-red-bright:  #F87168;
+  --acc-green:  #4BCE97;  --acc-green-bold:  #7EE2B8;  --acc-green-soft:  #1C3329;
+  --acc-yellow: #F5CD47;  --acc-yellow-bold: #E2B203;  --acc-yellow-soft: #332E1B;
+  --acc-orange: #FEA362;  --acc-orange-bold: #FBC28B;  --acc-orange-soft: #38291E;
+  --acc-purple: #C97CF4;  --acc-purple-bold: #D8A0F7;  --acc-purple-soft: #2B273F;
+  --acc-red:    #F87168;  --acc-red-bold:    #FD9891;  --acc-red-soft:    #42221F;
+  --acc-teal:   #6CC3E0;  --acc-teal-bold:   #9DD9EE;  --acc-teal-soft:   #1E3137;
+
+  /* The light theme's rhythm is white bands alternating with navy ones. On
+     dark there is no room below the page surface, so the invert band steps
+     UP into an elevated neutral instead — the alternation survives, and the
+     band still reads as the emphatic one. */
+  --surface-invert: #22272B;
+  --surface-invert-raised: #2C333A;
+  --ink-invert:     #DEE4EA;
+  --ink-invert-dim: #9FADBC;
+  --border-invert:  #38414A;
+
+  --field-bg-disabled: rgba(255, 255, 255, 0.04);
+  --field-border:       #738496;
+  --field-border-focus: #579DFF;
+  --field-border-danger: #F87168;
+  --field-ink-disabled: rgba(255, 255, 255, 0.28);
+
+  --news-blue:  #1C4C9C;
+  --news-olive: #3E5619;
+
+  --green: var(--acc-green);
+  --red:   var(--acc-red);
+
+  /* ADS puts DARK text on a bold fill in dark mode: the accent ramps lighten,
+     so white on them fails contrast. Anything reading --accent-on flips with
+     one line — buttons, active tabs, solid lozenges. */
+  --accent-on: #1D2125;
+
+  /* ADS dark elevation is a near-black shadow; the light theme's navy tint
+     is invisible on a dark surface. */
+  --shadow-raised:  0 1px 1px rgba(3, 4, 4, 0.5), 0 0 1px rgba(3, 4, 4, 0.56);
+  --shadow-overlay: 0 8px 12px rgba(3, 4, 4, 0.36), 0 0 1px rgba(3, 4, 4, 0.56);
+}
+
 /* Element defaults live in @layer base so Tailwind utilities (in the
    utilities layer) can still override them — unlayered rules would win. */
 @layer base {
@@ -833,3 +912,127 @@ textarea.field {
 @media (prefers-reduced-motion: reduce) {
   .prose-foxe .faq-item__chevron { transition: none; }
 }
+
+/* ===========================================================================
+   Dark theme component corrections.
+   The token block above recolours anything reading a token. What is left is
+   the handful of rules with a colour baked in, plus the places where the dark
+   theme wants a different treatment rather than a different colour.
+   =========================================================================== */
+
+/* ADS dark surfaces separate by elevation, not by shadow — a near-black
+   shadow on a near-black background is invisible, so cards take a raised fill
+   and a hairline instead. */
+[data-theme='dark'] .card {
+  background: var(--n100);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+[data-theme='dark'] .card--hover:hover {
+  background: var(--n200);
+  border-color: var(--border-bold);
+  box-shadow: none;
+}
+/* The inverted card is the terminal block on the contact page and the dark
+   tile elsewhere. Flattening it to a neutral grey loses the thing it is doing,
+   so on dark it keeps a navy cast and separates by a border instead. */
+[data-theme='dark'] .card--invert {
+  background: #101A2B;
+  border: 1px solid #22304A;
+}
+
+/* The neutral washes below are navy-tinted for light surfaces and vanish on
+   dark, so hover and pressed states lose their feedback entirely. */
+[data-theme='dark'] .btn--ghost:hover  { background: rgba(255, 255, 255, 0.08); }
+[data-theme='dark'] .btn--ghost:active { background: rgba(255, 255, 255, 0.16); }
+
+/* Code sits on a light wash in the light theme. On dark it needs to sit on a
+   lighter one than the page, not a darker. */
+[data-theme='dark'] .prose-foxe code { background: rgba(255, 255, 255, 0.06); }
+[data-theme='dark'] .prose-foxe pre  { background: rgba(255, 255, 255, 0.04) !important; }
+
+/* Shiki emits both themes as custom properties per token (see the shikiConfig
+   in astro.config.mjs). Without picking one, the tokens have no colour at all;
+   the light theme's near-black syntax would also be invisible on a dark wash. */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-light);
+  background-color: transparent;
+}
+[data-theme='dark'] .astro-code,
+[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark);
+}
+
+/* The track classes restate the accent tokens on a wrapper, so a value set on
+   :root alone never reaches a button inside one. The dark theme needs the same
+   flip applied at that level: dark ink on the lightened bold fills. */
+[data-theme='dark'] .track-hub,
+[data-theme='dark'] .track-oss,
+[data-theme='dark'] .track-trading {
+  --accent-on: #1D2125;
+}
+
+/* The invert band's white button keeps dark text, but the band's own surface
+   is now an elevated neutral rather than navy. */
+[data-theme='dark'] .track-hub .band--invert,
+[data-theme='dark'] .track-oss .band--invert,
+[data-theme='dark'] .track-trading .band--invert {
+  --accent-on: #161A1D;
+}
+
+/* .btn--ink is the ink-on-light pairing for tinted cards. In dark mode --ink
+   is a near-white, so the label has to invert with it. */
+[data-theme='dark'] .btn--ink {
+  color: #1D2125;
+}
+[data-theme='dark'] .btn--ink:hover  { background: var(--n900); }
+[data-theme='dark'] .btn--ink:active { background: var(--n800); }
+
+/* Two more white-on-fill pairings from the blog. Both fills are token-driven
+   and lighten on dark, so their labels have to darken. */
+[data-theme='dark'] .term-lozenge {
+  color: #1D2125;
+}
+[data-theme='dark'] .topic-tab[aria-pressed='true'] {
+  color: #1D2125;
+}
+[data-theme='dark'] .topic-tab[aria-pressed='true'] .topic-tab__dot {
+  background: #1D2125;
+}
+
+/* The nav's Contact button bakes in white text over the blue fill. That fill
+   lightens in dark mode, so the label has to darken with it. */
+[data-theme='dark'] a[href='/contact/'][style*='var(--b400)'] {
+  color: #1D2125 !important;
+}
+
+/* The fox mark is a solid black SVG with no light variant. Inverting it is
+   exact for a one-colour mark — black becomes white — and avoids shipping and
+   keeping in step a second asset. */
+[data-theme='dark'] img[src='/fox.svg'] {
+  filter: invert(1);
+}
+
+/* The theme toggle in the header. Sized to match the nav's other icon
+   buttons; the two icons are swapped by CSS so there is no flash on load and
+   no JavaScript needed to draw the correct one. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-btn);
+  background: transparent;
+  color: var(--ink-body);
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+.theme-toggle:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+.theme-toggle .theme-toggle__moon { display: none; }
+[data-theme='dark'] .theme-toggle .theme-toggle__moon { display: block; }
+[data-theme='dark'] .theme-toggle .theme-toggle__sun  { display: none; }
