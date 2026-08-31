@@ -60,9 +60,11 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
-    {/* One icon for every theme: black fox in a rounded white tile, so it reads on
-        light and dark tabs alike. .ico is the fallback for browsers without SVG icons. */}
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    {/* One icon for every theme: white fox head in a rounded black tile, so it
+        reads on light and dark tabs alike. .ico is the fallback for browsers
+        without SVG icons — Safari never uses the SVG. */}
+    <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />

@@ -1014,6 +1014,14 @@ textarea.field {
   filter: invert(1);
 }
 
+/* The brand mark (header and footer) ships as two one-colour files rather
+   than one inverted asset, so each theme gets the artwork as drawn. Swapped
+   by CSS for the same reason as the theme toggle: no flash on load, no
+   JavaScript. */
+.brand-mark--dark { display: none; }
+[data-theme='dark'] .brand-mark--dark { display: block; }
+[data-theme='dark'] .brand-mark--light { display: none; }
+
 /* The theme toggle in the header. Sized to match the nav's other icon
    buttons; the two icons are swapped by CSS so there is no flash on load and
    no JavaScript needed to draw the correct one. */
