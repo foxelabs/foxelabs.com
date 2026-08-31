@@ -33,16 +33,23 @@
   --n1000: #101214;   /* headings + primary text — the near-black */
   --n1100: #091E42;   /* navy, dark bands only */
 
-  /* ---- ADS brand blue ---- */
-  --b50:  #E9F2FF;
-  --b100: #CCE0FF;
-  --b200: #85B8FF;
-  --b400: #0C66E4;   /* primary */
-  --b500: #0055CC;   /* hovered */
-  --b700: #05389E;   /* pressed */
+  /* ---- Brand hue: navy (var names keep the b- prefix; a rename across
+     ~30 files is a separate cleanup) ---- */
+  --b50:  #E9EEF6;
+  --b100: #D3DDEC;
+  --b200: #8FA5C4;
+  --b400: #253858;   /* primary */
+  --b500: #091E42;   /* hovered */
+  --b700: #05132B;   /* pressed */
+
+  /* Wordmark halves. Kept as their own tokens because the lockup has to track
+     the mark's colour, not the body-text ramp: on dark the mark ships pure
+     white, so "Foxe" goes white there while the b- ramp stays put. */
+  --wordmark:     var(--b400);
+  --wordmark-alt: var(--b200);
 
   /* ---- ADS accent hues — illustration, lozenges, card fills. Not brand. ---- */
-  --acc-blue-bright: #1868DB;  /* illustration blue from the mockup */
+  --acc-blue-bright: #3B5A8F;  /* bright brand cut for illustration fills + H1 accent */
   --acc-red-bright:  #F87168;
   --acc-green:  #22A06B;  --acc-green-bold:  #216E4E;  --acc-green-soft:  #DCFFF1;
   --acc-yellow: #FCA700;  --acc-yellow-bold: #7F5F01;  --acc-yellow-soft: #FFF7D6;
@@ -77,7 +84,7 @@
   --field-bg-hover:    var(--n100);
   --field-bg-disabled: rgba(9, 30, 66, 0.03);
   --field-border:      #8590A2;
-  --field-border-focus: #388BFF;
+  --field-border-focus: #3B5A8F;
   --field-border-danger: #E2483D;
   --field-ink:         var(--n1000);
   --field-ink-placeholder: var(--n600);
@@ -207,16 +214,22 @@
   --n1100: #0D1B33;
 
   --b50:  #1C2B41;    /* soft fill on dark */
-  --b100: #09326C;
-  --b200: #388BFF;
-  --b400: #579DFF;    /* primary on dark */
-  --b500: #85B8FF;    /* hover moves lighter on dark, not darker */
-  --b700: #CCE0FF;
+  --b100: #253858;
+  --b200: #7A93B8;
+  --b400: #8FA9CE;    /* primary on dark */
+  --b500: #B3C7E0;    /* hover moves lighter on dark, not darker */
+  --b700: #D3DDEC;
 
-  /* Bright blue stays at its light-theme value: it is a FILL that carries
+  /* Matches the mark, which is painted --ink; the second half drops to the
+     dark primary so the two halves read as distinct instead of two
+     near-identical blues. */
+  --wordmark:     var(--ink);
+  --wordmark-alt: var(--b400);
+
+  /* Bright brand cut stays at its light-theme value: it is a FILL that carries
      white icons, and lightening it would drop that pairing below AA. The
      hues below are text and lozenge colours, which do have to lighten. */
-  --acc-blue-bright: #1868DB;
+  --acc-blue-bright: #3B5A8F;
   --acc-red-bright:  #F87168;
   --acc-green:  #4BCE97;  --acc-green-bold:  #7EE2B8;  --acc-green-soft:  #1C3329;
   --acc-yellow: #F5CD47;  --acc-yellow-bold: #E2B203;  --acc-yellow-soft: #332E1B;
@@ -237,7 +250,7 @@
 
   --field-bg-disabled: rgba(255, 255, 255, 0.04);
   --field-border:       #738496;
-  --field-border-focus: #579DFF;
+  --field-border-focus: #8FA9CE;
   --field-border-danger: #F87168;
   --field-ink-disabled: rgba(255, 255, 255, 0.28);
 
@@ -1007,11 +1020,16 @@ textarea.field {
   color: #1D2125 !important;
 }
 
-/* The fox mark is a solid black SVG with no light variant. Inverting it is
-   exact for a one-colour mark — black becomes white — and avoids shipping and
-   keeping in step a second asset. */
-[data-theme='dark'] img[src='/fox.svg'] {
-  filter: invert(1);
+/* The 404 fox: the full-body drawing of the same mark that sits in the header.
+   Painted through a mask rather than inverted, so it takes --ink and matches
+   the brand mark exactly in both themes instead of going pure white on dark. */
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .fox-404 {
+    display: inline-block;
+    background-color: var(--ink);
+    -webkit-mask: url('/foxe.svg') center / contain no-repeat;
+    mask: url('/foxe.svg') center / contain no-repeat;
+  }
 }
 
 /* The brand mark (header and footer). One file, painted through a mask, so
@@ -1025,10 +1043,14 @@ textarea.field {
     display: inline-block;
     /* Pinned to --ink rather than currentColor: the nav link around it is
        --ink-body, which left the mark visibly lighter than the wordmark
-       beside it. --ink tracks the theme on its own. */
+       beside it. --ink tracks the theme on its own.
+       The asset is a PNG, not an SVG: the redrawn mark was delivered as a
+       2000px raster wrapped in SVG chrome (55 KB), so a trimmed 256px alpha
+       mask is both smaller and honest about what it is. It only ever paints
+       at 30-32px, so 256 covers 3x displays with room to spare. */
     background-color: var(--ink);
-    -webkit-mask: url('/mark.svg') center / contain no-repeat;
-    mask: url('/mark.svg') center / contain no-repeat;
+    -webkit-mask: url('/mark.png') center / contain no-repeat;
+    mask: url('/mark.png') center / contain no-repeat;
   }
 }
 

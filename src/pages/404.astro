@@ -42,14 +42,14 @@ const exits = [
   <Nav />
   <main id="main" class="track-hub">
     <Section variant="light">
-      <div class="max-w-2xl mx-auto text-center py-6">
+      <div class="text-center py-6">
         <!-- The fox, on the hunt -->
         <div class="relative inline-flex items-center justify-center mb-8">
           <div
             class="w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center"
             style="background: var(--surface-alt); border: 1px solid var(--border-soft);"
           >
-            <img src="/fox.svg" alt="" width="72" height="72" class="w-16 h-16 md:w-[72px] md:h-[72px] animate-fox-sniff" aria-hidden="true" />
+            <span class="w-16 h-16 md:w-[72px] md:h-[72px] fox-404 animate-fox-sniff" aria-hidden="true"></span>
           </div>
           <span
             class="absolute -top-1 -right-1 font-display font-bold text-lg w-9 h-9 rounded-full flex items-center justify-center rotate-6"
@@ -57,14 +57,16 @@ const exits = [
           >?</span>
         </div>
 
-        <Eyebrow class="mb-5" color="var(--acc-orange-bold)">Error 404 · page not found</Eyebrow>
-        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
-          Even the fox couldn't <span style="color: var(--acc-orange-bold);">sniff this one out</span>.
-        </h1>
-        <p class="mb-8 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
-          This page doesn't exist. It either moved, never shipped, or got
-          liquidated on a bad trade. Either way — nothing to see here.
-        </p>
+        <div class="max-w-[720px] mx-auto">
+          <Eyebrow class="mb-5" color="var(--acc-orange-bold)">Error 404 · page not found</Eyebrow>
+          <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
+            Even the fox couldn't <span style="color: var(--acc-orange-bold);">sniff this one out</span>.
+          </h1>
+          <p class="mb-8 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
+            This page doesn't exist. It either moved, never shipped, or got
+            liquidated on a bad trade. Either way — nothing to see here.
+          </p>
+        </div>
 
         <!-- Mono easter-egg: one joke per craft -->
         <div
@@ -86,7 +88,7 @@ const exits = [
         <p class="mt-14 mb-5" style="font-size: var(--text-ui); font-weight: var(--fw-bold); color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em;">
           Or pick up a different scent
         </p>
-        <div class="grid sm:grid-cols-3 gap-4 text-left">
+        <div class="grid sm:grid-cols-3 gap-5 text-left">
           {exits.map((e) => (
             <a href={e.href} class="exit-card card card--hover p-5 flex flex-col" style={accentVars(e.accent)}>
               <span class="w-10 h-10 mb-4 flex items-center justify-center" style="background: var(--accent-soft); border-radius: var(--r-sm);">
