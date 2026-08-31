@@ -83,7 +83,7 @@ const structuredData = [
 >
   <Nav />
   <main id="main" class="track-hub" style={accentVars(topicAccent(topicOf(data.track)))}>
-    <!-- Post header: white ground, title + meta row, then a wide featured image -->
+    <!-- Post header: white ground, title + meta row, then the featured image at its native 16:9 -->
     <header style="padding-block: clamp(2.5rem, 4vw, 3.5rem) 0;">
       <div class="container-x">
         <h1 style="font-size: var(--text-hero-sm); line-height: 1.1;">{data.title}</h1>
@@ -110,7 +110,7 @@ const structuredData = [
             fetchpriority="high"
             loading="eager"
             class="w-full h-auto block"
-            style="aspect-ratio: 3 / 1; object-fit: cover; border-radius: var(--r-md);"
+            style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
           />
         </div>
       )}

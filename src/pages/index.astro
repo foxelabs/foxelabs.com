@@ -10,6 +10,7 @@ import { Icon } from 'astro-icon/components';
 import Faq from '../components/ui/Faq.astro';
 import { faqLd } from '../config/seo';
 import { topicOf } from '../config/tracks';
+import { accentVars, topicAccent } from '../config/accents';
 
 // Activity feed = real published blog posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -17,7 +18,6 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .slice(0, 3);
 
 // News-card fills, straight from the mockup (tokenised in global.css).
-const cardFills = ['var(--news-orange)', 'var(--news-blue)', 'var(--news-olive)'];
 
 // Proof numerals on the bold accent cuts — the bright cuts fail contrast on
 // the blue band (yellow was ~1.7:1).
@@ -239,7 +239,7 @@ const faq = [
       </div>
     </Section>
 
-    <!-- Blog feed: solid-colour news cards -->
+    <!-- Blog feed: white cards, the coloured cover art carries the topic hue -->
     {posts.length > 0 && (
       <Section variant="light">
         <div class="flex items-end justify-between gap-6 mb-10">
@@ -251,8 +251,8 @@ const faq = [
           {posts.map((post, i) => (
             <a
               href={`/blog/${post.id}/`}
-              class="card card--solid flex flex-col group"
-              style={`--card-fill: ${cardFills[i % cardFills.length]};`}
+              class="card card--hover home-post flex flex-col group overflow-hidden"
+              style={accentVars(topicAccent(topicOf(post.data.track)))}
             >
               {post.data.heroImage && (
                 <Image
@@ -267,9 +267,9 @@ const faq = [
               <div class="flex flex-col flex-1 gap-3 p-6">
                 <span
                   class="self-start text-[13px]"
-                  style={`background: #fff; color: ${cardFills[i % cardFills.length]}; font-weight: var(--fw-bold); border-radius: 20px; padding: 4px 14px;`}
+                  style="color: var(--accent-ink); font-weight: var(--fw-bold);"
                 >{topicOf(post.data.track)}</span>
-                <h3 class="flex-1" style="font-size: var(--text-h4); line-height: 1.24; font-weight: var(--fw-heading); letter-spacing: -0.014em; color: #fff;">{post.data.title}</h3>
+                <h3 class="home-post__title flex-1" style="font-size: var(--text-h4); line-height: 1.24; font-weight: var(--fw-heading); letter-spacing: -0.014em;">{post.data.title}</h3>
                 <span class="inline-flex items-center gap-[7px] text-[15px]">
                   Read more
                   <span class="transition-transform group-hover:translate-x-0.5">→</span>
@@ -309,3 +309,10 @@ const faq = [
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  /* Each card carries its topic's --accent-*, so the label and the hovered
+     title share the hue with the blog index cards. */
+  .home-post__title { transition: color 0.1s ease; }
+  .home-post:hover .home-post__title { color: var(--accent-ink); }
+</style>

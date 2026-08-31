@@ -65,7 +65,7 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
                     loading="eager"
                     fetchpriority="high"
                     class="w-full h-auto block mb-5"
-                    style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md) var(--r-md) 0 0;"
+                    style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
                   />
                 )}
                 <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(lead.data.track)}</span></p>
@@ -85,7 +85,7 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 272px"
                         loading="lazy"
                         class="w-full h-auto block mb-4"
-                        style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md) var(--r-md) 0 0;"
+                        style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
                       />
                     )}
                     <p class="post-kicker mb-2">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(post.data.track)}</span></p>
@@ -128,7 +128,7 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 368px"
                       loading="lazy"
                       class="w-full h-auto block mb-5"
-                      style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md) var(--r-md) 0 0;"
+                      style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
                     />
                   )}
                   <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(post.data.track)}</span></p>
@@ -157,11 +157,6 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
   }
   .post-link:hover .post-link__title {
     color: var(--accent-ink);
-  }
-  /* A hairline in the topic hue under each cover image. Bottom corners are
-     square (radius only on top) so the hairline doesn't bend around a curve. */
-  .post-link img {
-    border-bottom: 3px solid var(--accent-ink);
   }
 </style>
 
