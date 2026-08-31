@@ -62,13 +62,22 @@ const faq = [
   <Nav />
   <main id="main" class="track-hub">
     <!-- Hero: white ground, copy left, flat tinted illustration cards right -->
-    <section class="band overflow-hidden" data-reveal style="background: var(--surface); padding-block: var(--space-section-lg);">
+    <section class="band overflow-hidden relative bg-[var(--b50)] lg:bg-[var(--surface)]" data-reveal style="padding-block: var(--space-section-lg);">
+      <!-- Mobile-only decoration: the tinted band carries the colour, so the
+           shapes bleed in behind the copy instead of stacking cards below it. -->
+      <div class="lg:hidden absolute top-9 -right-6 w-22 h-22 rounded-full" style="background: var(--acc-purple);" aria-hidden="true"></div>
+      <svg class="lg:hidden absolute bottom-28 -left-3" width="54" height="46" viewBox="0 0 34 28" style="transform: rotate(18deg);" aria-hidden="true">
+        <polygon points="17,0 34,28 0,28" fill="var(--acc-red-bright)" />
+      </svg>
+      <svg class="lg:hidden absolute -bottom-7 -right-5" width="150" height="120" viewBox="0 0 150 120" aria-hidden="true">
+        <path d="M 6 110 L 40 88 L 74 96 L 108 62 L 142 24" fill="none" stroke="var(--acc-yellow)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />
+      </svg>
       <div class="container-x">
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          <div class="lg:col-span-7">
+          <div class="lg:col-span-7 relative">
             <span
-              class="inline-block mb-6 text-[13px]"
-              style="background: var(--b50); color: var(--b500); font-weight: var(--fw-bold); border-radius: var(--r-sm); padding: 6px 12px;"
+              class="inline-block mb-6 text-[13px] bg-[var(--surface)] lg:bg-[var(--b50)]"
+              style="color: var(--b500); font-weight: var(--fw-bold); border-radius: var(--r-sm); padding: 6px 12px;"
             >Lines of code · lines on the chart</span>
             <h1 style="font-size: var(--text-hero);" class="mb-6">
               Engineering in the open — and <span style="color: var(--acc-blue-bright);">in the markets</span>.
@@ -78,14 +87,15 @@ const faq = [
               decade-long track record, and the same engineering discipline brought
               to trading software.
             </p>
-            <div class="flex flex-wrap items-center gap-4">
-              <Button href="/software/" variant="primary" size="lg">Explore software</Button>
-              <Button href="/trading/" variant="ghost" size="lg" arrow>Trading tools</Button>
+            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-4 max-w-[340px] sm:max-w-none">
+              <Button href="/software/" variant="primary" size="lg" class="justify-center">Explore software</Button>
+              <Button href="/trading/" variant="ghost" size="lg" arrow class="justify-center bg-[var(--surface)] lg:bg-transparent">Trading tools</Button>
             </div>
           </div>
 
-          <!-- Flat illustration composition: three tinted cards + two shapes -->
-          <div class="lg:col-span-5">
+          <!-- Flat illustration composition: three tinted cards + two shapes.
+               Desktop only — on mobile the tinted band + shapes above replace it. -->
+          <div class="hidden lg:block lg:col-span-5">
             <div class="relative mx-auto max-w-[420px] lg:h-[400px] grid gap-4 lg:block">
               <!-- Software card -->
               <div
