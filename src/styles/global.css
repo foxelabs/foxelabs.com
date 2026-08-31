@@ -1014,13 +1014,23 @@ textarea.field {
   filter: invert(1);
 }
 
-/* The brand mark (header and footer) ships as two one-colour files rather
-   than one inverted asset, so each theme gets the artwork as drawn. Swapped
-   by CSS for the same reason as the theme toggle: no flash on load, no
-   JavaScript. */
-.brand-mark--dark { display: none; }
-[data-theme='dark'] .brand-mark--dark { display: block; }
-[data-theme='dark'] .brand-mark--light { display: none; }
+/* The brand mark (header and footer). One file, painted through a mask, so
+   a single asset serves both themes -- a light and a dark variant would
+   both be fetched on every page, since hiding one with display:none does
+   not stop its request.
+   The mask is only applied where it is supported: without the guard a
+   browser that cannot mask would paint the bare colour box. */
+@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
+  .brand-mark {
+    display: inline-block;
+    /* Pinned to --ink rather than currentColor: the nav link around it is
+       --ink-body, which left the mark visibly lighter than the wordmark
+       beside it. --ink tracks the theme on its own. */
+    background-color: var(--ink);
+    -webkit-mask: url('/mark.svg') center / contain no-repeat;
+    mask: url('/mark.svg') center / contain no-repeat;
+  }
+}
 
 /* The theme toggle in the header. Sized to match the nav's other icon
    buttons; the two icons are swapped by CSS so there is no flash on load and
