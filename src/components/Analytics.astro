@@ -1,11 +1,16 @@
 ---
-// Google Analytics 4, kept off the critical path.
+// Google Analytics 4, kept off the main thread until the visitor does something.
 //
-// gtag.js is ~90KB of script that nothing on the page waits for, so loading it
-// normally spends LCP and main-thread budget on a measurement call. Instead the
-// dataLayer queue and the config command run immediately — so no events are
-// lost — while the script itself is fetched once the browser goes idle, and the
-// queued commands flush the moment it arrives.
+// gtag.js costs ~166KB and ~340ms of main-thread work that nothing on the page
+// waits for. Loading it on idle still spent that budget inside the page's first
+// few seconds, so it now waits for the first real interaction — a pointer, a
+// key, a scroll, or a touch. The dataLayer queue and the config command still
+// run immediately, so the pageview keeps its true load timestamp and flushes
+// the moment the script arrives.
+//
+// The trade: a visitor who opens the page, scrolls nothing, touches nothing and
+// leaves is not counted. pagehide gives that case a last chance to fire, but a
+// browser tearing the page down may not finish the request.
 const GA_ID = 'G-JJEWCLB8DK';
 ---
 {import.meta.env.PROD && (
@@ -23,22 +28,21 @@ const GA_ID = 'G-JJEWCLB8DK';
       gtag('config', GA_ID);
 
       (function () {
+        var events = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
         var loaded = false;
         function loadGa() {
           if (loaded) return;
           loaded = true;
+          events.forEach(function (e) { removeEventListener(e, loadGa); });
           var s = document.createElement('script');
           s.async = true;
           s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
           document.head.appendChild(s);
         }
-        // Idle is the happy path; the timeout is the backstop for a tab that
-        // never goes idle, and pagehide covers a visitor who leaves first.
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(loadGa, { timeout: 5000 });
-        } else {
-          setTimeout(loadGa, 2500);
-        }
+        events.forEach(function (e) {
+          addEventListener(e, loadGa, { once: true, passive: true });
+        });
+        // Backstop for a visitor who leaves without interacting at all.
         addEventListener('pagehide', loadGa, { once: true });
       })();
     </script>

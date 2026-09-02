@@ -115,14 +115,6 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     {structuredData.map((node) => (
       <script type="application/ld+json" set:html={JSON.stringify(node)} />
     ))}
-    {import.meta.env.PROD && (
-      <script
-        is:inline
-        type="module"
-        src="https://static.cloudflareinsights.com/beacon.min.js"
-        data-cf-beacon='{"token": "33c34e18a89d4d40ba323b8e1dfe0ba3"}'
-      />
-    )}
     <Analytics />
   </head>
   <body>

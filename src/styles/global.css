@@ -46,7 +46,10 @@
      the mark's colour, not the body-text ramp: on dark the mark ships pure
      white, so "Foxe" goes white there while the b- ramp stays put. */
   --wordmark:     var(--b400);
-  --wordmark-alt: var(--b200);
+  /* The bright cut, not --b200: b200 sits at 2.5:1 on white and 2.4:1 on the
+     sunken footer, so the second half of the lockup failed AA in both places.
+     #3B5A8F clears 6.9:1 and still reads distinctly lighter than "Foxe". */
+  --wordmark-alt: var(--acc-blue-bright);
 
   /* ---- ADS accent hues — illustration, lozenges, card fills. Not brand. ---- */
   --acc-blue-bright: #3B5A8F;  /* bright brand cut for illustration fills + H1 accent */
