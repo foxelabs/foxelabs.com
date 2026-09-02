@@ -648,6 +648,8 @@ textarea.field {
 
 /* Pill tabs above the post grid: neutral fill, ink fill when selected. */
 .topic-tab {
+  display: inline-block;
+  text-decoration: none;
   border: none;
   border-radius: var(--r-pill);
   padding: 8px 24px;
@@ -660,7 +662,8 @@ textarea.field {
   transition: background-color 0.1s ease, color 0.1s ease;
 }
 .topic-tab:hover { background: var(--n300); }
-.topic-tab[aria-pressed='true'] {
+.topic-tab[aria-pressed='true'],
+.topic-tab[aria-current='page'] {
   background: var(--accent-ink);
   color: #FFFFFF;
 }
@@ -675,7 +678,8 @@ textarea.field {
   background: var(--accent-ink);
   vertical-align: middle;
 }
-.topic-tab[aria-pressed='true'] .topic-tab__dot { background: #FFFFFF; }
+.topic-tab[aria-pressed='true'] .topic-tab__dot,
+.topic-tab[aria-current='page'] .topic-tab__dot { background: #FFFFFF; }
 
 }
 
@@ -925,10 +929,12 @@ textarea.field {
 [data-theme='dark'] .term-lozenge {
   color: #1D2125;
 }
-[data-theme='dark'] .topic-tab[aria-pressed='true'] {
+[data-theme='dark'] .topic-tab[aria-pressed='true'],
+[data-theme='dark'] .topic-tab[aria-current='page'] {
   color: #1D2125;
 }
-[data-theme='dark'] .topic-tab[aria-pressed='true'] .topic-tab__dot {
+[data-theme='dark'] .topic-tab[aria-pressed='true'] .topic-tab__dot,
+[data-theme='dark'] .topic-tab[aria-current='page'] .topic-tab__dot {
   background: #1D2125;
 }
 

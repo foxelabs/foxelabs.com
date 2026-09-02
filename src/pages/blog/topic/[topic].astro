@@ -1,0 +1,85 @@
+---
+// Topic archive — one page per blog topic, the equivalent of a WordPress
+// category page. Topics come from a post's `track`, so the set is fixed and
+// every page here has hand-written copy of its own.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import PostGrid from '../../../components/PostGrid.astro';
+import PageHeader from '../../../components/ui/PageHeader.astro';
+import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
+import { accentVars, topicAccent } from '../../../config/accents';
+import { TOPICS, TOPIC_META, postTopic, topicPath, tagIndex, tagPath } from '../../../config/blog';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+  );
+  // Only topics that actually have posts — an empty archive is a thin page.
+  return TOPICS.filter((topic) => posts.some((p) => postTopic(p) === topic)).map((topic) => ({
+    params: { topic: TOPIC_META[topic].slug },
+    props: { topic, posts: posts.filter((p) => postTopic(p) === topic) },
+  }));
+}
+
+const { topic, posts } = Astro.props;
+const meta = TOPIC_META[topic];
+const path = topicPath(topic);
+
+// Tags used by posts in this topic — the cross-link between the two taxonomies.
+const tags = tagIndex(posts).slice(0, 12);
+
+const others = TOPICS.filter((t) => t !== topic);
+---
+<BaseLayout
+  title={`${meta.seoTitle} | Foxe Labs`}
+  description={meta.description}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+      { name: topic, path },
+    ]),
+    collectionPageLd({
+      name: `${topic} — Foxe Labs Blog`,
+      description: meta.description,
+      url: path,
+      items: posts.map((post) => ({ name: post.data.title, path: `/blog/${post.id}` })),
+    }),
+  ]}
+>
+  <Nav />
+  <main id="main" style={accentVars(topicAccent(topic))}>
+    <PageHeader eyebrow="Blog" title={topic} lead={meta.description} />
+
+    <section class="band" style="padding-block: 0 var(--space-section);">
+      <div class="container-x">
+        <p class="mb-8" style="font-size: var(--text-small); color: var(--ink-dim);">
+          {posts.length} {posts.length === 1 ? 'post' : 'posts'} in {topic}.
+        </p>
+
+        <PostGrid posts={posts} />
+
+        {tags.length > 0 && (
+          <div class="mt-16 pt-8" style="border-top: 1px solid var(--border-soft);">
+            <h2 class="mb-4" style="font-size: var(--text-h4);">Tags in {topic}</h2>
+            <div class="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <a href={tagPath(tag.slug)} class="term-lozenge">#{tag.label}</a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2" style="font-size: var(--text-ui);">
+          <a href="/blog/" style="color: var(--ink-dim);">All posts</a>
+          {others.map((t) => (
+            <a href={topicPath(t)} style="color: var(--ink-dim);">{t}</a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

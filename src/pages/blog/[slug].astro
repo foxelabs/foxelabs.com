@@ -9,6 +9,7 @@ import Faq from '../../components/ui/Faq.astro';
 import { articleLd, breadcrumbLd, faqLd, SITE } from '../../config/seo';
 import { accentVars, topicAccent } from '../../config/accents';
 import { topicOf } from '../../config/tracks';
+import { tagLabel, tagPath, topicPath } from '../../config/blog';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -38,8 +39,10 @@ const related = [
 
 const shareUrl = `${SITE.url}/blog/${post.id}/`;
 
-const topic = data.track === 'oss' ? 'Software' : data.track === 'trading' ? 'Trading' : null;
-const topicPath = data.track === 'oss' ? '/software/' : data.track === 'trading' ? '/trading/' : '/blog/';
+// "Published in <Topic>" points at the topic's blog archive, not the product
+// track — a reader following it wants more posts, not a product listing.
+const topic = topicOf(data.track);
+const topicHref = topicPath(topic);
 
 // No " | Foxe Labs" suffix on posts: seoTitles are already long, and the
 // WebSite JSON-LD gives engines the site name.
@@ -92,12 +95,10 @@ const structuredData = [
 
         <div class="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4">
           <time class="text-[14px]" style="color: var(--ink);">{fmt(data.pubDate)}</time>
-          {topic && (
-            <span class="flex items-center gap-2">
-              <span class="text-[12px]" style="color: var(--ink); font-weight: var(--fw-medium);">Published in</span>
-              <a href={topicPath} class="term-lozenge">{topic}</a>
-            </span>
-          )}
+          <span class="flex items-center gap-2">
+            <span class="text-[12px]" style="color: var(--ink); font-weight: var(--fw-medium);">Published in</span>
+            <a href={topicHref} class="term-lozenge">{topic}</a>
+          </span>
           {readingTime >= 3 && <span class="text-[14px]" style="color: var(--ink-dim);">{readingTime} min read</span>}
         </div>
       </div>
@@ -132,12 +133,13 @@ const structuredData = [
         {data.tags.length > 0 && (
           <div class="flex flex-wrap gap-2 mt-14 pt-8 mx-auto" style="max-width: 768px; border-top: 1px solid var(--border-soft);">
             {data.tags.map((t) => (
-              <span
+              <a
+                href={tagPath(t)}
                 class="lozenge"
                 style="background: var(--accent-soft); color: var(--accent-deep);"
               >
-                #{t}
-              </span>
+                #{tagLabel(t)}
+              </a>
             ))}
           </div>
         )}

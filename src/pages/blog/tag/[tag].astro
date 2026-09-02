@@ -1,0 +1,86 @@
+---
+// Tag archive — one page per tag used in blog frontmatter, the equivalent of a
+// WordPress tag page. Free-form, so the copy here is generated: a tag earns a
+// description by being used, not by being configured.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import PostGrid from '../../../components/PostGrid.astro';
+import PageHeader from '../../../components/ui/PageHeader.astro';
+import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
+import { accentFor, accentVars } from '../../../config/accents';
+import { tagIndex, tagPath, postTopic, topicPath } from '../../../config/blog';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
+  );
+  const tags = tagIndex(posts);
+  // Hue is positional within the full tag list, so a tag keeps one colour
+  // wherever it is shown.
+  const order = tags.map((t) => t.slug);
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tag, order, related: tags.filter((t) => t.slug !== tag.slug).slice(0, 12) },
+  }));
+}
+
+const { tag, order, related } = Astro.props;
+const path = tagPath(tag.slug);
+const description = `Every Foxe Labs post tagged ${tag.label} — ${tag.posts.length} ${tag.posts.length === 1 ? 'article' : 'articles'} on open-source software and trading tools.`;
+
+// Topics these posts sit under, so a tag page routes back up the taxonomy.
+const topics = [...new Set(tag.posts.map(postTopic))];
+---
+<BaseLayout
+  title={`${tag.label} Articles | Foxe Labs`}
+  description={description}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog' },
+      { name: tag.label, path },
+    ]),
+    collectionPageLd({
+      name: `Posts tagged ${tag.label}`,
+      description,
+      url: path,
+      items: tag.posts.map((post) => ({ name: post.data.title, path: `/blog/${post.id}` })),
+    }),
+  ]}
+>
+  <Nav />
+  <main id="main" style={accentVars(accentFor(order, tag.slug))}>
+    <PageHeader
+      eyebrow="Tag"
+      title={tag.label}
+      lead={`${tag.posts.length} ${tag.posts.length === 1 ? 'post' : 'posts'} tagged ${tag.label}.`}
+    />
+
+    <section class="band" style="padding-block: 0 var(--space-section);">
+      <div class="container-x">
+        <PostGrid posts={tag.posts} />
+
+        {related.length > 0 && (
+          <div class="mt-16 pt-8" style="border-top: 1px solid var(--border-soft);">
+            <h2 class="mb-4" style="font-size: var(--text-h4);">Other tags</h2>
+            <div class="flex flex-wrap gap-2">
+              {related.map((t) => (
+                <a href={tagPath(t.slug)} class="term-lozenge">#{t.label}</a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2" style="font-size: var(--text-ui);">
+          <a href="/blog/" style="color: var(--ink-dim);">All posts</a>
+          {topics.map((t) => (
+            <a href={topicPath(t)} style="color: var(--ink-dim);">{t}</a>
+          ))}
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</BaseLayout>

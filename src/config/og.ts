@@ -12,6 +12,7 @@ import { getCollection } from 'astro:content';
 import type { OgCard } from '../lib/og';
 import { categoryMeta, categoryPath, projectPath, addonPath, topicOf, trackConfig } from './tracks';
 import { accentFor, categoryAccent, topicAccent } from './accents';
+import { TOPICS, TOPIC_META, postTopic, topicPath, tagIndex, tagPath } from './blog';
 import type { OgAccent } from '../lib/og';
 
 export interface OgEntry extends OgCard {
@@ -160,7 +161,37 @@ export async function ogEntries(): Promise<OgEntry[]> {
     };
   });
 
-  return [...STATIC_CARDS, ...categories, ...projectCards, ...addonCards, ...postCards];
+  // Blog archives. Both taxonomies get a card, so a shared topic or tag link
+  // is not the only thing on the site falling back to the generic site card.
+  const topicCards: OgEntry[] = TOPICS.filter((topic) =>
+    posts.some((p) => postTopic(p) === topic)
+  ).map((topic) => ({
+    slug: ogSlug(topicPath(topic)),
+    eyebrow: 'Blog',
+    title: topic,
+    subtitle: TOPIC_META[topic].description,
+    accent: topicAccent(topic).name as OgAccent,
+  }));
+
+  const tags = tagIndex(posts);
+  const tagOrder = tags.map((t) => t.slug);
+  const tagCards: OgEntry[] = tags.map((tag) => ({
+    slug: ogSlug(tagPath(tag.slug)),
+    eyebrow: 'Tag',
+    title: tag.label,
+    subtitle: `${tag.posts.length} ${tag.posts.length === 1 ? 'post' : 'posts'} tagged ${tag.label}.`,
+    accent: accentFor(tagOrder, tag.slug).name as OgAccent,
+  }));
+
+  return [
+    ...STATIC_CARDS,
+    ...categories,
+    ...projectCards,
+    ...addonCards,
+    ...postCards,
+    ...topicCards,
+    ...tagCards,
+  ];
 }
 
 // Built once per build and shared, so each page's lookup is not another pass

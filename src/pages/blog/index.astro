@@ -5,8 +5,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import { breadcrumbLd, collectionPageLd } from '../../config/seo';
+import PostGrid from '../../components/PostGrid.astro';
 import { accentVars, topicAccent } from '../../config/accents';
 import { topicOf } from '../../config/tracks';
+import { tagIndex, tagPath, topicPath } from '../../config/blog';
 
 const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
@@ -20,7 +22,11 @@ const fmt = (d: Date) =>
 const [lead, ...rest] = posts;
 const runnersUp = rest.slice(0, 4);
 
-const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.track))))];
+const topics = Array.from(new Set(posts.map((p) => topicOf(p.data.track))));
+
+// Tag cloud under the grid: the only place every tag archive is linked from a
+// crawlable page, so it lists all of them rather than a top slice.
+const tags = tagIndex(posts);
 ---
 <BaseLayout
   title="Blog — WordPress Development & Trading Notes | Foxe Labs"
@@ -102,44 +108,30 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
           <div class="container-x">
             <h2 class="mb-6" style="font-size: var(--text-h2);">Latest by topic</h2>
 
-            <div class="flex flex-wrap gap-2.5 mb-10" role="group" aria-label="Filter posts by topic">
-              {topics.map((t, i) => (
-                <button
-                  type="button"
-                  class="topic-tab"
-                  data-topic={t}
-                  aria-pressed={i === 0 ? 'true' : 'false'}
-                  style={t === 'All' ? '--accent-ink: var(--ink);' : accentVars(topicAccent(t))}
-                >
-                  {t !== 'All' && <span class="topic-tab__dot" aria-hidden="true"></span>}
+            <!-- Pills are links, not filters: each topic has a real archive page
+                 at /blog/topic/<slug>/, the way a WordPress category does. -->
+            <nav class="flex flex-wrap gap-2.5 mb-10" aria-label="Blog topics">
+              <a href="/blog/" class="topic-tab" aria-current="page" style="--accent-ink: var(--ink);">All</a>
+              {topics.map((t) => (
+                <a href={topicPath(t)} class="topic-tab" style={accentVars(topicAccent(t))}>
+                  <span class="topic-tab__dot" aria-hidden="true"></span>
                   {t}
-                </button>
-              ))}
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-7 gap-y-11">
-              {posts.map((post) => (
-                <a href={`/blog/${post.id}/`} class="post-link group flex flex-col" data-post-topic={topicOf(post.data.track)} style={accentVars(topicAccent(topicOf(post.data.track)))}>
-                  {post.data.heroImage && (
-                    <Image
-                      src={post.data.heroImage}
-                      alt={post.data.heroImageAlt ?? ''}
-                      widths={[400, 640, 800]}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 368px"
-                      loading="lazy"
-                      class="w-full h-auto block mb-5"
-                      style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
-                    />
-                  )}
-                  <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(post.data.track)}</span></p>
-                  <h3 class="post-link__title mb-2.5" style="font-size: var(--text-h3);">{post.data.title}</h3>
-                  <p class="m-0" style="font-size: var(--text-ui); color: var(--ink-body);">{post.data.description}</p>
-                  <time class="mt-3" style="font-size: var(--text-small); color: var(--ink-dim);">{fmt(post.data.pubDate)}</time>
                 </a>
               ))}
-            </div>
+            </nav>
 
-            <p data-filter-status role="status" class="mt-2" style="color: var(--ink-dim);"></p>
+            <PostGrid posts={posts} />
+
+            {tags.length > 0 && (
+              <div class="mt-16 pt-8" style="border-top: 1px solid var(--border-soft);">
+                <h2 class="mb-4" style="font-size: var(--text-h4);">Browse by tag</h2>
+                <div class="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <a href={tagPath(tag.slug)} class="term-lozenge">#{tag.label} <span style="opacity: 0.65;">{tag.posts.length}</span></a>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -149,9 +141,10 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
   <Footer />
 </BaseLayout>
 
+
 <style>
-  /* Each card carries its topic's --accent-*, so the title picks up the same
-     hue as its kicker and its filter pill. */
+  /* Lead + runners-up carry their topic's --accent-*, so the title picks up
+     the same hue as its kicker. (The grid below has its own copy in PostGrid.) */
   .post-link__title {
     transition: color 0.1s ease;
   }
@@ -159,29 +152,3 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
     color: var(--accent-ink);
   }
 </style>
-
-<script is:inline>
-  const tabs = document.querySelectorAll('.topic-tab');
-  const cards = document.querySelectorAll('[data-post-topic]');
-  const status = document.querySelector('[data-filter-status]');
-  tabs.forEach((tab) =>
-    tab.addEventListener('click', () => {
-      const topic = tab.dataset.topic;
-      tabs.forEach((t) => t.setAttribute('aria-pressed', String(t === tab)));
-      let shown = 0;
-      cards.forEach((card) => {
-        const match = topic === 'All' || card.dataset.postTopic === topic;
-        card.hidden = !match;
-        if (match) shown++;
-      });
-      if (status) {
-        status.textContent =
-          shown === 0
-            ? 'Nothing under this topic yet.'
-            : topic === 'All'
-              ? ''
-              : `${shown} ${shown === 1 ? 'post' : 'posts'} in ${topic}.`;
-      }
-    })
-  );
-</script>
