@@ -6,7 +6,7 @@ import Section from '../components/ui/Section.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
 import Button from '../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
-import { ACCENTS, categoryAccent, accentVars } from '../config/accents';
+import { categoryAccent, topicAccent, accentVars } from '../config/accents';
 
 // A dead end is the one page where signposting matters more than apology, so
 // the three ways out get a hue each rather than a row of identical buttons.
@@ -30,7 +30,9 @@ const exits = [
     label: 'Blog',
     body: 'Notes on how we build — software, risk, and the occasional release.',
     icon: 'mingcute:book-2-line',
-    accent: ACCENTS[3],
+    // The hue the blog's own filter row gives untracked writing, so the card
+    // and the page it opens agree.
+    accent: topicAccent('Writing'),
   },
 ];
 ---
@@ -53,14 +55,14 @@ const exits = [
           </div>
           <span
             class="absolute -top-1 -right-1 font-display font-bold text-lg w-9 h-9 rounded-full flex items-center justify-center rotate-6"
-            style="background: var(--acc-orange-bold); color: #fff;"
+            style="background: var(--accent); color: var(--accent-on);"
           >?</span>
         </div>
 
         <div class="max-w-[720px] mx-auto">
-          <Eyebrow class="mb-5" color="var(--acc-orange-bold)">Error 404 · page not found</Eyebrow>
+          <Eyebrow class="mb-5">Error 404 · page not found</Eyebrow>
           <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
-            Even the fox couldn't <span style="color: var(--acc-orange-bold);">sniff this one out</span>.
+            Even the fox couldn't <span class="hl-accent">sniff this one out</span>.
           </h1>
           <p class="mb-8 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
             This page doesn't exist. It either moved, never shipped, or got
