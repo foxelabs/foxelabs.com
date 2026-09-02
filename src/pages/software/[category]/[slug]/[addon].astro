@@ -3,14 +3,14 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
-import Button from '../../../../components/ui/Button.astro';
+import CtaBanner from '../../../../components/CtaBanner.astro';
+import Section from '../../../../components/ui/Section.astro';
 import PricingCard from '../../../../components/ui/PricingCard.astro';
 import Faq from '../../../../components/ui/Faq.astro';
 import Screenshots from '../../../../components/ui/Screenshots.astro';
-import { Icon } from 'astro-icon/components';
 import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
 import { breadcrumbLd, softwareApplicationLd, faqLd } from '../../../../config/seo';
-import { accentFor, accentVars } from '../../../../config/accents';
+import { accentFor, ACCENTS } from '../../../../config/accents';
 
 export async function getStaticPaths() {
   const [addons, projects] = await Promise.all([
@@ -43,23 +43,19 @@ const siblingIds = (await getCollection('addons', (a) => !a.data.draft && a.data
   .map((a) => a.id);
 const { data } = addon;
 const { Content } = await render(addon);
+const accent = accentFor(siblingIds, addon.id);
 
 const parentUrl = projectPath('oss', parent.data.category, parent.id);
 
 const DOCS_FALLBACK = 'https://docs.foxelabs.com';
 const docsUrl = data.docsUrl ?? DOCS_FALLBACK;
 
-// Header metadata strip (facts we actually know).
-const meta = [
-  { label: 'Add-on for', value: parent.data.name },
-  data.location && { label: 'Appears in', value: data.location },
-].filter(Boolean) as { label: string; value: string }[];
-
 // Commercial "what you get" — verified from the Loggedin add-on docs.
 const benefits = [
   `Works with the free ${parent.data.name} core plugin`,
   'Automatic updates & support while licensed',
   '1, 5 or 10-site licenses',
+  '7-day money-back guarantee',
 ];
 
 const pageTitle = `${data.seoTitle ?? `${data.name} — ${parent.data.name} Add-on`} | Foxe Labs`;
@@ -91,6 +87,8 @@ const structuredData = [
   }),
 ];
 if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
+
+const quad = ACCENTS.map((a) => a.color);
 ---
 <BaseLayout
   title={pageTitle}
@@ -99,127 +97,120 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
   jsonLd={structuredData}
 >
   <Nav />
-  <main id="main" style={accentVars(accentFor(siblingIds, addon.id))}>
-    <div class="band band--light" style="padding-block: var(--space-section-sm);">
-      <div class="container-x">
-        <a href={parentUrl} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          All {parent.data.name} add-ons
-        </a>
+  <main id="main">
+    <!-- Hero -->
+    <section class="band band--sm band--bottom">
+      <div class="container-x addon-hero">
+        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
+          <a href={parentUrl} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+            ← All {parent.data.name} add-ons
+          </a>
 
-        <div class="flex items-center gap-3 mb-5 flex-wrap">
-          <span class="inline-flex items-center gap-1.5 lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">
-            <Icon name="mingcute:puzzled-line" width={12} height={12} aria-hidden="true" />
-            {parent.data.name} add-on
-          </span>
-        </div>
-
-        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-4">{data.name}</h1>
-        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">{data.tagline}</p>
-
-        {meta.length > 0 && (
-          <div class="flex flex-wrap gap-x-10 gap-y-3 mt-8">
-            {meta.map((m) => (
-              <div>
-                <p class="text-[10px] mb-1" style="color: var(--ink-dim); text-transform: uppercase;">{m.label}</p>
-                <p class="text-[14px]" style="color: var(--ink);">{m.value}</p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-
-    <section class="band band--light">
-      <div class="container-x">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
-          <div class="lg:col-span-7">
-            {data.features.length > 0 && (
-              <ul class="list-none m-0 p-0 space-y-3 mb-12">
-                {data.features.map((f) => (
-                  <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
-                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="chip chip--sm">
+              <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+              {parent.data.name} add-on
+            </span>
+            {data.location && (
+              <span class="chip chip--sm">
+                <span class="dot" style="background:var(--acc-3)" aria-hidden="true"></span>
+                {data.location}
+              </span>
             )}
-            <article class="prose-foxe max-w-none">
-              <Content />
-            </article>
           </div>
 
-          <aside class="lg:col-span-5">
-            <PricingCard
-              price={data.price}
-              badge={data.tier === 'premium' ? 'Premium add-on' : data.tier === 'free' ? 'Free add-on' : undefined}
-              benefits={benefits}
-            >
-              <div>
-                {data.url && (
-                  <Button href={data.url} variant="primary" class="w-full justify-center gap-2">
-                    <Icon name="mingcute:shopping-cart-1-line" width={16} height={16} aria-hidden="true" />
-                    Get {data.name}
-                  </Button>
-                )}
-                <div class="pricing-links">
-                  <a href={docsUrl}>
-                    <Icon name="mingcute:book-2-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
-                    Documentation
-                    <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
-                  </a>
-                  <a href="/contact/">
-                    <Icon name="mingcute:chat-1-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
-                    Get support
-                    <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
-                  </a>
-                </div>
-              </div>
+          <h1 style="font-size:var(--text-title);line-height:1.05;letter-spacing:-1.4px">{data.name}</h1>
+          <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
+            {data.tagline}
+          </p>
 
-              <div class="flex items-center gap-3.5 mt-6 p-4 rounded-[8px]" style="background: var(--accent-soft);">
-                <Icon name="mingcute:shield-line" width={34} height={34} style="color: var(--accent-ink);" class="shrink-0" aria-hidden="true" />
-                <div>
-                  <p class="text-[14px] font-semibold m-0" style="color: var(--ink);">7-day money-back guarantee</p>
-                  <p class="text-[13px] m-0" style="color: var(--ink-body);">Don't like it? 100% refund, no questions asked.</p>
-                </div>
-              </div>
-
-              <p class="mt-5 text-[13px]" style="color: var(--ink-dim);">
-                Requires the free <a href={parentUrl} style="color: var(--accent-ink);">{parent.data.name}</a> plugin to be installed and active.
-              </p>
-            </PricingCard>
-          </aside>
+          {data.features.length > 0 && (
+            <ul style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+              {data.features.map((f, i) => (
+                <li style="display:flex;align-items:flex-start;gap:10px;font-size:0.9375rem;line-height:1.5">
+                  <span
+                    class="dot"
+                    style={`background:${quad[i % 4]};width:10px;height:10px;margin-top:5px`}
+                    aria-hidden="true"
+                  ></span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
+
+        <PricingCard
+          price={data.price}
+          badge={data.tier === 'premium' ? 'Premium add-on' : data.tier === 'free' ? 'Free add-on' : undefined}
+          benefits={benefits}
+        >
+          {data.url && (
+            <a href={data.url} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+              Get {data.name}
+            </a>
+          )}
+          <div style="display:flex;flex-direction:column;gap:10px;padding-top:var(--space-150);border-top:1px solid var(--border)">
+            <a href={docsUrl} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+              Documentation →
+            </a>
+            <a href="/contact/" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">Get support →</a>
+          </div>
+          <p style="margin:0;font-size:var(--text-small);color:var(--text-subtle)">
+            Requires the free <a href={parentUrl}>{parent.data.name}</a> plugin to be installed and active.
+          </p>
+        </PricingCard>
       </div>
     </section>
 
-    {data.screenshots.length > 0 && (
-      <section class="band band--alt">
-        <div class="container-x">
-          <Screenshots
-            id={`shots-${addon.id}`}
-            shots={data.screenshots}
-            heading={`${data.name} in the WordPress admin`}
-            lead={`Every screen ${data.name} adds, and where to find it.`}
-          />
+    <!-- What it does -->
+    <Section>
+      <div class="what-grid">
+        <div>
+          <h2 style="margin-bottom:14px;font-size:1.625rem;letter-spacing:-0.5px">What it does</h2>
+          <p style="margin:0;font-size:0.96875rem;line-height:1.6;color:var(--text-subtle)">{data.summary}</p>
         </div>
-      </section>
+        <div class="prose-foxe">
+          <Content />
+        </div>
+      </div>
+    </Section>
+
+    {data.screenshots.length > 0 && (
+      <Section variant="ink">
+        <Screenshots
+          id={`shots-${addon.id}`}
+          shots={data.screenshots}
+          heading={`${data.name} in the WordPress admin`}
+          lead={`Every screen ${data.name} adds, and where to find it.`}
+        />
+      </Section>
     )}
 
     {data.faq.length > 0 && (
-      <section class="band band--light" style="border-top: 1px solid var(--border-soft);">
-        <div class="container-x">
-          <div class="max-w-3xl">
-            <Faq items={data.faq} bare />
-          </div>
-        </div>
-      </section>
+      <Section variant="alt" rule="top">
+        <Faq items={data.faq} />
+      </Section>
     )}
+
+    <CtaBanner />
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  .addon-hero {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-700);
+  }
+  .what-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-600);
+  }
+  @media (max-width: 960px) {
+    .addon-hero { grid-template-columns: 1fr; gap: var(--space-500); }
+    .what-grid { grid-template-columns: 1fr; gap: var(--space-400); }
+  }
+</style>

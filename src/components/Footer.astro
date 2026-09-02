@@ -1,26 +1,9 @@
 ---
-import { Icon } from 'astro-icon/components';
-
 interface Props {
-  /** Hide the "Let's build something" band — e.g. on /contact, where it just repeats the page. */
-  cta?: boolean;
-  ctaHeading?: string;
-  ctaBody?: string;
+  /** The compact single-row footer, for pages that fill the viewport themselves (404). */
+  slim?: boolean;
 }
-
-const {
-  cta = true,
-  ctaHeading = 'Learn how we can help you build better.',
-  ctaBody = 'Questions about a plugin, a licence, or an expert advisor — ask and get a straight answer from the team that wrote the code.',
-} = Astro.props;
-
-const socials = [
-  { href: 'https://x.com/foxelabs',        label: 'Foxe Labs on X',        icon: 'mingcute:social-x-line' },
-  { href: 'https://github.com/foxelabs',   label: 'Foxe Labs on GitHub',   icon: 'mingcute:github-line' },
-  { href: 'https://youtube.com/@foxelabs', label: 'Foxe Labs on YouTube',  icon: 'mingcute:youtube-line' },
-  { href: 'https://instagram.com/foxelabs', label: 'Foxe Labs on Instagram', icon: 'mingcute:instagram-line' },
-  { href: 'https://www.facebook.com/foxelabs', label: 'Foxe Labs on Facebook', icon: 'mingcute:facebook-line' },
-];
+const { slim = false } = Astro.props;
 
 const columns = [
   {
@@ -51,116 +34,61 @@ const columns = [
     title: 'Support',
     links: [
       { href: '/contact/', label: 'Contact us' },
-      { href: '/contact/', label: 'Report an issue' },
+      { href: '/contact/#support', label: 'Report an issue' },
     ],
   },
 ];
 
 const legal = [
-  { href: '/legal/terms/', label: 'Terms of Service' },
-  { href: '/legal/privacy/', label: 'Privacy Policy' },
-  { href: '/legal/refunds/', label: 'Refund Policy' },
+  { href: '/legal/terms/', label: 'Terms' },
+  { href: '/legal/privacy/', label: 'Privacy' },
+  { href: '/legal/refunds/', label: 'Refunds' },
 ];
 
 const year = new Date().getFullYear();
 const isExternal = (href: string) => href.startsWith('http');
 ---
-{cta && (
-  <!-- Atlassian's "Learn how we can help you achieve more." band: one heading,
-       one button, sitting directly above the footer on the same sunken surface. -->
-  <section style="background: var(--surface-sunken); border-top: 1px solid var(--border-soft);">
-    <div class="container-x" style="padding-block: var(--space-section);">
-      <div class="max-w-[720px] mx-auto text-center">
-        <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display); color: var(--ink);" class="mb-4">
-          {ctaHeading}
-        </h2>
-        <p class="mx-auto mb-8 max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">
-          {ctaBody}
-        </p>
-        <div class="flex flex-wrap items-center justify-center gap-3">
-          <a href="/contact/" class="btn btn--lg btn--primary">Contact us</a>
-          <a
-            href="/software/"
-            class="btn btn--lg transition-colors hover:bg-[var(--n200)]"
-            style="color: var(--ink); border: 1px solid var(--border); background: transparent;"
-          >Browse the software</a>
+
+<footer class:list={['footer', slim && 'footer--slim']} style={slim ? 'padding:24px 0' : undefined}>
+  <div class="container-x">
+    {!slim && (
+      <div class="footer__cols">
+        <div class="footer__col">
+          <span class="brand">
+            <span class="brand-mark" style="width:24px;height:24px" aria-hidden="true"></span>
+            <span class="brand__name" style="font-size:0.9375rem">Foxe Labs</span>
+          </span>
+          <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--text-subtle);max-width:220px">
+            Software provided as-is. Trading carries risk — not financial advice.
+          </p>
         </div>
+        {columns.map((col) => (
+          <div class="footer__col">
+            <span class="kicker">{col.title}</span>
+            {col.links.map((link) => (
+              <a
+                href={link.href}
+                class="footer__link"
+                target={isExternal(link.href) ? '_blank' : undefined}
+                rel={isExternal(link.href) ? 'noopener noreferrer' : undefined}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+        ))}
+      </div>
+    )}
+
+    <div class="footer__bar" style={slim ? 'margin-top:0;padding-top:0;border-top:none' : undefined}>
+      <span>© {year} Foxe Labs LLP · Kerala, India</span>
+      <button class="theme-toggle" type="button" data-theme-toggle>
+        <span class="theme-toggle__light">Dark mode</span>
+        <span class="theme-toggle__dark">Light mode</span>
+      </button>
+      <div style="display:flex;gap:16px">
+        {legal.map((l) => <a href={l.href}>{l.label}</a>)}
       </div>
     </div>
-  </section>
-)}
-
-<!-- Atlassian footer: brand row on top, a compact link grid under it, then a
-     thin bottom bar carrying copyright, legal links, and socials. -->
-<footer style="background: var(--surface-sunken); border-top: 1px solid var(--border); padding-block: 3rem 2rem;">
-  <div class="container-x">
-    <a
-      href="/"
-      class="inline-flex items-center gap-2.5 font-display text-lg"
-      style="color: var(--ink); font-weight: var(--fw-display); letter-spacing: -0.01em;"
-    >
-      <span class="w-[30px] h-[30px] shrink-0 brand-mark" aria-hidden="true"></span>
-      Foxe <span class="wordmark-box">Labs</span>
-    </a>
-
-    <nav
-      aria-label="Footer"
-      class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-8"
-    >
-      {columns.map((col) => (
-        <div>
-          <p class="m-0 mb-3 text-[14px]" style="color: var(--ink); font-weight: var(--fw-subhead);">
-            {col.title}
-          </p>
-          <ul class="list-none m-0 p-0 space-y-2 text-[14px]" style="color: var(--ink-body);">
-            {col.links.map((l) => (
-              <li>
-                <a
-                  href={l.href}
-                  target={isExternal(l.href) ? '_blank' : undefined}
-                  rel={isExternal(l.href) ? 'noopener noreferrer' : undefined}
-                  class="transition-colors hover:text-[var(--ink)] hover:underline"
-                >{l.label}</a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </nav>
-
-    <div
-      class="mt-10 pt-6 flex flex-col lg:flex-row lg:items-center gap-5"
-      style="border-top: 1px solid var(--border);"
-    >
-      <ul class="list-none m-0 p-0 flex flex-wrap items-center gap-x-5 gap-y-2 text-[13px]" style="color: var(--ink-body);">
-        <li class="m-0 text-[12px]">© {year} Foxe Labs LLP · Kerala, India</li>
-        {legal.map((l) => (
-          <li>
-            <a href={l.href} class="transition-colors hover:text-[var(--ink)] hover:underline">{l.label}</a>
-          </li>
-        ))}
-      </ul>
-
-      <ul class="list-none m-0 p-0 flex items-center gap-2 lg:ml-auto">
-        {socials.map((s) => (
-          <li>
-            <a
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={s.label}
-              class="flex items-center justify-center w-9 h-9 rounded-full transition-colors hover:text-[var(--ink)] hover:border-[var(--border-bold)]"
-              style="border: 1px solid var(--border); color: var(--ink-body);"
-            >
-              <Icon name={s.icon} width={16} height={16} aria-hidden="true" />
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-
-    <p class="mt-6 m-0 text-[12px]" style="color: var(--ink-dim);">
-      Software provided as-is. Trading carries risk — not financial advice.
-    </p>
   </div>
 </footer>

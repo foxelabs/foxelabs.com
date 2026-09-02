@@ -1,9 +1,18 @@
 ---
 interface Props {
   class?: string;
-  /** Overline colour, e.g. a category hue. Defaults to the accent token. */
+  /** Render as a bordered pill with a coloured dot, rather than a plain kicker. */
+  chip?: boolean;
+  /** Dot colour for the chip form. */
   color?: string;
 }
-const { class: className = '', color } = Astro.props;
+const { class: className = '', chip = false, color = 'var(--acc-1)' } = Astro.props;
 ---
-<p class={`eyebrow ${className}`} style={color ? `color: ${color};` : undefined}><slot /></p>
+{chip ? (
+  <span class:list={['chip', 'chip--muted', className]}>
+    <span class="dot" style={`background:${color}`} aria-hidden="true"></span>
+    <slot />
+  </span>
+) : (
+  <span class:list={['eyebrow', className]}><slot /></span>
+)}

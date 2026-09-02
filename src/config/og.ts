@@ -48,7 +48,7 @@ const STATIC_CARDS: OgEntry[] = [
   {
     slug: 'trading',
     eyebrow: 'Trading',
-    accent: 'orange',
+    accent: 'amber',
     title: 'Expert advisors and trading tools',
     subtitle: 'Engineered for prop firm and serious retail traders.',
   },
@@ -62,7 +62,7 @@ const STATIC_CARDS: OgEntry[] = [
   {
     slug: 'about',
     eyebrow: 'About',
-    accent: 'teal',
+    accent: 'lime',
     title: 'A small studio that ships and keeps shipping',
     subtitle: 'Foxe Labs builds open-source tools and trading software, and runs on both.',
   },

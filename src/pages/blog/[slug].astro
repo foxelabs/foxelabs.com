@@ -4,10 +4,12 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
-import { Icon } from 'astro-icon/components';
+import CtaBanner from '../../components/CtaBanner.astro';
+import PostCard from '../../components/PostCard.astro';
 import Faq from '../../components/ui/Faq.astro';
+import { Icon } from 'astro-icon/components';
 import { articleLd, breadcrumbLd, faqLd, SITE } from '../../config/seo';
-import { accentVars, topicAccent } from '../../config/accents';
+import { topicAccent } from '../../config/accents';
 import { topicOf } from '../../config/tracks';
 import { tagLabel, tagPath, topicPath } from '../../config/blog';
 
@@ -43,6 +45,7 @@ const shareUrl = `${SITE.url}/blog/${post.id}/`;
 // track — a reader following it wants more posts, not a product listing.
 const topic = topicOf(data.track);
 const topicHref = topicPath(topic);
+const accent = topicAccent(topic);
 
 // No " | Foxe Labs" suffix on posts: seoTitles are already long, and the
 // WebSite JSON-LD gives engines the site name.
@@ -72,6 +75,24 @@ const structuredData = [
   }),
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
+
+const shares = [
+  {
+    href: `https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(data.title)}`,
+    label: 'Share on X',
+    icon: 'mingcute:social-x-line',
+  },
+  {
+    href: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+    label: 'Share on LinkedIn',
+    icon: 'mingcute:linkedin-line',
+  },
+  {
+    href: `mailto:?subject=${encodeURIComponent(data.title)}&body=${encodeURIComponent(shareUrl)}`,
+    label: 'Share by email',
+    icon: 'mingcute:mail-line',
+  },
+];
 ---
 <BaseLayout
   title={pageTitle}
@@ -87,153 +108,123 @@ const structuredData = [
   jsonLd={structuredData}
 >
   <Nav />
-  <main id="main" style={accentVars(topicAccent(topicOf(data.track)))}>
-    <!-- Post header: white ground, title + meta row, then the featured image at its native 16:9 -->
-    <header style="padding-block: clamp(2.5rem, 4vw, 3.5rem) 0;">
-      <div class="container-x">
-        <h1 style="font-size: var(--text-hero-sm); line-height: 1.1;">{data.title}</h1>
+  <main id="main">
+    <!-- Article header -->
+    <section class="band band--sm band--bottom">
+      <div class="measure" style="display:flex;flex-direction:column;gap:var(--space-250)">
+        <a href="/blog/" style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+          ← Back to all posts
+        </a>
+        <h1 style="font-size:var(--text-h1);line-height:1.12;letter-spacing:-1px">{data.title}</h1>
 
-        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4">
-          <time class="text-[14px]" style="color: var(--ink);">{fmt(data.pubDate)}</time>
-          <span class="flex items-center gap-2">
-            <span class="text-[12px]" style="color: var(--ink); font-weight: var(--fw-medium);">Published in</span>
-            <a href={topicHref} class="term-lozenge">{topic}</a>
-          </span>
-          {readingTime >= 3 && <span class="text-[14px]" style="color: var(--ink-dim);">{readingTime} min read</span>}
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a href={topicHref} class="chip chip--sm">
+            <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+            {topic}
+          </a>
+          <span class="chip chip--sm chip--muted">{fmt(data.pubDate)}</span>
+          {readingTime >= 3 && <span class="chip chip--sm chip--muted">{readingTime} min read</span>}
+          <span class="chip chip--sm chip--muted">By {data.author}</span>
         </div>
+
+        {data.heroImage && (
+          <div style="border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
+            <Image
+              src={data.heroImage}
+              alt={data.heroImageAlt ?? ''}
+              widths={[640, 960, 1280]}
+              sizes="(max-width: 800px) 100vw, 760px"
+              fetchpriority="high"
+              loading="eager"
+              style="display:block;width:100%;height:auto"
+            />
+          </div>
+        )}
       </div>
-
-      {data.heroImage && (
-        <div class="container-x mt-8">
-          <Image
-            src={data.heroImage}
-            alt={data.heroImageAlt ?? ''}
-            widths={[640, 960, 1280, 1600]}
-            sizes="(max-width: 1248px) 100vw, 1152px"
-            fetchpriority="high"
-            loading="eager"
-            class="w-full h-auto block"
-            style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
-          />
-        </div>
-      )}
-    </header>
+    </section>
 
     <!-- Body -->
-    <article class="band" style="padding-block: clamp(2.5rem, 4vw, 3rem) clamp(3.5rem, 6vw, 5rem);">
-      <div class="container-x">
-        <div class="prose-foxe mx-auto" style="max-width: 768px;">
+    <article class="band band--sm">
+      <div class="measure">
+        <div class="prose-foxe">
           <Content />
         </div>
 
-        <div class="mx-auto" style="max-width: 768px;">
-          <Faq items={data.faq} />
-        </div>
+        {data.faq.length > 0 && (
+          <div style="margin-top:var(--space-700)">
+            <Faq items={data.faq} />
+          </div>
+        )}
 
         {data.tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-14 pt-8 mx-auto" style="max-width: 768px; border-top: 1px solid var(--border-soft);">
-            {data.tags.map((t) => (
-              <a
-                href={tagPath(t)}
-                class="lozenge"
-                style="background: var(--accent-soft); color: var(--accent-deep);"
-              >
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:var(--space-600);padding-top:var(--space-300);border-top:1px solid var(--border)">
+            {data.tags.map((t, i) => (
+              <a href={tagPath(t)} class="chip chip--sm">
+                <span
+                  class="dot"
+                  style={`background:var(--acc-${(i % 4) + 1})`}
+                  aria-hidden="true"
+                ></span>
                 #{tagLabel(t)}
               </a>
             ))}
           </div>
         )}
 
-        <div class="mx-auto mt-10" style="max-width: 768px;">
-          <a href="/blog/" class="inline-flex items-center gap-1.5 text-[14px] transition-colors hover:text-[var(--b500)]" style="color: var(--ink-dim);">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="19" y1="12" x2="5" y2="12" />
-              <polyline points="12 19 5 12 12 5" />
-            </svg>
-            Back to all posts
-          </a>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-300);margin-top:var(--space-400)">
+          <p style="margin:0;font-size:var(--text-ui);color:var(--text-subtle)">By {data.author}</p>
+          <ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:16px">
+            {shares.map((s) => (
+              <li>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={s.label}
+                  style="color:var(--text-subtle);display:inline-flex"
+                >
+                  <Icon name={s.icon} width={20} height={20} aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </article>
 
-    <!-- Post footer: share row, follow panel, related content -->
-    <div class="container-x pb-4">
-      <div class="flex items-center justify-between gap-6 pt-2">
-        <p class="m-0 text-[14px]" style="color: var(--ink-dim);">By {data.author}</p>
-        <ul class="list-none m-0 p-0 flex items-center gap-4">
-          <li>
-            <a
-              href={`https://x.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(data.title)}`}
-              target="_blank" rel="noopener noreferrer" aria-label="Share on X"
-              class="transition-colors hover:text-[var(--b500)]" style="color: var(--ink-body);"
-            >
-              <Icon name="mingcute:social-x-line" width={20} height={20} aria-hidden="true" />
-            </a>
-          </li>
-          <li>
-            <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
-              target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn"
-              class="transition-colors hover:text-[var(--b500)]" style="color: var(--ink-body);"
-            >
-              <Icon name="mingcute:linkedin-line" width={20} height={20} aria-hidden="true" />
-            </a>
-          </li>
-          <li>
-            <a
-              href={`mailto:?subject=${encodeURIComponent(data.title)}&body=${encodeURIComponent(shareUrl)}`}
-              aria-label="Share by email"
-              class="transition-colors hover:text-[var(--b500)]" style="color: var(--ink-body);"
-            >
-              <Icon name="mingcute:mail-line" width={20} height={20} aria-hidden="true" />
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-
     {related.length > 0 && (
-      <section class="band" style="padding-block: var(--space-section);">
+      <section class="band band--sm band--subtle band--top">
         <div class="container-x">
-          <h2 class="mb-8">Related content</h2>
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {related.map((r) => (
-              <a
-                href={`/blog/${r.id}/`}
-                class="post-link group flex flex-col overflow-hidden"
-                style={`background: var(--surface); border: 1px solid var(--border); border-top: 3px solid var(--accent-ink); border-radius: var(--r-md); ${accentVars(topicAccent(topicOf(r.data.track)))}`}
-              >
-                {r.data.heroImage && (
-                  <Image
-                    src={r.data.heroImage}
-                    alt={r.data.heroImageAlt ?? ''}
-                    widths={[400, 640, 800]}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
-                    loading="lazy"
-                    class="w-full h-auto block"
-                    style="aspect-ratio: 16 / 9; object-fit: cover;"
-                  />
-                )}
-                <div class="flex flex-col flex-1 p-6">
-                  <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(r.data.track)}</span></p>
-                  <h3 class="post-link__title mb-2.5" style="font-size: var(--text-h3);">{r.data.title}</h3>
-                  <p class="m-0" style="font-size: var(--text-ui); color: var(--ink-body);">{r.data.description}</p>
-                </div>
-              </a>
-            ))}
+          <h2 style="margin-bottom:var(--space-400);font-size:var(--text-h2);letter-spacing:-0.6px">
+            Related content
+          </h2>
+          <div class="related-grid">
+            {related.map((r) => <PostCard post={r} height={110} />)}
           </div>
         </div>
       </section>
     )}
+
+    <CtaBanner />
   </main>
   <Footer />
 </BaseLayout>
 
 <style>
-  .post-link__title {
-    transition: color 0.1s ease;
+  .measure {
+    max-width: var(--measure);
+    margin-inline: auto;
+    padding-inline: var(--container-pad);
   }
-  .post-link:hover .post-link__title {
-    color: var(--accent-ink);
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-300);
+  }
+  @media (max-width: 960px) {
+    .related-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .related-grid { grid-template-columns: 1fr; }
   }
 </style>

@@ -1,141 +1,129 @@
 ---
-// ADS field + label classes live in global.css so every form matches.
-const fieldClass = 'field';
-const labelClass = 'field-label';
+// Field and label classes live in global.css so every form matches.
 ---
-<form data-contact-form class="w-full" novalidate>
-  <div data-fields class="flex flex-col gap-5">
-    <div class="grid sm:grid-cols-2 gap-5">
-      <div>
-        <label for="c-name" class={labelClass}>Name</label>
+<form data-contact-form novalidate style="width:100%">
+  <div data-fields style="padding:32px;display:flex;flex-direction:column;gap:18px">
+    <div class="form-row">
+      <label class="field-label" for="c-name">
+        Name
         <input
-          id="c-name" type="text" name="name" required maxlength="120" placeholder="Jane Trader"
-          class={fieldClass}
+          id="c-name" type="text" name="name" required maxlength="120" placeholder="Your name"
+          class="field"
         />
-      </div>
-      <div>
-        <label for="c-email" class={labelClass}>Email</label>
+      </label>
+      <label class="field-label" for="c-email">
+        Email
         <input
-          id="c-email" type="email" name="email" required placeholder="you@domain.com"
-          class={fieldClass}
+          id="c-email" type="email" name="email" required placeholder="you@example.com"
+          class="field"
         />
-      </div>
+      </label>
     </div>
 
-    <div class="grid sm:grid-cols-2 gap-5">
-      <div>
-        <label for="c-subject" class={labelClass}>Subject</label>
-        <input
-          id="c-subject" type="text" name="subject" required maxlength="150" placeholder="Licensing question"
-          class={fieldClass}
-        />
-      </div>
-      <div>
-        <label for="c-license" class={labelClass}>
-          License key <span style="font-weight: var(--fw-body); color: var(--ink-dim);">(optional)</span>
-        </label>
-        <input
-          id="c-license" type="text" name="license" maxlength="120" placeholder="sk_a1b2c3d4e5f6"
-          autocomplete="off" spellcheck="false"
-          class={fieldClass}
-        />
-      </div>
-    </div>
+    <label class="field-label" for="c-subject">
+      Subject
+      <input
+        id="c-subject" type="text" name="subject" required maxlength="150" placeholder="What's it about?"
+        class="field"
+      />
+    </label>
 
-    <div>
-      <label for="c-message" class={labelClass}>Message</label>
+    <label class="field-label" for="c-license">
+      License key (optional)
+      <input
+        id="c-license" type="text" name="license" maxlength="120" placeholder="FXL-XXXX-XXXX"
+        autocomplete="off" spellcheck="false"
+        class="field field--mono"
+      />
+    </label>
+
+    <label class="field-label" for="c-message">
+      Message
       <textarea
-        id="c-message" name="message" required rows="6" maxlength="5000" placeholder="What's on your mind?"
-        class={fieldClass}
+        id="c-message" name="message" required rows="6" maxlength="5000"
+        placeholder="Tell us what you need — the more detail, the faster the answer."
+        class="field"
       ></textarea>
-    </div>
+    </label>
 
     <!-- Honeypot -->
     <input type="text" name="company" tabindex="-1" autocomplete="off" aria-hidden="true"
-      class="hidden" style="display:none" />
+      style="display:none" />
 
-    <button
-      type="submit" data-submit
-      class="btn btn--primary self-start !px-4 disabled:opacity-60 disabled:cursor-not-allowed"
-    >
+    <button type="submit" data-submit class="btn btn--primary" style="padding:13px 24px">
       <span data-label-text>Send message</span>
-      <svg data-spinner class="hidden animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-opacity="0.25" />
-        <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-      </svg>
     </button>
-  </div>
 
-  <div data-success role="status" tabindex="-1" class="hidden flex-col items-center text-center py-6">
-    <span data-success-mark class="inline-flex items-center justify-center rounded-full mb-5"
-      style="width: 64px; height: 64px; background: color-mix(in srgb, var(--accent) 14%, transparent);">
-      <svg width="34" height="34" viewBox="0 0 52 52" fill="none" aria-hidden="true">
-        <circle class="sm-ring" cx="26" cy="26" r="24" stroke="var(--accent-ink)" stroke-width="3" fill="none" />
-        <path class="sm-tick" d="M15 27l7.5 7.5L38 19" stroke="var(--accent-ink)" stroke-width="3.5"
-          stroke-linecap="round" stroke-linejoin="round" fill="none" />
-      </svg>
-    </span>
-    <p class="mb-1.5" style="font-size: var(--text-h4); font-weight: var(--fw-heading); color: var(--ink);">Message sent — caught by the fox. 🦊</p>
-    <p class="m-0" style="font-size: var(--text-ui); color: var(--ink-body);">
-      It just landed in the inbox. Expect a reply within one business day (IST).
+    <p data-error role="alert" hidden style="margin:0;font-size:var(--text-ui);color:var(--bad)">
+      Something went wrong. Try again or email support@foxelabs.com.
     </p>
   </div>
-  <p data-error role="alert" class="hidden mt-4 text-[14px]" style="color: var(--red);">
-    Something went wrong. Try again or email support@foxelabs.com.
-  </p>
+
+  <div
+    data-success
+    role="status"
+    tabindex="-1"
+    hidden
+    style="padding:56px 40px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px"
+  >
+    <span
+      style="width:44px;height:44px;border-radius:var(--r-md);background:var(--acc-4);display:flex;align-items:center;justify-content:center;color:#1D1E20;font-size:22px;font-weight:var(--fw-display)"
+      aria-hidden="true"
+    >✓</span>
+    <h2 style="font-size:1.5rem">Message sent — caught by the fox.</h2>
+    <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+      It just landed in the inbox. Expect a reply within one business day (IST).
+    </p>
+    <button
+      type="button"
+      data-reset
+      style="all:unset;box-sizing:border-box;cursor:pointer;font-family:inherit;font-size:var(--text-ui);font-weight:var(--fw-medium);color:var(--link);margin-top:6px"
+    >
+      Send another message
+    </button>
+  </div>
 </form>
 
 <style>
-  [data-success]:not(.hidden) { display: flex; }
-
-  [data-success]:not(.hidden) .sm-ring {
-    stroke-dasharray: 151;
-    stroke-dashoffset: 151;
-    animation: sm-draw 520ms ease-out forwards;
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-200);
   }
-  [data-success]:not(.hidden) .sm-tick {
-    stroke-dasharray: 40;
-    stroke-dashoffset: 40;
-    animation: sm-draw 340ms ease-out 420ms forwards;
-  }
-  [data-success]:not(.hidden) [data-success-mark] {
-    animation: sm-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-
-  @keyframes sm-draw { to { stroke-dashoffset: 0; } }
-  @keyframes sm-pop {
-    0% { transform: scale(0.6); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    [data-success]:not(.hidden) .sm-ring,
-    [data-success]:not(.hidden) .sm-tick { animation: none; stroke-dashoffset: 0; }
-    [data-success]:not(.hidden) [data-success-mark] { animation: none; }
+  @media (max-width: 520px) {
+    .form-row { grid-template-columns: 1fr; }
   }
 </style>
 
 <script is:inline>
   (function () {
-    const form = document.querySelector('[data-contact-form]');
+    var form = document.querySelector('[data-contact-form]');
     if (!form || form.dataset.bound === '1') return;
     form.dataset.bound = '1';
 
-    const fields = form.querySelector('[data-fields]');
-    const success = form.querySelector('[data-success]');
-    const errorEl = form.querySelector('[data-error]');
-    const button = form.querySelector('[data-submit]');
-    const labelText = form.querySelector('[data-label-text]');
-    const spinner = form.querySelector('[data-spinner]');
-    const inputs = form.querySelectorAll('input, textarea, button');
+    var fields = form.querySelector('[data-fields]');
+    var success = form.querySelector('[data-success]');
+    var errorEl = form.querySelector('[data-error]');
+    var labelText = form.querySelector('[data-label-text]');
+    var resetButton = form.querySelector('[data-reset]');
+    var inputs = form.querySelectorAll('input, textarea, button');
 
     function setLoading(loading) {
-      inputs.forEach((el) => (el.disabled = loading));
+      inputs.forEach(function (el) {
+        el.disabled = loading;
+      });
       labelText.textContent = loading ? 'Sending…' : 'Send message';
-      spinner.classList.toggle('hidden', !loading);
     }
 
-    form.addEventListener('submit', async (e) => {
+    resetButton.addEventListener('click', function () {
+      form.reset();
+      setLoading(false);
+      form.dataset.submitting = '0';
+      success.hidden = true;
+      fields.hidden = false;
+    });
+
+    form.addEventListener('submit', async function (e) {
       e.preventDefault();
       if (form.dataset.submitting === '1') return;
       if (!form.checkValidity()) {
@@ -144,10 +132,10 @@ const labelClass = 'field-label';
       }
 
       form.dataset.submitting = '1';
-      errorEl.classList.add('hidden');
+      errorEl.hidden = true;
       setLoading(true);
 
-      const payload = {
+      var payload = {
         name: form.querySelector('[name="name"]').value,
         email: form.querySelector('[name="email"]').value,
         subject: form.querySelector('[name="subject"]').value,
@@ -157,17 +145,17 @@ const labelClass = 'field-label';
       };
 
       try {
-        const res = await fetch('/api/contact', {
+        var res = await fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
         if (!res.ok) throw new Error('request failed');
-        fields.classList.add('hidden');
-        success.classList.remove('hidden');
+        fields.hidden = true;
+        success.hidden = false;
         success.focus();
-      } catch {
-        errorEl.classList.remove('hidden');
+      } catch (err) {
+        errorEl.hidden = false;
         setLoading(false);
         form.dataset.submitting = '0';
       }

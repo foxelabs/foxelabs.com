@@ -1,38 +1,90 @@
 ---
 import { getCollection } from 'astro:content';
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
+import CtaBanner from '../components/CtaBanner.astro';
 import Section from '../components/ui/Section.astro';
-import Button from '../components/ui/Button.astro';
-import { Icon } from 'astro-icon/components';
 import Faq from '../components/ui/Faq.astro';
+import PostCard from '../components/PostCard.astro';
 import { faqLd } from '../config/seo';
-import { topicOf } from '../config/tracks';
-import { accentVars, topicAccent } from '../config/accents';
+import { trackConfig } from '../config/tracks';
 
-// Activity feed = real published blog posts, newest first. No fabricated releases.
+// Latest writing — real published posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
   .slice(0, 3);
 
-// News-card fills, straight from the mockup (tokenised in global.css).
+// The three names under each track card come from the project collection, so
+// the home page cannot drift from what actually ships.
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+const pick = (track: 'oss' | 'trading') =>
+  projects
+    .filter((p) => p.data.track === track)
+    .slice(0, 3)
+    .map((p) => ({
+      href: `${trackConfig[track].basePath}/${p.data.category}/${p.id}/`,
+      label: `${p.data.name} — ${p.data.tagline}`,
+    }));
 
-// Proof numerals on the bold accent cuts — the bright cuts fail contrast on
-// the blue band (yellow was ~1.7:1).
-const proof = [
-  { value: '110K+',    label: 'active installs',  color: 'var(--acc-blue-bright)' },
-  { value: '2.7M+',    label: 'downloads',        color: 'var(--b500)' },
-  { value: '2014',     label: 'shipping since',   color: 'var(--acc-yellow-bold)' },
-  { value: 'In-house', label: 'designed & built', color: 'var(--acc-purple-bold)' },
+const tracks = [
+  {
+    id: 'software',
+    title: 'Software',
+    color: 'var(--acc-1)',
+    body:
+      'WordPress plugins and PHP libraries — open source and GPL-licensed, documented, and shipped for years. Paid Pro add-ons and new apps join the same shelf.',
+    links: pick('oss'),
+    cta: { href: '/software/', label: 'Explore software →' },
+  },
+  {
+    id: 'trading',
+    title: 'Trading',
+    color: 'var(--acc-2)',
+    body:
+      'Expert advisors, a universal trading journal, and precision utilities for prop firm and serious retail traders. Engineered risk-first.',
+    links: pick('trading'),
+    cta: { href: '/trading/', label: 'Explore trading →' },
+  },
 ];
 
-const ethos = [
-  { title: 'Risk-first',      body: 'Downside is designed in before upside — in code and in the markets.', tint: 'var(--acc-blue-bright)', icon: 'mingcute:time-line' },
-  { title: 'Open by default', body: 'Our source is public. Read it, fork it, trust it.',                   tint: 'var(--b400)', fg: '#101214', icon: 'mingcute:code-fill' },
-  { title: 'Documented',      body: 'Clear docs and changelogs. Questions reach the team that wrote it.',  tint: 'var(--acc-yellow)',      icon: 'mingcute:document-line' },
-  { title: 'Built in-house',  body: 'Every project designed, built and supported under one roof.',         tint: 'var(--acc-purple)',      icon: 'mingcute:user-2-line' },
+const tags = [
+  { label: '110K+ installs', color: 'var(--acc-1)' },
+  { label: 'XAUUSD · risk-first', color: 'var(--acc-2)' },
+  { label: 'Open source · GPL', color: 'var(--acc-3)' },
+  { label: 'Shipping since 2014', color: 'var(--acc-4)' },
+];
+
+const stats = [
+  { value: '110K+', label: 'active installs' },
+  { value: '2.7M+', label: 'downloads' },
+  { value: '2014', label: 'shipping since' },
+  { value: 'In-house', label: 'designed & built' },
+];
+
+const principles = [
+  {
+    title: 'Risk-first',
+    color: 'var(--acc-1)',
+    body: 'Downside is designed in before upside — in code and in the markets.',
+  },
+  {
+    title: 'Open by default',
+    color: 'var(--acc-2)',
+    body: 'Our source is public. Read it, fork it, trust it.',
+  },
+  {
+    title: 'Documented',
+    color: 'var(--acc-3)',
+    body: 'Clear docs and changelogs. Questions reach the team that wrote it.',
+  },
+  {
+    title: 'Built in-house',
+    color: 'var(--acc-4)',
+    body: 'Every project designed, built and supported under one roof.',
+  },
 ];
 
 const faq = [
@@ -57,269 +109,189 @@ const faq = [
       'Free plugins are supported on their WordPress.org support forums, and anything else goes through the contact form or support@foxelabs.com. Messages reach the team that wrote the code — there are no support tiers to escalate through.',
   },
 ];
+
+// The decorative grid behind the hero. Colours are assigned by a fixed
+// arithmetic walk rather than at random, so the pattern is stable across builds.
+const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
+const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor(i / 13) * 3) % 4]);
 ---
+
 <BaseLayout jsonLd={faqLd(faq)}>
   <Nav />
   <main id="main">
-    <!-- Hero: white ground, copy left, flat tinted illustration cards right -->
-    <section class="band overflow-hidden relative bg-[var(--b50)] lg:bg-[var(--surface)]" style="padding-block: var(--space-section-lg);">
-      <!-- Mobile-only decoration: the tinted band carries the colour, so the
-           shapes bleed in behind the copy instead of stacking cards below it. -->
-      <div class="lg:hidden absolute top-9 -right-6 w-22 h-22 rounded-full pointer-events-none" style="background: var(--acc-purple);" aria-hidden="true"></div>
-      <svg class="lg:hidden absolute top-44 -left-4 pointer-events-none" width="54" height="46" viewBox="0 0 34 28" style="transform: rotate(18deg);" aria-hidden="true">
-        <polygon points="17,0 34,28 0,28" fill="var(--acc-red-bright)" />
-      </svg>
-      <div class="container-x">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14 items-center">
-          <div class="lg:col-span-7 relative z-10 text-center lg:text-left">
-            <span
-              class="inline-block mb-6 text-[13px] bg-[var(--surface)] lg:bg-[var(--b50)]"
-              style="color: var(--b500); font-weight: var(--fw-bold); border-radius: var(--r-sm); padding: 6px 12px;"
-            >Lines of code · Lines on the chart</span>
-            <h1 style="font-size: var(--text-hero);" class="mb-6">
-              Engineering in the open — and <span class="hl-accent">in the markets</span>.
-            </h1>
-            <p class="mb-9 max-w-[540px] mx-auto lg:mx-0 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
-              Foxe Labs is a small software studio. Open-source tools with a
-              decade-long track record, and the same engineering discipline brought
-              to trading software.
-            </p>
-            <div class="flex flex-col sm:flex-row sm:flex-wrap sm:items-center sm:justify-center lg:justify-start gap-3 sm:gap-4 max-w-[340px] sm:max-w-none mx-auto lg:mx-0">
-              <Button href="/software/" variant="primary" size="lg" class="justify-center">Explore Software</Button>
-              <Button href="/trading/" variant="ghost" size="lg" arrow class="justify-center bg-[var(--surface)] lg:bg-transparent">Explore Trading</Button>
-            </div>
-          </div>
-
-          <!-- Flat illustration composition: three tinted cards + two shapes.
-               Desktop only — on mobile the tinted band + shapes above replace it. -->
-          <div class="hidden lg:block lg:col-span-5">
-            <div class="relative mx-auto max-w-[420px] lg:h-[400px] grid gap-4 lg:block">
-              <!-- Software card -->
-              <div
-                class="lg:absolute lg:top-0 lg:left-6 lg:w-[240px] lg:h-[170px] p-5"
-                style="background: var(--b50); border-radius: var(--r-md);"
-              >
-                <div class="w-9 h-9 flex items-center justify-center mb-3.5" style="background: var(--b400); border-radius: var(--r-md);">
-                  <Icon name="mingcute:code-fill" width={18} height={18} style="color: #101214;" aria-hidden="true" />
-                </div>
-                <div class="h-[9px] w-[80%] mb-2" style="background: var(--b100); border-radius: var(--r-sm);"></div>
-                <div class="h-[9px] w-[55%]" style="background: var(--b100); border-radius: var(--r-sm);"></div>
-                <p class="mt-3.5 text-[12px]" style="color: var(--b500); font-weight: var(--fw-bold);">110K+ installs</p>
-              </div>
-
-              <!-- Trading card -->
-              <div
-                class="lg:absolute lg:top-[104px] lg:right-0 lg:w-[240px] p-5"
-                style="background: var(--acc-orange-soft); border-radius: var(--r-md);"
-              >
-                <div class="w-9 h-9 flex items-center justify-center mb-3.5" style="background: var(--acc-orange); border-radius: var(--r-md);">
-                  <Icon name="mynaui:chart-line-solid" width={18} height={18} style="color: #fff;" aria-hidden="true" />
-                </div>
-                <svg viewBox="0 0 100 44" class="w-full h-auto" style="max-height: 64px;" preserveAspectRatio="none" role="img" aria-label="Illustrative rising trend line">
-                  <path d="M 2 38 L 18 30 L 34 33 L 50 22 L 66 25 L 82 12 L 98 5" fill="none" stroke="var(--acc-orange-bold)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
-                  <circle cx="98" cy="5" r="3.4" fill="var(--acc-orange)" vector-effect="non-scaling-stroke" />
-                </svg>
-                <p class="mt-3 text-[12px]" style="color: var(--acc-orange-bold); font-weight: var(--fw-bold);">XAUUSD · risk-first</p>
-              </div>
-
-              <!-- Trust card -->
-              <div
-                class="lg:absolute lg:bottom-0 lg:left-0 lg:w-[216px] p-[18px] flex flex-col gap-2.5"
-                style="background: var(--acc-teal-soft); border-radius: var(--r-md);"
-              >
-                {['Open source · GPL', 'Shipping since 2014', 'Built in-house'].map((line) => (
-                  <div class="flex items-center gap-2.5">
-                    <span class="w-5 h-5 rounded-full flex items-center justify-center shrink-0" style="background: var(--acc-teal);">
-                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m3 8 4 4 6-8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    </span>
-                    <span class="text-[13px]" style="color: var(--acc-teal-bold); font-weight: var(--fw-bold);">{line}</span>
-                  </div>
-                ))}
-              </div>
-
-              <!-- Decorative shapes -->
-              <div class="hidden lg:block absolute top-[44px] right-[64px] w-11 h-11 rounded-full" style="background: var(--acc-purple);" aria-hidden="true"></div>
-              <svg class="hidden lg:block absolute bottom-[10px] right-[26px]" width="34" height="28" viewBox="0 0 34 28" style="transform: rotate(18deg);" aria-hidden="true">
-                <polygon points="17,0 34,28 0,28" fill="var(--acc-red-bright)" />
-              </svg>
-            </div>
-          </div>
+    <!-- Hero -->
+    <section style="position:relative;overflow:hidden">
+      <div class="cellgrid" aria-hidden="true" data-cellgrid>
+        {heroCells.map((color) => <i data-color={color}></i>)}
+      </div>
+      <div
+        class="container-x"
+        style="position:relative;padding-block:var(--space-800) var(--band-pad-sm);display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-300);pointer-events:none"
+      >
+        <span class="chip chip--muted">
+          <span class="dot" style="background:var(--acc-4);border-radius:2px;width:8px;height:8px" aria-hidden="true"></span>
+          Lines of code · Lines on the chart
+        </span>
+        <h1 style="font-size:var(--text-hero);line-height:1.08;letter-spacing:-1.5px;max-width:820px">
+          Engineering in the open — and in the markets.
+        </h1>
+        <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle);max-width:620px">
+          Foxe Labs is a small software studio. Open-source tools with a decade-long track record,
+          and the same engineering discipline brought to trading software.
+        </p>
+        <div style="display:flex;gap:12px;margin-top:8px;pointer-events:auto;flex-wrap:wrap;justify-content:center">
+          <a href="/software/" class="btn btn--primary">Explore Software</a>
+          <a href="/trading/" class="btn btn--ghost">Explore Trading</a>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+          {tags.map((tag) => (
+            <span class="chip">
+              <span class="dot" style={`background:${tag.color};width:10px;height:10px`} aria-hidden="true"></span>
+              {tag.label}
+            </span>
+          ))}
         </div>
       </div>
     </section>
 
-    <!-- Proof strip: flat blue tint band -->
-    <section class="band band--sky" style="padding-block: var(--space-section-sm);">
+    <!-- Proof -->
+    <section class="band--subtle band--top band--bottom">
       <div class="container-x">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-          {proof.map((s) => (
-            <div>
-              <p class="font-display" style={`font-size: clamp(2rem, 1.4rem + 1.9vw, 2.75rem); font-weight: var(--fw-display); letter-spacing: -0.03em; color: ${s.color}; line-height: 1;`}>{s.value}</p>
-              <p class="text-[14px] mt-2.5" style="color: var(--ink-body); font-weight: var(--fw-medium);">{s.label}</p>
+        <div class="stat-row">
+          {stats.map((s) => (
+            <div style="padding:28px 24px;text-align:center">
+              <div class="stat__value">{s.value}</div>
+              <div class="stat__label">{s.label}</div>
             </div>
           ))}
         </div>
-        <p class="mt-9 text-center text-[13px]" style="color: var(--ink-body);">
+        <p style="margin:0;text-align:center;font-size:var(--text-small);color:var(--text-subtle);padding:0 24px 20px">
           Public on WordPress.org · Packagist · GitHub — open source since 2014
         </p>
       </div>
     </section>
 
-    <!-- Two tracks: flat tinted cards, centred intro -->
-    <Section variant="light">
-      <div class="text-center max-w-[680px] mx-auto mb-13">
-        <h2 class="mb-4">One studio, two disciplines.</h2>
-        <p style="font-size: var(--text-lead-sm); color: var(--ink-body);">
-          The same team, the same standards — pointed at two different problems.
-          Open-source software is the proof of how we build; trading is where that
-          discipline goes next.
-        </p>
-      </div>
-
-      <div class="grid md:grid-cols-2 gap-7">
-        <!-- Software -->
-        <div class="p-9 flex flex-col gap-4" style="background: var(--b50); border-radius: var(--r-md);">
-          <div class="w-12 h-12 flex items-center justify-center" style="background: var(--b400); border-radius: var(--r-md);">
-            <Icon name="mingcute:code-fill" width={24} height={24} style="color: #101214;" aria-hidden="true" />
-          </div>
-          <h3>Software</h3>
-          <p class="m-0" style="font-size: var(--text-body); color: var(--ink-body);">
-            WordPress plugins and PHP libraries — open source and GPL-licensed, documented,
-            and shipped for years. Paid Pro add-ons and new apps join the same shelf.
-          </p>
-          <ul class="list-none m-0 p-0 flex flex-col gap-2.5" style="font-size: var(--text-ui); color: var(--ink); font-weight: var(--fw-medium);">
-            {[
-              ['/software/plugins/404-to-301/', '404 to 301 — 100,000+ installs'],
-              ['/software/plugins/loggedin/', 'Loggedin — session control'],
-              ['/software/libraries/', 'PHP libraries on Packagist'],
-            ].map(([href, label]) => (
-              <li class="flex items-center gap-2">
-                <span class="w-[7px] h-[7px] rounded-full shrink-0" style="background: var(--b400);"></span>
-                <a href={href} class="transition-colors hover:text-[var(--b500)]">{label}</a>
-              </li>
-            ))}
-          </ul>
-          <Button href="/software/" variant="primary" class="mt-auto self-start">Explore software</Button>
-        </div>
-
-        <!-- Trading -->
-        <div class="p-9 flex flex-col gap-4" style="background: var(--acc-orange-soft); border-radius: var(--r-md);">
-          <div class="w-12 h-12 flex items-center justify-center" style="background: var(--acc-orange); border-radius: var(--r-md);">
-            <Icon name="mynaui:chart-line-solid" width={24} height={24} style="color: #fff;" aria-hidden="true" />
-          </div>
-          <h3>Trading</h3>
-          <p class="m-0" style="font-size: var(--text-body); color: var(--ink-body);">
-            Expert advisors, a universal trading journal, and precision utilities for
-            prop firm and serious retail traders. Engineered risk-first.
-          </p>
-          <ul class="list-none m-0 p-0 flex flex-col gap-2.5" style="font-size: var(--text-ui); color: var(--ink); font-weight: var(--fw-medium);">
-            {[
-              ['/trading/expert-advisors/gold-scalpel/', 'Gold Scalpel — MT5 expert advisor'],
-              ['/trading/tools/tickerlog/', 'TickerLog — universal journal'],
-              ['/trading/tools/', 'Session tools — MT5 indicators'],
-            ].map(([href, label]) => (
-              <li class="flex items-center gap-2">
-                <span class="w-[7px] h-[7px] rounded-full shrink-0" style="background: var(--acc-orange);"></span>
-                <a href={href} class="transition-colors hover:text-[var(--acc-orange-bold)]">{label}</a>
-              </li>
-            ))}
-          </ul>
-          <!-- Ink button on the warm field — a lime button would vanish into it. -->
-          <a href="/trading/" class="btn btn--ink mt-auto self-start">Explore trading</a>
-        </div>
-      </div>
-    </Section>
-
-    <!-- Ethos: coloured icon squares on the sunken band -->
-    <Section variant="alt">
-      <h2 class="mb-11">How we build</h2>
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {ethos.map((e) => (
-          <div>
-            <div class="w-10 h-10 flex items-center justify-center mb-4" style={`background: ${e.tint}; border-radius: var(--r-md);`}>
-              <Icon name={e.icon} width={20} height={20} style={`color: ${e.fg ?? '#fff'};`} aria-hidden="true" />
-            </div>
-            <h3 class="mb-2" style="font-size: var(--text-h5); line-height: 1.3; font-weight: var(--fw-subhead); letter-spacing: -0.008em;">{e.title}</h3>
-            <p style="font-size: var(--text-ui); color: var(--ink-body);">{e.body}</p>
+    <!-- Two tracks -->
+    <Section id="tracks">
+      <h2 style="margin-bottom:12px;font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+        One studio, two disciplines.
+      </h2>
+      <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:640px">
+        The same team, the same standards — pointed at two different problems. Open-source software
+        is the proof of how we build; trading is where that discipline goes next.
+      </p>
+      <div class="two-col">
+        {tracks.map((track) => (
+          <div
+            class="card card--pad"
+            id={track.id}
+            style={`gap:var(--space-200);border-top:4px solid ${track.color}`}
+          >
+            <h3 style="font-size:var(--text-h3)">{track.title}</h3>
+            <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+              {track.body}
+            </p>
+            <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:0.90625rem">
+              {track.links.map((link) => (
+                <li><a href={link.href}>{link.label}</a></li>
+              ))}
+            </ul>
+            <a href={track.cta.href} class="link-more" style="margin-top:auto">{track.cta.label}</a>
           </div>
         ))}
       </div>
     </Section>
 
-    <!-- Blog feed: white cards, the coloured cover art carries the topic hue -->
+    <!-- Principles -->
+    <Section variant="ink" size="sm">
+      <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
+        How we build
+      </h2>
+      <div class="four-col">
+        {principles.map((p) => (
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
+            <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{p.title}</h3>
+            <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--ink-band-subtle)">
+              {p.body}
+            </p>
+          </div>
+        ))}
+      </div>
+    </Section>
+
+    <!-- Latest writing -->
     {posts.length > 0 && (
-      <Section variant="light">
-        <div class="flex items-end justify-between gap-6 mb-10">
-          <h2>Latest from the studio</h2>
-          <Button href="/blog/" variant="ghost" arrow class="hidden sm:inline-flex shrink-0">Read the blog</Button>
+      <Section id="blog">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:var(--space-500);flex-wrap:wrap">
+          <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Latest from the studio</h2>
+          <a href="/blog/" class="link-more">Read the blog →</a>
         </div>
-
-        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map((post, i) => (
-            <a
-              href={`/blog/${post.id}/`}
-              class="card card--hover home-post flex flex-col group overflow-hidden"
-              style={accentVars(topicAccent(topicOf(post.data.track)))}
-            >
-              {post.data.heroImage && (
-                <Image
-                  src={post.data.heroImage}
-                  alt={post.data.heroImageAlt ?? ''}
-                  widths={[400, 640, 800]}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
-                  loading="lazy"
-                  class="w-full h-[220px] object-cover block"
-                />
-              )}
-              <div class="flex flex-col flex-1 gap-3 p-6">
-                <span
-                  class="self-start text-[13px]"
-                  style="color: var(--accent-ink); font-weight: var(--fw-bold);"
-                >{topicOf(post.data.track)}</span>
-                <h3 class="home-post__title flex-1" style="font-size: var(--text-h4); line-height: 1.24; font-weight: var(--fw-heading); letter-spacing: -0.014em;">{post.data.title}</h3>
-                <span class="inline-flex items-center gap-[7px] text-[15px]">
-                  Read more
-                  <span class="transition-transform group-hover:translate-x-0.5">→</span>
-                </span>
-              </div>
-            </a>
-          ))}
-        </div>
-
-        <div class="mt-8 sm:hidden">
-          <Button href="/blog/" variant="ghost" arrow>Read the blog</Button>
+        <div class="three-col">
+          {posts.map((post) => <PostCard post={post} height={140} />)}
         </div>
       </Section>
     )}
 
-    <!-- Maker band: navy, flat, white button on the right -->
-    <section class="band band--invert" style="padding-block: var(--space-section);">
-      <div class="container-x flex flex-col md:flex-row md:items-center md:justify-between gap-8 md:gap-12">
-        <div class="max-w-[660px]">
-          <h2 class="mb-3.5" style="font-size: var(--text-h2);">A small studio, by design.</h2>
-          <p style="font-size: var(--text-lead-sm); color: var(--ink-invert-dim);">
-            Every project — plugin, library or EA — is designed, built and supported
-            in-house. The open-source work is the proof of how we build; the trading
-            track is where that discipline goes next.
-          </p>
-        </div>
-        <a href="/about/" class="btn btn--white shrink-0 self-start">About Foxe Labs</a>
-      </div>
-    </section>
-
     <!-- FAQ -->
-    <Section variant="light">
-      <div class="max-w-[800px] mx-auto">
-        <Faq items={faq} bare />
-      </div>
+    <Section variant="alt" rule="top">
+      <Faq items={faq} />
     </Section>
+
+    <CtaBanner />
   </main>
   <Footer />
 </BaseLayout>
 
 <style>
-  /* Each card carries its topic's --accent-*, so the label and the hovered
-     title share the hue with the blog index cards. */
-  .home-post__title { transition: color 0.1s ease; }
-  .home-post:hover .home-post__title { color: var(--accent-ink); }
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-300);
+  }
+  .three-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-300);
+  }
+  .four-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-400);
+  }
+  @media (max-width: 960px) {
+    .three-col { grid-template-columns: repeat(2, 1fr); }
+    .four-col  { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .two-col, .three-col { grid-template-columns: 1fr; }
+  }
 </style>
+
+<script is:inline>
+  // Hovering a cell flashes its colour, then lets it fade back out. Purely
+  // decorative: the grid is aria-hidden and sits behind the copy.
+  (function () {
+    var grid = document.querySelector('[data-cellgrid]');
+    if (!grid) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    grid.addEventListener('mouseover', function (event) {
+      var cell = event.target;
+      if (!cell || cell.tagName !== 'I') return;
+      cell.style.transition = 'background-color 0s';
+      cell.style.backgroundColor = cell.dataset.color;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          cell.style.transition = 'background-color 1.4s ease-out';
+          cell.style.backgroundColor = 'transparent';
+        });
+      });
+    });
+  })();
+</script>

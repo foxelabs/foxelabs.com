@@ -73,7 +73,7 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="Foxe Labs Blog" href="/rss.xml" />
     <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#161A1D" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#15191C" media="(prefers-color-scheme: dark)" />
     {/* Runs before the first paint so a dark-theme visitor never sees a white
         flash. It is deliberately inline and un-bundled for that reason. */}
     <script is:inline>
@@ -134,7 +134,7 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
           if (!button) return;
           const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
           root.dataset.theme = next;
-          if (meta) meta.setAttribute('content', next === 'dark' ? '#161A1D' : '#FFFFFF');
+          if (meta) meta.setAttribute('content', next === 'dark' ? '#15191C' : '#FFFFFF');
           try {
             localStorage.setItem('foxe-theme', next);
           } catch (e) {

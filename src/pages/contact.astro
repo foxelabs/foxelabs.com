@@ -3,9 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ContactForm from '../components/ContactForm.astro';
-import Section from '../components/ui/Section.astro';
 import Eyebrow from '../components/ui/Eyebrow.astro';
-import { Icon } from 'astro-icon/components';
 import { abs, breadcrumbLd, SITE } from '../config/seo';
 
 const contactLd = {
@@ -20,41 +18,23 @@ const contactLd = {
   },
 };
 
-const channels = [
-  {
-    icon: 'mingcute:mail-line',
-    label: 'Email',
-    value: 'support@foxelabs.com',
-    href: 'mailto:support@foxelabs.com',
-    ink: 'var(--b500)',
-    soft: 'var(--b50)',
-  },
-  {
-    icon: 'mingcute:location-line',
-    label: 'Where we are',
-    value: 'Kerala, India — London & New York sessions',
-    ink: 'var(--acc-teal-bold)',
-    soft: 'var(--acc-teal-soft)',
-  },
-];
-
 const studioSocials = [
-  { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line' },
-  { href: 'https://github.com/foxelabs',       label: '@foxelabs',  icon: 'mingcute:github-line' },
-  { href: 'https://youtube.com/@foxelabs',     label: '@foxelabs',  icon: 'mingcute:youtube-line' },
-  { href: 'https://instagram.com/foxelabs',    label: '@foxelabs',  icon: 'mingcute:instagram-line' },
-  { href: 'https://www.facebook.com/foxelabs', label: '@foxelabs',  icon: 'mingcute:facebook-line' },
+  { href: 'https://x.com/foxelabs', label: 'X' },
+  { href: 'https://github.com/foxelabs', label: 'GitHub' },
+  { href: 'https://youtube.com/@foxelabs', label: 'YouTube' },
+  { href: 'https://instagram.com/foxelabs', label: 'Instagram' },
+  { href: 'https://www.facebook.com/foxelabs', label: 'Facebook' },
 ];
 
 const founderSocials = [
-  { href: 'https://x.com/Joel_James',          label: '@Joel_James', icon: 'mingcute:social-x-line' },
-  { href: 'https://github.com/joel-james',     label: '@joel-james', icon: 'mingcute:github-line' },
-  { href: 'https://instagram.com/joeltalks',   label: '@joeltalks',  icon: 'mingcute:instagram-line' },
+  { href: 'https://x.com/Joel_James', label: '@Joel_James' },
+  { href: 'https://github.com/joel-james', label: '@joel-james' },
+  { href: 'https://instagram.com/joeltalks', label: '@joeltalks' },
 ];
 ---
 <BaseLayout
-  title="Contact Foxe Labs — Plugin & Trading Tool Support"
-  description="Questions about our software, trading tools, licensing, or a custom build? Get in touch with Foxe Labs."
+  title="Contact Foxe Labs — Support & Licensing"
+  description="Questions about a plugin, a licence, or an expert advisor? Message the team that wrote the code."
   jsonLd={[
     breadcrumbLd([
       { name: 'Home', path: '/' },
@@ -65,122 +45,68 @@ const founderSocials = [
 >
   <Nav />
   <main id="main">
-    <Section variant="light">
-      <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
-        <div class="lg:col-span-5">
-          <Eyebrow class="mb-5">Contact</Eyebrow>
-          <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
-            Say <span style="color: var(--accent-ink);">hello</span>.
-          </h1>
-          <p class="mb-8 leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
-            A plugin question, an EA idea, licensing, or a custom build — send it
-            over. No ticket queues, no tier one: your message lands in the inbox
-            of the team that wrote the code.
+    <section class="band band--sm">
+      <div class="container-x contact-grid">
+        <div style="display:flex;flex-direction:column;gap:var(--space-300);align-items:flex-start">
+          <Eyebrow chip color="var(--acc-3)">Contact</Eyebrow>
+          <h1 style="font-size:var(--text-title);line-height:1.06;letter-spacing:-1.3px">Say hello.</h1>
+          <p style="margin:0;font-size:1.0625rem;line-height:1.6;color:var(--text-subtle)">
+            A plugin question, an EA idea, licensing, or a custom build — send it over. No ticket
+            queues, no tier one: your message lands in the inbox of the team that wrote the code.
           </p>
+          <a href="mailto:support@foxelabs.com" class="btn btn--primary">Email support@foxelabs.com</a>
 
-
-          <div class="grid gap-3 mb-9">
-            {channels.map((c) => {
-              const Tag = c.href ? 'a' : 'div';
-              return (
-                <Tag
-                  href={c.href}
-                  class:list={['contact-row flex items-center gap-3 p-3', c.href && 'contact-row--link']}
-                  style={`--row-soft: ${c.soft}; --row-ink: ${c.ink}; font-size: var(--text-ui); color: var(--ink-body);`}
-                >
-                  <span class="w-9 h-9 shrink-0 flex items-center justify-center" style={`background: ${c.soft}; border-radius: var(--r-sm);`}>
-                    <Icon name={c.icon} width={17} height={17} style={`color: ${c.ink};`} aria-hidden="true" />
-                  </span>
-                  <span>
-                    <span class="block" style={`font-size: var(--text-small); color: ${c.ink}; font-weight: var(--fw-bold);`}>{c.label}</span>
-                    {c.value}
-                  </span>
-                </Tag>
-              );
-            })}
-          </div>
-
-          <div class="mb-7">
-            <p class="mb-3" style="font-size: var(--text-small); color: var(--ink-dim); font-weight: var(--fw-subhead); text-transform: uppercase; letter-spacing: 0.06em;">
-              The studio
-            </p>
-            <div class="flex flex-wrap gap-2">
-              {studioSocials.map((s) => (
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="social-pill inline-flex items-center gap-1.5 lozenge"
-                >
-                  <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
-                </a>
-              ))}
+          <div
+            id="support"
+            class="card"
+            style="padding:22px 24px;gap:18px;margin-top:8px;width:100%"
+          >
+            <div>
+              <div class="kicker">Where we are</div>
+              <div style="font-size:0.9375rem;font-weight:var(--fw-medium);margin-top:4px">
+                Kerala, India — London &amp; New York sessions
+              </div>
             </div>
-          </div>
-
-          <div>
-            <p class="mb-3" style="font-size: var(--text-small); color: var(--ink-dim); font-weight: var(--fw-subhead); text-transform: uppercase; letter-spacing: 0.06em;">
-              The human behind it
-            </p>
-            <div class="flex flex-wrap gap-2">
-              {founderSocials.map((s) => (
-                <a
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="social-pill inline-flex items-center gap-1.5 lozenge"
-                >
-                  <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
-                </a>
-              ))}
+            <div>
+              <div class="kicker">The studio</div>
+              <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">
+                {studioSocials.map((s) => (
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div class="kicker">The human behind it</div>
+              <div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">
+                {founderSocials.map((s) => (
+                  <a href={s.href} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+                    {s.label}
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="lg:col-span-7">
-          <div class="card p-7 md:p-9">
-            <ContactForm />
-          </div>
+        <div class="card" style="align-self:start">
+          <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <ContactForm />
         </div>
       </div>
-    </Section>
+    </section>
   </main>
-  <Footer cta={false} />
+  <Footer />
 </BaseLayout>
 
 <style>
-  /* Contact channels: a soft tint per channel, deepening on hover. */
-  .contact-row {
-    background: var(--surface);
-    border: 1px solid var(--border-soft);
-    border-radius: var(--r-md);
-    transition: border-color 180ms ease, background-color 180ms ease;
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: var(--space-800);
   }
-  .contact-row--link:hover {
-    background: var(--row-soft);
-    border-color: var(--row-ink);
-  }
-
-  /* Restrained, theme-aligned social pills — neutral, no lift. */
-  .social-pill {
-    background: var(--surface-alt);
-    color: var(--ink-body);
-    border: 1px solid var(--border);
-    transition: color 180ms ease, border-color 180ms ease;
-  }
-  .social-pill__icon {
-    color: var(--ink-dim);
-    transition: color 180ms ease;
-  }
-  .social-pill:hover {
-    color: var(--ink);
-    border-color: var(--accent-ink);
-  }
-  .social-pill:hover .social-pill__icon {
-    color: var(--accent-ink);
-  }
-  .social-pill:focus-visible {
-    outline: 2px solid var(--accent-ink);
-    outline-offset: 2px;
+  @media (max-width: 960px) {
+    .contact-grid { grid-template-columns: 1fr; gap: var(--space-500); }
   }
 </style>

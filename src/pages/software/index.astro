@@ -3,14 +3,12 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
 import Section from '../../components/ui/Section.astro';
 import Eyebrow from '../../components/ui/Eyebrow.astro';
-import Button from '../../components/ui/Button.astro';
-import TrustBar from '../../components/TrustBar.astro';
-import { Icon } from 'astro-icon/components';
-import { categoryPath } from '../../config/tracks';
-import { ACCENTS, accentVars, categoryAccent } from '../../config/accents';
 import Faq from '../../components/ui/Faq.astro';
+import { categoryPath } from '../../config/tracks';
+import { ACCENTS, categoryAccent } from '../../config/accents';
 import { breadcrumbLd, faqLd } from '../../config/seo';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
@@ -19,7 +17,7 @@ const GITHUB_URL: string | null = 'https://github.com/foxelabs';
 const projects = await getCollection('projects', ({ data }) => !data.draft && data.track === 'oss');
 const count = (cat: string) => projects.filter((p) => p.data.category === cat).length;
 
-// Landing shows category boxes (like Trading); full lists live on the category pages.
+// The hub shows category boxes; the full lists live on the category pages.
 const categoryBoxes = [
   {
     title: 'WordPress Plugins',
@@ -27,8 +25,6 @@ const categoryBoxes = [
       'Redirect managers, session limits, comment and performance tools — battle-tested on over 100,000 active sites.',
     badge: `${count('plugins')} plugins`,
     href: categoryPath('oss', 'plugins'),
-    icon: 'ic:round-wordpress',
-    featured: true,
     accent: categoryAccent('plugins'),
   },
   {
@@ -37,7 +33,6 @@ const categoryBoxes = [
       'Composer packages for background queues, caching, admin notices and more — small, tested, and dependency-light.',
     badge: `${count('libraries')} libraries`,
     href: categoryPath('oss', 'libraries'),
-    icon: 'file-icons:php',
     accent: categoryAccent('libraries'),
   },
   {
@@ -46,21 +41,42 @@ const categoryBoxes = [
       'Hosted tools and SaaS built on the same engineering. In the works — say hello if you want an early look.',
     badge: 'Coming soon',
     href: '/contact/',
-    icon: 'tdesign:app-filled',
-    // Not a real category yet, so it takes the next free hue in the ramp.
+    // Not a real category yet, so it takes the next free hue in the quad.
     accent: ACCENTS[3],
   },
 ];
 
-const whyItems = [
-  { n: '01', title: 'Battle-tested.', body: 'Running on 100,000+ active sites. Not a demo — code that holds up in the real world.' },
-  { n: '02', title: 'Open source, always.', body: 'GPL-licensed and public on WordPress.org and Packagist. Read it, fork it, trust it.' },
-  { n: '03', title: 'Documented & supported.', body: 'Clear docs and changelogs. Your question reaches the person who wrote the code.' },
-  { n: '04', title: 'Free core, paid power.', body: 'Every plugin is free and complete. Optional Pro addons add more — still GPL-licensed.' },
+const principles = [
+  {
+    title: 'Battle-tested',
+    color: 'var(--acc-1)',
+    body: 'Running on 100,000+ active sites. Not a demo — code that holds up in the real world.',
+  },
+  {
+    title: 'Open source, always',
+    color: 'var(--acc-2)',
+    body: 'GPL-licensed and public on WordPress.org and Packagist. Read it, fork it, trust it.',
+  },
+  {
+    title: 'Documented & supported',
+    color: 'var(--acc-3)',
+    body: 'Clear docs and changelogs. Your question reaches the person who wrote the code.',
+  },
+  {
+    title: 'Free core, paid power',
+    color: 'var(--acc-4)',
+    body: 'Every plugin is free and complete. Optional add-ons extend it — still GPL-licensed.',
+  },
 ];
 
 // Real aggregates, summed from the plugins' WordPress.org figures (conservative rounding).
-// 100k+8k+3k+2k active installs; 2.20M+0.14M+0.21M+0.23M downloads; oldest plugin 2014.
+const stats = [
+  { value: '110,000+', label: 'active installs' },
+  { value: '2.7M+', label: 'downloads' },
+  { value: '2014', label: 'shipping since' },
+  { value: 'GPL', label: 'licensed, every one' },
+];
+
 const faq = [
   {
     q: 'Are Foxe Labs WordPress plugins free?',
@@ -83,12 +99,6 @@ const faq = [
       'Yes. The GPL places no restriction on commercial or client use — install them on as many sites as you like, modify them, and redistribute them under the same license.',
   },
 ];
-
-const stats = [
-  { value: '110,000+', label: 'active installs' },
-  { value: '2.7M+', label: 'downloads' },
-  { value: '2014', label: 'shipping since' },
-];
 ---
 <BaseLayout
   title="Open-Source WordPress Plugins & PHP Libraries | Foxe Labs"
@@ -103,178 +113,120 @@ const stats = [
 >
   <Nav />
   <main id="main">
-    <!-- Hero — white opening, Atlassian inner-page pattern -->
-    <section class="band band--light overflow-hidden">
+    <!-- Hero -->
+    <section class="band band--sm band--bottom">
       <div class="container-x">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          <div class="lg:col-span-7">
-            <Eyebrow class="mb-5">Software</Eyebrow>
-            <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
-              Tools we've shipped and kept shipping.
-            </h1>
-            <p class="max-w-[520px]" style="font-size: var(--text-lead); color: var(--ink-body);">
-              Open-source WordPress plugins and PHP libraries — GPL-licensed, documented,
-              and maintained in public. The same engineering that goes into everything we build.
-            </p>
-            {GITHUB_URL && (
-              <div class="mt-9">
-                <Button href={GITHUB_URL} variant="primary" arrow>View on GitHub</Button>
-              </div>
-            )}
-          </div>
-
-          <div class="lg:col-span-5">
-            <div class="card p-6 md:p-7" style="background: var(--n100);">
-              <div class="flex items-center justify-between mb-5">
-                <span class="font-code" style="font-size: var(--text-small); color: var(--ink);">~/foxe-labs</span>
-                <span class="lozenge">bash</span>
-              </div>
-
-              <div class="font-code leading-[1.9] overflow-x-auto" style="font-size: var(--text-small); color: var(--ink);">
-                <div><span style="color: var(--b500);">$</span> composer <span style="color: var(--acc-orange-bold);">require</span> <span style="color: var(--acc-purple-bold);">foxelabs/wp-queue-process</span></div>
-                <div style="color: var(--ink-dim);"><span style="color: var(--b500);">✓</span> 1 package installed</div>
-                <div class="h-3" aria-hidden="true"></div>
-                <div><span style="color: var(--b500);">$</span> wp plugin <span style="color: var(--acc-orange-bold);">install</span> <span style="color: var(--acc-purple-bold);">404-to-301</span> --activate</div>
-                <div style="color: var(--ink-dim);"><span style="color: var(--b500);">Success:</span> installed and activated.</div>
-                <div><span style="color: var(--b500);">$</span> <span style="color: var(--b500);">▋</span></div>
-              </div>
-
-              <div class="grid grid-cols-3 gap-4 mt-6 pt-5" style="border-top: 1px solid var(--border);">
-                {stats.map((s) => (
-                  <div>
-                    <p class="font-display" style="font-size: var(--text-h4); font-weight: var(--fw-heading); color: var(--ink);">{s.value}</p>
-                    <p class="mt-1" style="font-size: var(--text-small); color: var(--ink-dim);">{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <p class="mt-3 text-center" style="font-size: var(--text-small); color: var(--ink-dim);">
-              Combined across our published plugins &amp; libraries.
-            </p>
-          </div>
+        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start;max-width:760px">
+          <Eyebrow chip color="var(--acc-1)">Software</Eyebrow>
+          <h1 style="font-size:var(--text-title);letter-spacing:-1.2px">
+            Tools we've shipped and kept shipping.
+          </h1>
+          <p style="margin:0;max-width:560px;font-size:1.125rem;line-height:1.5;color:var(--text-subtle)">
+            Open-source WordPress plugins and PHP libraries — GPL-licensed, documented, and
+            maintained in public. The same engineering that goes into everything we build.
+          </p>
+          {GITHUB_URL && (
+            <a href={GITHUB_URL} class="btn btn--ghost" target="_blank" rel="noopener noreferrer">
+              Browse the source on GitHub
+            </a>
+          )}
         </div>
       </div>
     </section>
 
-    <!-- Trust bar — light sunken strip -->
-    <TrustBar items={[
-      { label: 'Open source · GPL', icon: 'code' },
-      { label: 'On WordPress.org & Packagist', icon: 'box' },
-      { label: 'Documented & tested', icon: 'doc' },
-      { label: 'Maintained for years', icon: 'refresh' },
-    ]} />
-
-    <!-- Category boxes -->
-    <Section variant="light">
-      <div class="max-w-2xl mb-14">
-        <Eyebrow class="mb-5">What we build</Eyebrow>
-        <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
-          Small, sharp tools — each built deep.
-        </h2>
-        <p style="font-size: var(--text-lead); color: var(--ink-body);">
-          Focused plugins and libraries that do one thing well, open-sourced and
-          maintained for the long run — not sprawling do-everything suites.
-        </p>
-      </div>
-
-      <div class="grid md:grid-cols-3 gap-6">
-        {categoryBoxes.map((c) => (
-          <article class="category-card card card--hover p-7 flex flex-col" style={accentVars(c.accent)}>
-            <div class="w-11 h-11 rounded-[8px] flex items-center justify-center mb-6" style="background: var(--accent-soft);">
-              <Icon name={c.icon} width={21} height={21} style="color: var(--accent-ink);" aria-hidden="true" />
+    <!-- Proof -->
+    <section class="band--subtle band--bottom">
+      <div class="container-x">
+        <div class="stat-row">
+          {stats.map((s) => (
+            <div style="padding:28px 24px;text-align:center">
+              <div class="stat__value">{s.value}</div>
+              <div class="stat__label">{s.label}</div>
             </div>
+          ))}
+        </div>
+      </div>
+    </section>
 
-            <h3 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-3">{c.title}</h3>
-            <p class="mb-7 flex-1" style="font-size: var(--text-ui); color: var(--ink-body);">{c.description}</p>
-
-            <div class="flex items-center justify-between gap-4">
-              <Button href={c.href} variant="ghost" arrow size="sm">
-                {c.badge === 'Coming soon' ? 'Get in touch' : 'Browse'}
-              </Button>
-              <span
-                class="lozenge whitespace-nowrap"
-                style="background: var(--accent-soft); color: var(--accent-deep);"
-              >
-                {c.badge}
+    <!-- Categories -->
+    <Section>
+      <h2 style="margin-bottom:12px;font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+        Three shelves, one standard.
+      </h2>
+      <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
+        Everything here is built, documented and supported in-house — whether it runs inside
+        WordPress, inside your Composer autoloader, or on our servers.
+      </p>
+      <div class="cat-grid">
+        {categoryBoxes.map((box) => (
+          <a
+            href={box.href}
+            class="card card--pad"
+            style={`gap:14px;padding:30px;border-top:4px solid ${box.accent.color}`}
+          >
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <h3 style="font-size:var(--text-h3)">{box.title}</h3>
+              <span style="font-size:var(--text-xs);font-weight:var(--fw-heading);background:var(--bg-hover);border-radius:var(--r-pill);padding:4px 10px;white-space:nowrap">
+                {box.badge}
               </span>
             </div>
-          </article>
+            <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+              {box.description}
+            </p>
+            <span class="link-more" style="margin-top:auto">Explore →</span>
+          </a>
         ))}
       </div>
     </Section>
 
-    <!-- Why -->
-    <Section variant="alt">
-      <div class="max-w-2xl mb-14">
-        <Eyebrow class="mb-5">Why our software</Eyebrow>
-        <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
-          Code you can read, and rely on.
-        </h2>
-        <p style="font-size: var(--text-lead); color: var(--ink-body);">
-          Open source is the proof of how we build — public, documented, and used in
-          production by tens of thousands of sites.
-        </p>
-      </div>
-
-      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-        {whyItems.map((item, i) => (
-          <div style={accentVars(ACCENTS[i % ACCENTS.length])}>
-            <div class="w-10 h-10 flex items-center justify-center mb-4" style="background: var(--accent-soft); border-radius: var(--r-md);">
-              <span style="font-size: var(--text-ui); font-weight: var(--fw-subhead); color: var(--accent-deep);">{item.n}</span>
-            </div>
-            <h3 style="font-size: var(--text-h5); font-weight: var(--fw-heading);" class="mb-2.5">{item.title}</h3>
-            <p style="font-size: var(--text-ui); color: var(--ink-body);">{item.body}</p>
-          </div>
-        ))}
-      </div>
-    </Section>
-
-    <!-- CTA (black) -->
-    <section class="band band--invert">
-      <div class="container-x">
-        <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
-          <div class="lg:col-span-7">
-            <Eyebrow class="mb-5">Open source</Eyebrow>
-            <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
-              Read the source. Build with confidence.
-            </h2>
-            <p style="font-size: var(--text-lead); color: var(--ink-invert-dim);">
-              Every line is public and GPL-licensed. Browse the code, file an issue, or
-              just reach out — the team that built it will answer.
+    <!-- Principles -->
+    <Section variant="ink" size="sm">
+      <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
+        Why these are worth installing
+      </h2>
+      <div class="four-col">
+        {principles.map((p) => (
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
+            <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{p.title}</h3>
+            <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--ink-band-subtle)">
+              {p.body}
             </p>
           </div>
-          <div class="lg:col-span-5 lg:justify-self-end flex flex-wrap gap-3">
-            {GITHUB_URL && <Button href={GITHUB_URL} variant="primary" arrow>View on GitHub</Button>}
-            <Button href="/contact/" variant="invert" arrow>Get in touch</Button>
-          </div>
-        </div>
-      </div>
-    </section>
-    <Section variant="alt">
-      <div class="max-w-3xl mx-auto">
-        <Faq items={faq} bare />
+        ))}
       </div>
     </Section>
+
+    <Section variant="alt" rule="top">
+      <Faq items={faq} />
+    </Section>
+
+    <CtaBanner />
   </main>
   <Footer />
 </BaseLayout>
 
 <style>
-  .category-card {
-    position: relative;
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
   }
-  /* Stretched link: the Browse button's hit area covers the whole card, so
-     the card is clickable anywhere while the button stays the visible cue. */
-  .category-card :global(a.btn)::after {
-    content: '';
-    position: absolute;
-    inset: 0;
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-300);
   }
-  .category-card h3 {
-    transition: color 0.1s ease;
+  .four-col {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-400);
   }
-  .category-card:hover h3 {
-    color: var(--accent-ink);
+  @media (max-width: 960px) {
+    .cat-grid { grid-template-columns: repeat(2, 1fr); }
+    .four-col { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 720px) {
+    .stat-row { grid-template-columns: 1fr 1fr; }
+    .cat-grid { grid-template-columns: 1fr; }
   }
 </style>

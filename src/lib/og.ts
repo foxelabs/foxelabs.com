@@ -16,10 +16,10 @@ export const OG_HEIGHT = 630;
 
 // Brand tokens, hard-coded because satori has no cascade to read them from.
 // Keep in step with src/styles/global.css.
-const INK = '#101214';
+const INK = '#1D1E20';
 const WHITE = '#FFFFFF';
-const DIM = '#C7CDD4';
-const FAINT = '#7A7B80';
+const DIM = '#DDE3E9';
+const FAINT = '#777A81';
 
 /**
  * Card hues, keyed on the names in config/accents.ts so a card and the page it
@@ -31,11 +31,10 @@ const FAINT = '#7A7B80';
  * everywhere else since the rebrand.
  */
 export const OG_ACCENTS = {
-  blue: '#A8D95E',
-  purple: '#C97CF4',
-  orange: '#FEA362',
-  teal: '#6CC3E0',
-  yellow: '#F5CD47',
+  blue: '#4C93EE',
+  purple: '#C084EE',
+  amber: '#FBBA47',
+  lime: '#A9D66A',
 } as const;
 
 export type OgAccent = keyof typeof OG_ACCENTS;

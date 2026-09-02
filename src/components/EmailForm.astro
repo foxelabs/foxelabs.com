@@ -11,9 +11,8 @@ const {
 } = Astro.props;
 
 
-// --chart-up clears AA on the navy band, where --accent (b400) sits at ~3.2:1.
-const successColor = tone === 'invert' ? 'var(--chart-up)' : 'var(--accent-ink)';
-const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
+const successColor = 'var(--ok)';
+const errorColor = 'var(--bad)';
 ---
 <form data-email-form id={id} class="w-full max-w-md" novalidate>
   <!-- Honeypot: humans never see it; bots that fill it get a fake 200. -->
@@ -26,7 +25,7 @@ const errorColor = tone === 'invert' ? 'var(--red-invert)' : 'var(--red)';
       placeholder="you@domain.com"
       aria-label="Email address"
       aria-describedby={`${id}-error`}
-      class:list={['field flex-1', tone === 'invert' && 'field--invert']}
+      class="field" style="flex:1" 
     />
     <button
       type="submit"

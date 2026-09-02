@@ -4,9 +4,10 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
-import { breadcrumbLd, collectionPageLd } from '../../config/seo';
+import CtaBanner from '../../components/CtaBanner.astro';
 import PostGrid from '../../components/PostGrid.astro';
-import { accentVars, topicAccent } from '../../config/accents';
+import { breadcrumbLd, collectionPageLd } from '../../config/seo';
+import { topicAccent } from '../../config/accents';
 import { topicOf } from '../../config/tracks';
 import { tagIndex, tagPath, topicPath } from '../../config/blog';
 
@@ -14,18 +15,15 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
   (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
 );
 
-const fmt = (d: Date) =>
-  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-
-// Atlassian's blog leads with one large story plus a short stack of runners-up,
-// then a topic-filtered grid of everything.
-const [lead, ...rest] = posts;
-const runnersUp = rest.slice(0, 4);
+const [lead] = posts;
+const leadTopic = lead ? topicOf(lead.data.track) : 'Software';
+const leadAccent = topicAccent(leadTopic);
 
 const topics = Array.from(new Set(posts.map((p) => topicOf(p.data.track))));
+const filters = ['All', ...topics];
 
-// Tag cloud under the grid: the only place every tag archive is linked from a
-// crawlable page, so it lists all of them rather than a top slice.
+// Tag row under the grid: the only crawlable page linking every tag archive,
+// so it lists all of them rather than a top slice.
 const tags = tagIndex(posts);
 ---
 <BaseLayout
@@ -47,108 +45,120 @@ const tags = tagIndex(posts);
   <Nav />
   <main id="main">
     {posts.length === 0 ? (
-      <section class="band"><div class="container-x"><p style="color: var(--ink-dim);">No posts yet — check back soon.</p></div></section>
+      <section class="band"><div class="container-x"><p style="color:var(--text-subtle)">No posts yet — check back soon.</p></div></section>
     ) : (
       <>
-        <!-- Top section: one tinted band holding the page title, the lead story
-             and a 2x2 grid of runners-up beside it (atlassian.com/blog). -->
-        <section style="background: var(--surface-sunken); padding-block: var(--space-section);">
+        <!-- Title + the lead story -->
+        <section class="band band--sm band--bottom">
           <div class="container-x">
-            <h1 style="font-size: var(--text-hero-sm); line-height: 1.2;">From the studio</h1>
-            <p class="mt-4 mb-0" style="font-size: var(--text-body); color: var(--ink-body);">
-              Notes on how we build — open-source software, expert advisor design, risk, and the occasional release.
+            <h1 style="font-size:var(--text-title);letter-spacing:-1.2px;margin-bottom:12px">From the studio</h1>
+            <p style="margin:0 0 var(--space-500);font-size:1.125rem;line-height:1.5;color:var(--text-subtle);max-width:560px">
+              Notes on how we build — open-source software, expert advisor design, risk, and the
+              occasional release.
             </p>
 
-            <div class="grid lg:grid-cols-2 gap-8 mt-12">
-              <!-- Lead story -->
-              <a href={`/blog/${lead.id}/`} class="post-link group flex flex-col" style={accentVars(topicAccent(topicOf(lead.data.track)))}>
+            <a href={`/blog/${lead.id}/`} class="card lead-card">
+              <div class="card__field" style={`background:${leadAccent.color};min-height:260px;padding:0`}>
                 {lead.data.heroImage && (
                   <Image
                     src={lead.data.heroImage}
                     alt={lead.data.heroImageAlt ?? ''}
-                    widths={[480, 768, 1152]}
-                    sizes="(max-width: 1024px) 100vw, 576px"
+                    widths={[600, 1200]}
+                    sizes="(max-width: 860px) 100vw, 560px"
                     loading="eager"
-                    fetchpriority="high"
-                    class="w-full h-auto block mb-5"
-                    style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
                   />
                 )}
-                <p class="post-kicker mb-2.5">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(lead.data.track)}</span></p>
-                <h2 class="post-link__title mb-3" style="font-size: var(--text-h2); line-height: 1.125;">{lead.data.title}</h2>
-                <p class="m-0" style="font-size: var(--text-body); color: var(--ink-body);">{lead.data.description}</p>
-              </a>
+              </div>
+              <div style="padding:var(--space-500);display:flex;flex-direction:column;gap:14px;justify-content:center">
+                <span class="chip chip--sm" style="align-self:flex-start">
+                  <span class="dot" style={`background:${leadAccent.color}`} aria-hidden="true"></span>
+                  {leadTopic} · Featured
+                </span>
+                <h2 style="font-size:1.625rem;line-height:1.2;letter-spacing:-0.5px">{lead.data.title}</h2>
+                <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+                  {lead.data.description}
+                </p>
+                <span class="link-more">Read the article →</span>
+              </div>
+            </a>
+          </div>
+        </section>
 
-              <!-- Runners-up: 2x2, each with its own image -->
-              <div class="grid sm:grid-cols-2 gap-8">
-                {runnersUp.map((post) => (
-                  <a href={`/blog/${post.id}/`} class="post-link group flex flex-col" style={accentVars(topicAccent(topicOf(post.data.track)))}>
-                    {post.data.heroImage && (
-                      <Image
-                        src={post.data.heroImage}
-                        alt={post.data.heroImageAlt ?? ''}
-                        widths={[320, 560, 800]}
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 272px"
-                        loading="lazy"
-                        class="w-full h-auto block mb-4"
-                        style="aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-md);"
-                      />
-                    )}
-                    <p class="post-kicker mb-2">Article <span style="color: var(--ink-dim);">in</span> <span style="color: var(--accent-ink);">{topicOf(post.data.track)}</span></p>
-                    <h3 class="post-link__title" style="font-size: var(--text-h4); line-height: 1.25;">{post.data.title}</h3>
+        <!-- Topic filter + grid -->
+        <section class="band">
+          <div class="container-x">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:var(--space-400);flex-wrap:wrap">
+              <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Latest by topic</h2>
+              <div style="display:flex;gap:8px;flex-wrap:wrap" data-topic-filter>
+                {filters.map((label) => (
+                  <button
+                    type="button"
+                    class="tab"
+                    data-topic={label}
+                    aria-pressed={label === 'All' ? 'true' : 'false'}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <PostGrid posts={posts} />
+
+            <!-- Every archive URL, linked from one crawlable place. -->
+            <div style="margin-top:var(--space-600);display:flex;flex-direction:column;gap:var(--space-200)">
+              <span class="kicker">Browse the archives</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                {topics.map((topic) => (
+                  <a href={topicPath(topic)} class="chip chip--sm">
+                    <span class="dot" style={`background:${topicAccent(topic).color}`} aria-hidden="true"></span>
+                    {topic}
                   </a>
+                ))}
+                {tags.map((tag) => (
+                  <a href={tagPath(tag.label)} class="chip chip--sm chip--muted">#{tag.label}</a>
                 ))}
               </div>
             </div>
           </div>
         </section>
-
-        <!-- Latest by topic: pill filter over every post, newest first -->
-        <section class="band" style="padding-block: var(--space-section-sm) var(--space-section);">
-          <div class="container-x">
-            <h2 class="mb-6" style="font-size: var(--text-h2);">Latest by topic</h2>
-
-            <!-- Pills are links, not filters: each topic has a real archive page
-                 at /blog/topic/<slug>/, the way a WordPress category does. -->
-            <nav class="flex flex-wrap gap-2.5 mb-10" aria-label="Blog topics">
-              <a href="/blog/" class="topic-tab" aria-current="page" style="--accent-ink: var(--ink);">All</a>
-              {topics.map((t) => (
-                <a href={topicPath(t)} class="topic-tab" style={accentVars(topicAccent(t))}>
-                  <span class="topic-tab__dot" aria-hidden="true"></span>
-                  {t}
-                </a>
-              ))}
-            </nav>
-
-            <PostGrid posts={posts} />
-
-            {tags.length > 0 && (
-              <div class="mt-16 pt-8" style="border-top: 1px solid var(--border-soft);">
-                <h2 class="mb-4" style="font-size: var(--text-h4);">Browse by tag</h2>
-                <div class="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
-                    <a href={tagPath(tag.slug)} class="term-lozenge">#{tag.label} <span style="opacity: 0.65;">{tag.posts.length}</span></a>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
-
       </>
     )}
+
+    <CtaBanner subtle />
   </main>
   <Footer />
 </BaseLayout>
 
-
 <style>
-  /* Lead + runners-up carry their topic's --accent-*, so the title picks up
-     the same hue as its kicker. (The grid below has its own copy in PostGrid.) */
-  .post-link__title {
-    transition: color 0.1s ease;
+  .lead-card {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
   }
-  .post-link:hover .post-link__title {
-    color: var(--accent-ink);
+  @media (max-width: 860px) {
+    .lead-card { grid-template-columns: 1fr; }
   }
 </style>
+
+<script is:inline>
+  // Client-side topic filter. Every post is in the HTML; the buttons only hide
+  // cards, so the page is complete with JavaScript off (and for crawlers).
+  (function () {
+    var bar = document.querySelector('[data-topic-filter]');
+    if (!bar) return;
+    var cards = document.querySelectorAll('[data-post-topic]');
+
+    bar.addEventListener('click', function (event) {
+      var button = event.target.closest('[data-topic]');
+      if (!button) return;
+      var topic = button.dataset.topic;
+
+      bar.querySelectorAll('[data-topic]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b === button));
+      });
+      cards.forEach(function (card) {
+        card.hidden = topic !== 'All' && card.dataset.postTopic !== topic;
+      });
+    });
+  })();
+</script>

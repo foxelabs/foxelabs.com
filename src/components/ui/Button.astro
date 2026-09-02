@@ -1,8 +1,8 @@
 ---
 interface Props {
   href?: string;
-  variant?: 'primary' | 'ghost' | 'invert';
-  size?: 'lg' | 'md' | 'sm';
+  variant?: 'primary' | 'ghost';
+  size?: 'md' | 'sm';
   /** true appends a forward arrow; 'back' prepends a left-pointing one. */
   arrow?: boolean | 'back';
   type?: 'button' | 'submit';
@@ -21,8 +21,6 @@ const {
 } = Astro.props;
 
 const Tag = href ? 'a' : 'button';
-const sizeClass = size === 'md' ? '' : ` btn--${size}`;
-const cls = `btn btn--${variant}${sizeClass} ${className}`;
 
 // External links (and mailto/tel) open in a new tab, unless the caller already
 // set target explicitly. rel guards against tab-nabbing on the new context.
@@ -33,27 +31,13 @@ const external =
     : {};
 ---
 <Tag
-  class={cls}
+  class:list={['btn', `btn--${variant}`, size === 'sm' && 'btn--sm', className]}
   href={href}
   type={href ? undefined : type}
   {...external}
   {...rest}
 >
-  {arrow === 'back' && (
-    <span class="btn__arrow" aria-hidden="true">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="19" y1="12" x2="5" y2="12" />
-        <polyline points="11 6 5 12 11 18" />
-      </svg>
-    </span>
-  )}
+  {arrow === 'back' && <span aria-hidden="true">←</span>}
   <slot />
-  {arrow === true && (
-    <span class="btn__arrow" aria-hidden="true">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12" />
-        <polyline points="13 6 19 12 13 18" />
-      </svg>
-    </span>
-  )}
+  {arrow === true && <span aria-hidden="true">→</span>}
 </Tag>

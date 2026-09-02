@@ -1,8 +1,9 @@
 ---
+// The admin tour: tabbed screens on the ink band. One tab per captured screen,
+// each with the path it lives at, a heading, and a caption.
 import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 
-export interface Shot {
+interface Shot {
   src: ImageMetadata;
   alt: string;
   tab: string;
@@ -13,255 +14,124 @@ export interface Shot {
 }
 
 interface Props {
+  id: string;
   shots: Shot[];
-  /** Section heading. */
-  heading?: string;
-  /** Optional lead paragraph under the heading. */
+  heading: string;
   lead?: string;
-  /** Unique per page — ids have to be stable when two galleries ever coexist. */
-  id?: string;
-  class?: string;
 }
 
-const {
-  shots,
-  heading = 'See it in the admin',
-  lead,
-  id = 'shots',
-  class: className = '',
-} = Astro.props;
-
-// A single shot doesn't need a tab bar — it's just a framed figure.
-const tabbed = shots.length > 1;
+const { id, shots, heading, lead } = Astro.props;
+const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
 ---
-{/* Every panel ships in the HTML and only the inactive ones are hidden, so
-    crawlers and answer engines read every caption whichever tab is open. */}
-{shots.length > 0 && (
-  <div class={`shots ${className}`} data-shots={id}>
-    <div class="max-w-2xl mb-9">
-      <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">{heading}</h2>
-      {lead && <p style="font-size: var(--text-lead); color: var(--ink-body);">{lead}</p>}
+<div data-tour={id}>
+  <h2 style="margin-bottom:8px;font-size:var(--text-h2);letter-spacing:-0.6px">{heading}</h2>
+  {lead && (
+    <p style="margin:0 0 var(--space-400);font-size:var(--text-body);color:var(--ink-band-subtle)">{lead}</p>
+  )}
+
+  {shots.length > 1 && (
+    <div role="tablist" aria-label={heading} style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+      {shots.map((shot, i) => (
+        <button
+          type="button"
+          class="tab"
+          role="tab"
+          id={`${id}-tab-${i}`}
+          aria-controls={`${id}-panel-${i}`}
+          aria-selected={i === 0 ? 'true' : 'false'}
+          tabindex={i === 0 ? undefined : '-1'}
+        >
+          {shot.tab}
+        </button>
+      ))}
     </div>
+  )}
 
-    {tabbed && (
-      <div class="shots__tabs" role="tablist" aria-label={`${heading} — screens`}>
-        {shots.map((shot, i) => (
-          <button
-            type="button"
-            class="shots__tab"
-            role="tab"
-            id={`${id}-tab-${i}`}
-            aria-controls={`${id}-panel-${i}`}
-            aria-selected={i === 0 ? 'true' : 'false'}
-            tabindex={i === 0 ? 0 : -1}
-          >
-            {shot.tab}
-          </button>
-        ))}
+  {shots.map((shot, i) => (
+    <div
+      id={`${id}-panel-${i}`}
+      role="tabpanel"
+      aria-labelledby={`${id}-tab-${i}`}
+      hidden={i !== 0}
+      class="tour-panel"
+    >
+      <div style="border-radius:var(--r-md);overflow:hidden;border:1px solid var(--ink-band-border)">
+        <Image
+          src={shot.src}
+          alt={shot.alt}
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 960px) 100vw, 620px"
+          loading={i === 0 ? 'eager' : 'lazy'}
+          style="display:block;width:100%;height:auto"
+        />
       </div>
-    )}
-
-    {shots.map((shot, i) => (
-      <div
-        class="shots__panel"
-        role={tabbed ? 'tabpanel' : undefined}
-        id={`${id}-panel-${i}`}
-        aria-labelledby={tabbed ? `${id}-tab-${i}` : undefined}
-        hidden={tabbed && i > 0}
-      >
-        <figure class="shots__figure">
-          <div class="shots__frame">
-            {shot.crumb && (
-              <div class="shots__chrome">
-                <span class="shots__mark" aria-hidden="true"></span>
-                <span class="shots__crumb">{shot.crumb}</span>
-              </div>
-            )}
-            <Image
-              src={shot.src}
-              alt={shot.alt}
-              widths={[640, 960, 1280]}
-              sizes="(min-width: 1024px) 60vw, 100vw"
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          {shot.caption && <figcaption class="shots__caption">{shot.caption}</figcaption>}
-        </figure>
-
-        <div class="shots__copy">
-          <h3 style="font-size: var(--text-h3); font-weight: var(--fw-heading);">{shot.heading}</h3>
-          <p>{shot.body}</p>
-        </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        {shot.crumb && (
+          <span class="chip chip--sm" style="align-self:flex-start">
+            <span class="dot" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
+            {shot.crumb}
+          </span>
+        )}
+        <h3 style="font-size:var(--text-h3)">{shot.heading}</h3>
+        <p style="margin:0;font-size:0.9375rem;line-height:1.6;color:var(--ink-band-subtle)">{shot.body}</p>
+        {shot.caption && (
+          <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--ink-band-faint);font-style:italic">
+            {shot.caption}
+          </p>
+        )}
       </div>
-    ))}
-  </div>
-)}
+    </div>
+  ))}
+</div>
 
 <style>
-  .shots__tabs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1.75rem;
-  }
-
-  .shots__tab {
-    font-family: var(--font-body);
-    font-size: var(--text-ui);
-    font-weight: var(--fw-medium);
-    padding: 0.45rem 0.95rem;
-    border-radius: var(--r-pill);
-    cursor: pointer;
-    color: var(--ink-body);
-    background: var(--surface);
-    border: 1px solid var(--border-soft);
-    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  }
-
-  .shots__tab:hover { border-color: var(--border); }
-
-  .shots__tab[aria-selected='true'] {
-    background: var(--accent-btn);
-    border-color: var(--accent-btn);
-    color: var(--accent-on);
-  }
-
-  .shots__panel {
+  .tour-panel {
     display: grid;
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    align-items: start;
-  }
-
-  .shots__panel[hidden] { display: none; }
-
-  @media (min-width: 900px) {
-    .shots__panel { grid-template-columns: 1.55fr 1fr; }
-  }
-
-  .shots__figure { margin: 0; }
-
-  /* The frame is what makes differently-cropped captures read as one set.
-     ADS treatment: 8px radius, border + hairline raised shadow, no soft glow. */
-  .shots__frame {
-    border: 1px solid var(--border);
-    border-radius: var(--r-md);
-    overflow: hidden;
-    background: var(--surface);
-    box-shadow: var(--shadow-raised);
-  }
-
-  /* Screenshots are captures of a light WordPress admin and cannot be retaken
-     dark. Rather than let them glare out of a dark page, the frame keeps a
-     white plate and a lighter border, so the light rectangle reads as the
-     product's own chrome rather than as a hole in the page. */
-  :global([data-theme='dark']) .shots__frame {
-    background: #FFFFFF;
-    border-color: var(--n500);
-    box-shadow: none;
-  }
-
-  /* The frame stays light all the way through in dark mode — a dark chrome bar
-     above a white screenshot would read as two unrelated pieces. These are the
-     light theme's own values, restated because the tokens have flipped. */
-  :global([data-theme='dark']) .shots__chrome {
-    background: #F1F1F2;
-    border-bottom-color: #E3E3E5;
-  }
-
-  :global([data-theme='dark']) .shots__crumb {
-    color: #5E6166;
-  }
-
-  :global([data-theme='dark']) .shots__mark {
-    border-color: #5E6166;
-  }
-
-  .shots__chrome {
-    display: flex;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--space-500);
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.5rem 0.85rem;
-    background: var(--surface-alt);
-    border-bottom: 1px solid var(--border-soft);
   }
-
-  .shots__mark {
-    width: 13px;
-    height: 13px;
-    flex: none;
-    border-radius: 50%;
-    border: 1.5px solid var(--ink-dim);
-    opacity: 0.65;
-  }
-
-  .shots__crumb {
-    font-family: var(--font-body);
-    font-size: 11px;
-    color: var(--ink-dim);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .shots__frame :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .shots__caption {
-    margin-top: 0.85rem;
-    font-size: 13.5px;
-    color: var(--ink-dim);
-    max-width: 60ch;
-  }
-
-  .shots__copy {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-  }
-
-  .shots__copy p {
-    font-size: 15px;
-    color: var(--ink-body);
-    margin: 0;
+  .tour-panel[hidden] { display: none; }
+  @media (max-width: 860px) {
+    .tour-panel { grid-template-columns: 1fr; gap: var(--space-300); }
   }
 </style>
 
-<script>
-  // Progressive enhancement: without JS every panel is still in the DOM and the
-  // first one is visible, so the section degrades to a plain framed screenshot.
-  document.querySelectorAll<HTMLElement>('[data-shots]').forEach((root) => {
-    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('.shots__tab'));
-    if (tabs.length < 2) return;
+<script is:inline>
+  // Tabs. Every panel is in the HTML; the buttons only toggle [hidden], so all
+  // of the copy is served whether or not the script runs.
+  (function () {
+    document.querySelectorAll('[data-tour]').forEach(function (tour) {
+      var list = tour.querySelector('[role="tablist"]');
+      if (!list) return;
+      var tabs = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
+      var panels = Array.prototype.slice.call(tour.querySelectorAll('[role="tabpanel"]'));
 
-    const select = (tab: HTMLButtonElement, focus = false) => {
-      tabs.forEach((t) => {
-        const on = t === tab;
-        t.setAttribute('aria-selected', String(on));
-        t.tabIndex = on ? 0 : -1;
-        const panel = document.getElementById(t.getAttribute('aria-controls') ?? '');
-        if (panel) panel.hidden = !on;
-      });
-      if (focus) tab.focus();
-    };
+      function select(index) {
+        tabs.forEach(function (tab, i) {
+          tab.setAttribute('aria-selected', String(i === index));
+          if (i === index) tab.removeAttribute('tabindex');
+          else tab.setAttribute('tabindex', '-1');
+        });
+        panels.forEach(function (panel, i) {
+          panel.hidden = i !== index;
+        });
+      }
 
-    tabs.forEach((tab, i) => {
-      tab.addEventListener('click', () => select(tab));
-      tab.addEventListener('keydown', (event) => {
-        const keys: Record<string, number> = {
-          ArrowRight: i + 1,
-          ArrowLeft: i - 1,
-          Home: 0,
-          End: tabs.length - 1,
-        };
-        const next = keys[event.key];
-        if (next === undefined) return;
-        event.preventDefault();
-        select(tabs[(next + tabs.length) % tabs.length], true);
+      tabs.forEach(function (tab, i) {
+        tab.addEventListener('click', function () {
+          select(i);
+        });
+        tab.addEventListener('keydown', function (event) {
+          var next =
+            event.key === 'ArrowRight' ? i + 1 : event.key === 'ArrowLeft' ? i - 1 : null;
+          if (next === null) return;
+          event.preventDefault();
+          var target = (next + tabs.length) % tabs.length;
+          select(target);
+          tabs[target].focus();
+        });
       });
     });
-  });
+  })();
 </script>

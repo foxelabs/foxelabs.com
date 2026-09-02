@@ -2,27 +2,29 @@
 import Eyebrow from './Eyebrow.astro';
 
 interface Props {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
-  /** Trailing portion of the title rendered in the page's accent colour. */
-  titleAccent?: string;
   lead?: string;
-  narrow?: boolean;
+  /** Dot colour on the eyebrow chip. */
+  color?: string;
+  /** Back link above the title, e.g. "← All WordPress Plugins". */
+  back?: { href: string; label: string };
 }
 
-const { eyebrow, title, titleAccent, lead, narrow = false } = Astro.props;
+const { eyebrow, title, lead, color = 'var(--acc-1)', back } = Astro.props;
 ---
-<!-- Atlassian inner pages open on WHITE — no tinted header band. -->
-<section class="band band--light" style="padding-block: var(--space-section-sm);">
+<section class="band band--sm band--bottom">
   <div class="container-x">
-    <div class={narrow ? 'max-w-3xl' : 'max-w-4xl'}>
-      <Eyebrow class="mb-5">{eyebrow}</Eyebrow>
-      <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class={lead ? 'mb-5' : ''}>
-        {title}
-        {titleAccent && <span>{titleAccent}</span>}
-      </h1>
+    <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start;max-width:760px">
+      {back && (
+        <a href={back.href} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+          ← {back.label}
+        </a>
+      )}
+      {eyebrow && <Eyebrow chip color={color}>{eyebrow}</Eyebrow>}
+      <h1 style="font-size:var(--text-title);letter-spacing:-1.2px">{title}</h1>
       {lead && (
-        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">
+        <p style="margin:0;max-width:600px;font-size:1.125rem;line-height:1.5;color:var(--text-subtle)">
           {lead}
         </p>
       )}

@@ -1,0 +1,54 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import { topicOf } from '../config/tracks';
+import { topicAccent } from '../config/accents';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  /** Height of the cover field. */
+  height?: number;
+  showExcerpt?: boolean;
+  showDate?: boolean;
+}
+
+const { post, height = 140, showExcerpt = false, showDate = false } = Astro.props;
+
+const topic = topicOf(post.data.track);
+const accent = topicAccent(topic);
+const date = post.data.pubDate.toLocaleDateString('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+});
+---
+<a href={`/blog/${post.id}/`} class="card" data-post-topic={topic}>
+  {/* The cover sits on a field in the topic's hue: a post without an image
+      still gets the same block of colour the grid is built around. */}
+  <div class="card__field" style={`height:${height}px;background:${accent.color};padding:0`}>
+    {post.data.heroImage && (
+      <Image
+        src={post.data.heroImage}
+        alt={post.data.heroImageAlt ?? ''}
+        widths={[360, 720]}
+        sizes="(max-width: 760px) 100vw, 340px"
+        loading="lazy"
+      />
+    )}
+  </div>
+  <div class="card__body">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <span class="kicker">{topic}</span>
+      {showDate && <span style="font-size:var(--text-xs);color:var(--text-subtle)">{date}</span>}
+    </div>
+    <h3 style="font-size:1.03125rem;font-weight:var(--fw-heading);line-height:1.35;letter-spacing:0">
+      {post.data.title}
+    </h3>
+    {showExcerpt && (
+      <p style="margin:0;font-size:var(--text-small);line-height:1.55;color:var(--text-subtle)">
+        {post.data.description}
+      </p>
+    )}
+    <span class="link-more" style="margin-top:auto">Read more →</span>
+  </div>
+</a>

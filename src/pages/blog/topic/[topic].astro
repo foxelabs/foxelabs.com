@@ -9,7 +9,8 @@ import Footer from '../../../components/Footer.astro';
 import PostGrid from '../../../components/PostGrid.astro';
 import PageHeader from '../../../components/ui/PageHeader.astro';
 import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
-import { accentVars, topicAccent } from '../../../config/accents';
+import CtaBanner from '../../../components/CtaBanner.astro';
+import { topicAccent } from '../../../config/accents';
 import { TOPICS, TOPIC_META, postTopic, topicPath, tagIndex, tagPath } from '../../../config/blog';
 
 export async function getStaticPaths() {
@@ -50,36 +51,35 @@ const others = TOPICS.filter((t) => t !== topic);
   ]}
 >
   <Nav />
-  <main id="main" style={accentVars(topicAccent(topic))}>
-    <PageHeader eyebrow="Blog" title={topic} lead={meta.description} />
+  <main id="main">
+    <PageHeader eyebrow="Blog" title={topic} lead={meta.description} color={topicAccent(topic).color} />
 
-    <section class="band" style="padding-block: 0 var(--space-section);">
+    <section class="band">
       <div class="container-x">
-        <p class="mb-8" style="font-size: var(--text-small); color: var(--ink-dim);">
+        <p style="margin:0 0 var(--space-400);font-size:var(--text-small);color:var(--text-subtle)">
           {posts.length} {posts.length === 1 ? 'post' : 'posts'} in {topic}.
         </p>
 
         <PostGrid posts={posts} />
 
         {tags.length > 0 && (
-          <div class="mt-16 pt-8" style="border-top: 1px solid var(--border-soft);">
-            <h2 class="mb-4" style="font-size: var(--text-h4);">Tags in {topic}</h2>
-            <div class="flex flex-wrap gap-2">
+          <div style="margin-top:var(--space-600);padding-top:var(--space-300);border-top:1px solid var(--border)">
+            <h2 style="margin-bottom:var(--space-200);font-size:var(--text-h4)">Tags in {topic}</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
               {tags.map((tag) => (
-                <a href={tagPath(tag.slug)} class="term-lozenge">#{tag.label}</a>
+                <a href={tagPath(tag.slug)} class="chip chip--sm chip--muted">#{tag.label}</a>
               ))}
             </div>
           </div>
         )}
 
-        <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2" style="font-size: var(--text-ui);">
-          <a href="/blog/" style="color: var(--ink-dim);">All posts</a>
-          {others.map((t) => (
-            <a href={topicPath(t)} style="color: var(--ink-dim);">{t}</a>
-          ))}
+        <div style="margin-top:var(--space-600);display:flex;gap:24px;flex-wrap:wrap;font-size:var(--text-ui)">
+          <a href="/blog/">All posts</a>
+          {others.map((t) => <a href={topicPath(t)}>{t}</a>)}
         </div>
       </div>
     </section>
+    <CtaBanner subtle />
   </main>
   <Footer />
 </BaseLayout>

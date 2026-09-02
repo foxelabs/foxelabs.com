@@ -1,8 +1,11 @@
 ---
 interface Props {
-  variant?: 'light' | 'alt' | 'invert' | 'sky';
+  /** light = page surface, alt = sunken band, ink = the black band. */
+  variant?: 'light' | 'alt' | 'ink';
+  /** Hairline above/below the band. */
+  rule?: 'top' | 'bottom' | 'both';
+  size?: 'md' | 'sm';
   id?: string;
-  reveal?: boolean;
   class?: string;
   /** Skip the inner .container-x when the section manages its own width. */
   bare?: boolean;
@@ -10,16 +13,25 @@ interface Props {
 
 const {
   variant = 'light',
+  rule,
+  size = 'md',
   id,
-  reveal = true,
   bare = false,
   class: className = '',
 } = Astro.props;
+
+const variantClass = variant === 'alt' ? 'band--subtle' : variant === 'ink' ? 'band--ink' : '';
 ---
 <section
   id={id}
-  class={`band band--${variant} ${className}`}
- ={reveal ? '' : undefined}
+  class:list={[
+    'band',
+    size === 'sm' && 'band--sm',
+    variantClass,
+    (rule === 'top' || rule === 'both') && 'band--top',
+    (rule === 'bottom' || rule === 'both') && 'band--bottom',
+    className,
+  ]}
 >
   {bare ? <slot /> : <div class="container-x"><slot /></div>}
 </section>

@@ -3,14 +3,13 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
-import Button from '../../../components/ui/Button.astro';
-import Eyebrow from '../../../components/ui/Eyebrow.astro';
-import { Icon } from 'astro-icon/components';
-import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
+import CtaBanner from '../../../components/CtaBanner.astro';
+import Section from '../../../components/ui/Section.astro';
 import Faq from '../../../components/ui/Faq.astro';
 import Screenshots from '../../../components/ui/Screenshots.astro';
+import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
-import { accentFor, accentVars } from '../../../config/accents';
+import { accentFor, ACCENTS } from '../../../config/accents';
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -36,12 +35,11 @@ const siblingIds = (await getCollection(
 const { data } = project;
 const { Content } = await render(project);
 const cat = categoryMeta('oss', data.category);
+const accent = accentFor(siblingIds, project.id);
 
 // Add-ons that extend this project, ordered.
 const addons = (await getCollection('addons', (a) => !a.data.draft && a.data.parent === project.id))
   .sort((a, b) => a.data.order - b.data.order);
-
-// Ordered add-on ids, so a card here and the add-on's own page share a hue.
 const addonIds = addons.map((a) => a.id);
 
 // Build an install one-liner from whatever registry info is present.
@@ -62,26 +60,21 @@ const changelogUrl = data.changelogUrl ?? DOCS_FALLBACK;
 // Acquired projects point support at the new owner's channel; ours goes to /contact.
 const supportUrl = data.supportUrl ?? '/contact/';
 
-// Label + icon for the canonical registry listing button.
-const registryCta =
+// Label for the canonical registry listing button.
+const registryLabel =
   data.registry === 'WordPress.org'
-    ? { label: 'View on WordPress.org', icon: 'ic:round-wordpress' }
+    ? 'View on WordPress.org'
     : data.registry === 'Packagist'
-      ? { label: 'View on Packagist', icon: 'file-icons:php' }
-      : { label: 'View project', icon: 'mingcute:external-link-line' };
+      ? 'View on Packagist'
+      : 'View project';
 
 // Products with their own site lead with that; the registry link drops to secondary.
 const primaryCta = data.websiteUrl
-  ? {
-      href: data.websiteUrl,
-      label: data.websiteLabel ?? 'Visit website',
-      icon: 'mingcute:external-link-line',
-    }
+  ? { href: data.websiteUrl, label: data.websiteLabel ?? 'Visit website' }
   : data.url
-    ? { href: data.url, ...registryCta }
+    ? { href: data.url, label: registryLabel }
     : null;
-// Registry listing shown as a secondary button only when it isn't the primary.
-const registryLink = data.url && data.websiteUrl ? { href: data.url, ...registryCta } : null;
+const registryLink = data.url && data.websiteUrl ? { href: data.url, label: registryLabel } : null;
 
 // Keyword-first <title>; falls back to the product name.
 const pageTitle = `${data.seoTitle ?? data.name} | Foxe Labs`;
@@ -114,7 +107,7 @@ const structuredData = [
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
 
-const specs = [
+const facts = [
   data.license && { label: 'License', value: data.license },
   data.language && { label: 'Language', value: data.language },
   data.minPhp && { label: 'Requires', value: `PHP ${data.minPhp}+` },
@@ -123,6 +116,8 @@ const specs = [
   data.stars && { label: 'Stars', value: data.stars },
   data.rating && { label: 'Rating', value: data.rating },
 ].filter(Boolean) as { label: string; value: string }[];
+
+const quad = ACCENTS.map((a) => a.color);
 ---
 <BaseLayout
   title={pageTitle}
@@ -131,255 +126,248 @@ const specs = [
   jsonLd={structuredData}
 >
   <Nav />
-  <main id="main" style={accentVars(accentFor(siblingIds, project.id))}>
-    <div class="band band--light" style="padding-block: var(--space-section-sm);">
-      <div class="container-x">
-        <a href={categoryPath('oss', data.category)} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          All {cat?.label ?? 'software'}
-        </a>
+  <main id="main">
+    <!-- Hero -->
+    <section class="band band--sm band--bottom">
+      <div class="container-x product-hero">
+        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
+          <a href={categoryPath('oss', data.category)} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+            ← All {cat?.label ?? 'software'}
+          </a>
 
-        <div class="flex items-center gap-3 mb-5 flex-wrap">
-          <span class="lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">
-            {data.language}
-          </span>
-          <span class="lozenge" style="background: var(--accent-soft); color: var(--accent-deep);">
-            Open source · {data.license}
-          </span>
-          <span class="text-[11px]" style="color: var(--ink-dim);">{data.kind}</span>
-        </div>
-
-        <div class="flex items-center gap-3 flex-wrap mb-4">
-          <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);">{data.name}</h1>
-          {addons.length > 0 && (
-            <a
-              href="#addons"
-              class="inline-flex items-center gap-1.5 lozenge no-underline transition-colors"
-              style="background: var(--accent-soft); color: var(--accent-deep); border: 1px solid color-mix(in srgb, var(--accent-ink) 20%, transparent);"
-            >
-              <Icon name="mingcute:puzzled-line" width={13} height={13} aria-hidden="true" />
-              {addons.length} add-on{addons.length > 1 ? 's' : ''}
-            </a>
-          )}
-        </div>
-        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">{data.tagline}</p>
-
-      </div>
-    </div>
-
-    <section class="band band--light">
-      <div class="container-x">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
-          <div class="lg:col-span-7">
-            {data.acquired && (
-              <div
-                class="flex items-start gap-3 mb-12 p-5 rounded-[8px]"
-                style="background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 22%, transparent);"
-                role="note"
-              >
-                <Icon name="mingcute:announcement-line" width={20} height={20} style="color: var(--accent-ink);" class="mt-0.5 shrink-0" aria-hidden="true" />
-                <p class="text-[14px] m-0" style="color: var(--accent-deep);">
-                  <strong>
-                    {data.acquiredBy ? (
-                      <>
-                        Now part of the{' '}
-                        {data.acquiredUrl
-                          ? <a href={data.acquiredUrl} target="_blank" rel="noopener" class="underline underline-offset-2 hover:no-underline" style="color: inherit;">{data.acquiredBy}</a>
-                          : data.acquiredBy}
-                        {' '}family.
-                      </>
-                    ) : 'Now acquired.'}
-                  </strong>{' '}
-                  Future maintenance, updates, support, and everything else related to {data.name} will
-                  be handled by {data.acquiredBy ? `the ${data.acquiredBy} team` : 'the new owners'}.
-                </p>
-              </div>
-            )}
-            {data.features.length > 0 && (
-              <ul class="list-none m-0 p-0 space-y-3 mb-12">
-                {data.features.map((f) => (
-                  <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
-                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <article class="prose-foxe max-w-none">
-              <Content />
-            </article>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="chip chip--sm">
+              <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+              {data.kind}
+            </span>
+            <span class="chip chip--sm">
+              <span class="dot" style="background:var(--acc-4)" aria-hidden="true"></span>
+              Open source · {data.license}
+            </span>
+            <span class="chip chip--sm">
+              <span class="dot" style="background:var(--acc-2)" aria-hidden="true"></span>
+              {data.language}
+            </span>
           </div>
 
-          <aside class="lg:col-span-5">
-            <div class="card p-7 lg:sticky lg:top-24">
-              {specs.length > 0 && (
-                <dl class="m-0 mb-7">
-                  {specs.map((s) => (
-                    <div class="flex items-center justify-between gap-4 py-3 text-[14px]" style="border-bottom: 1px solid var(--border-soft);">
-                      <dt style="color: var(--ink-body);">{s.label}</dt>
-                      <dd class="text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
+          <h1 style="font-size:var(--text-title);line-height:1.05;letter-spacing:-1.4px">{data.name}</h1>
+          <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
+            {data.tagline}
+          </p>
 
-              {install && (
-                <div class="mb-6">
-                  <p class="text-[11px] mb-2" style="color: var(--ink-dim); text-transform: uppercase;">Install</p>
-                  <code class="block font-code text-[13px] px-3 py-2.5 rounded-[4px] overflow-x-auto" style="background: var(--surface-sunken); border: 1px solid var(--border-soft); color: var(--ink);">{install}</code>
-                </div>
-              )}
+          <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap">
+            {primaryCta && (
+              <a href={primaryCta.href} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+                {primaryCta.label}
+              </a>
+            )}
+            {addons.length > 0 && (
+              <a href="#addons" class="btn btn--ghost">
+                {addons.length} add-on{addons.length > 1 ? 's' : ''}
+              </a>
+            )}
+          </div>
 
-              <div class="flex flex-col gap-2.5">
-                {primaryCta && (
-                  <Button href={primaryCta.href} variant="primary" class="w-full justify-center gap-2">
-                    <Icon name={primaryCta.icon} width={17} height={17} aria-hidden="true" />
-                    {primaryCta.label}
-                  </Button>
-                )}
-                {registryLink && (
-                  <Button href={registryLink.href} variant="ghost" class="w-full justify-center gap-2">
-                    <Icon name={registryLink.icon} width={16} height={16} aria-hidden="true" />
-                    {registryLink.label}
-                  </Button>
-                )}
-                {data.repo && (
-                  <Button href={data.repo} variant="ghost" class="w-full justify-center gap-2">
-                    <Icon name="mingcute:github-line" width={16} height={16} aria-hidden="true" />
-                    View source on GitHub
-                  </Button>
-                )}
-                {!data.acquired && (
+          {data.acquired && (
+            <p
+              role="note"
+              style="margin:8px 0 0;padding:16px 18px;border:1px solid var(--border);border-radius:var(--r-md);font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)"
+            >
+              <strong style="color:var(--text)">
+                {data.acquiredBy ? (
                   <>
-                    <Button href={docsUrl} variant="ghost" class="w-full justify-center gap-2">
-                      <Icon name="mingcute:book-2-line" width={16} height={16} aria-hidden="true" />
-                      Documentation
-                    </Button>
-                    <Button href={changelogUrl} variant="ghost" class="w-full justify-center gap-2">
-                      <Icon name="mingcute:history-line" width={16} height={16} aria-hidden="true" />
-                      Changelog
-                    </Button>
+                    Now part of the{' '}
+                    {data.acquiredUrl ? (
+                      <a href={data.acquiredUrl} target="_blank" rel="noopener noreferrer">{data.acquiredBy}</a>
+                    ) : (
+                      data.acquiredBy
+                    )}{' '}
+                    family.
                   </>
+                ) : (
+                  'Now acquired.'
                 )}
-                <Button href={supportUrl} variant="ghost" class="w-full justify-center gap-2">
-                  <Icon name="mingcute:chat-1-line" width={16} height={16} aria-hidden="true" />
-                  Get support
-                </Button>
-              </div>
+              </strong>{' '}
+              Future maintenance, updates, support, and everything else related to {data.name} will be
+              handled by {data.acquiredBy ? `the ${data.acquiredBy} team` : 'the new owners'}.
+            </p>
+          )}
 
-              {addons.length > 0 && (
-                <a
-                  href="#addons"
-                  class="addon-hint group flex items-center gap-3 mt-5 p-3.5 rounded-[8px] no-underline"
-                  style="background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent-ink) 18%, transparent);"
-                >
-                  <span class="w-9 h-9 rounded-[4px] flex items-center justify-center shrink-0" style="background: var(--surface);">
-                    <Icon name="mingcute:puzzled-line" width={18} height={18} style="color: var(--accent-ink);" aria-hidden="true" />
-                  </span>
-                  <span class="flex-1 min-w-0">
-                    <span class="block text-[11px] uppercase" style="color: var(--accent-deep); font-weight: var(--fw-bold); letter-spacing: 0.05em;">
-                      {addons.length} add-on{addons.length > 1 ? 's' : ''} available
-                    </span>
-                    <span class="block text-[13.5px] font-medium" style="color: var(--ink);">
-                      Extend {data.name} with more
-                    </span>
-                  </span>
-                  <Icon name="mingcute:down-line" width={18} height={18} class="addon-hint__arrow shrink-0" style="color: var(--accent-ink);" aria-hidden="true" />
+          {data.features.length > 0 && (
+            <ul style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+              {data.features.map((f, i) => (
+                <li style="display:flex;align-items:flex-start;gap:10px;font-size:0.9375rem;line-height:1.5">
+                  <span
+                    class="dot"
+                    style={`background:${quad[i % 4]};width:10px;height:10px;margin-top:5px`}
+                    aria-hidden="true"
+                  ></span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card">
+            <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+            {facts.length > 0 && (
+              <dl class="fact-grid">
+                {facts.map((f) => (
+                  <div>
+                    <dt class="kicker">{f.label}</dt>
+                    <dd style="margin:3px 0 0;font-size:0.96875rem;font-weight:var(--fw-heading)">{f.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+            <div style="border-top:1px solid var(--border);padding:16px 24px;display:flex;flex-direction:column;gap:10px">
+              {registryLink && (
+                <a href={registryLink.href} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+                  {registryLink.label} →
                 </a>
               )}
+              {data.repo && (
+                <a href={data.repo} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+                  View source on GitHub →
+                </a>
+              )}
+              {!data.acquired && (
+                <>
+                  <a href={docsUrl} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+                    Documentation →
+                  </a>
+                  <a href={changelogUrl} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+                    Changelog →
+                  </a>
+                </>
+              )}
+              <a href={supportUrl} style="font-size:var(--text-ui);font-weight:var(--fw-medium)">Get support →</a>
             </div>
-          </aside>
+          </div>
+
+          {install && (
+            <div class="code">
+              <div class="code__head">
+                <span>INSTALL</span>
+                <span class="code__dots" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+              </div>
+              <pre>{install}</pre>
+            </div>
+          )}
         </div>
       </div>
     </section>
 
-    {data.screenshots.length > 0 && (
-      <section id="screenshots" class="band band--light scroll-mt-24">
-        <div class="container-x">
-          <Screenshots
-            id={`shots-${project.id}`}
-            shots={data.screenshots}
-            heading={`${data.name} in the WordPress admin`}
-            lead={`Everything ${data.name} adds to wp-admin, and where to find it.`}
-          />
+    <!-- What it does -->
+    <Section>
+      <div class="what-grid">
+        <div>
+          <h2 style="margin-bottom:14px;font-size:1.625rem;letter-spacing:-0.5px">What it does</h2>
+          <p style="margin:0;font-size:0.96875rem;line-height:1.6;color:var(--text-subtle)">{data.summary}</p>
         </div>
-      </section>
+        <div class="prose-foxe">
+          <Content />
+        </div>
+      </div>
+    </Section>
+
+    {data.screenshots.length > 0 && (
+      <Section id="screenshots" variant="ink">
+        <Screenshots
+          id={`shots-${project.id}`}
+          shots={data.screenshots}
+          heading={`${data.name} in the WordPress admin`}
+          lead={`Everything ${data.name} adds to wp-admin, and where to find it.`}
+        />
+      </Section>
     )}
 
     {addons.length > 0 && (
-      <section id="addons" class="band band--alt scroll-mt-24">
-        <div class="container-x">
-          <div class="max-w-2xl mb-12">
-            <Eyebrow class="mb-5">Add-ons</Eyebrow>
-            <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display);" class="mb-4">
-              Extend {data.name} when you need more.
-            </h2>
-            <p style="font-size: var(--text-lead); color: var(--ink-body);">
-              The core plugin stays lean. Each add-on is a small, opt-in plugin
-              that snaps into the same settings screen — install only the ones you need.
-            </p>
-          </div>
+      <Section id="addons">
+        <span class="eyebrow">Add-ons</span>
+        <h2 style="margin:8px 0 12px;font-size:var(--text-h2-lg);letter-spacing:-0.7px">
+          Extend {data.name} when you need more.
+        </h2>
+        <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
+          The core plugin stays lean. Each add-on is a small, opt-in plugin that snaps into the same
+          settings screen — install only the ones you need.
+        </p>
 
-          <div class="grid md:grid-cols-2 gap-6">
-            {addons.map((addon) => (
-              <a
-                href={addonPath('oss', data.category, project.id, addon.id)}
-                class="addon-card card card--hover p-7 flex flex-col group"
-                style={accentVars(accentFor(addonIds, addon.id))}
-              >
-                <div class="flex items-center justify-between gap-3 mb-4">
-                  <div class="w-11 h-11 rounded-[8px] flex items-center justify-center" style="background: var(--accent-soft);">
-                    <Icon name={addon.data.icon ?? 'mingcute:puzzled-line'} width={21} height={21} style="color: var(--accent-ink);" aria-hidden="true" />
-                  </div>
-                  {addon.data.location && (
-                    <span class="lozenge whitespace-nowrap" style="background: var(--surface-alt); color: var(--ink-dim);">
-                      {addon.data.location}
-                    </span>
-                  )}
-                </div>
-                <h3 style="font-size: var(--text-h3); font-weight: var(--fw-heading);" class="mb-2 transition-colors group-hover:text-[var(--accent-ink)]">
-                  {addon.data.name}
-                </h3>
-                <p class="text-[15px] mb-6 flex-1" style="color: var(--ink-body);">{addon.data.summary}</p>
-                <div class="flex items-center justify-between gap-4">
-                  <span class="inline-flex items-center gap-1.5 text-[12px] font-medium" style="color: var(--accent-ink);">
-                    Learn more
-                    <span class="transition-transform group-hover:translate-x-0.5">→</span>
+        <div class="addon-grid">
+          {addons.map((addon) => (
+            <a
+              href={addonPath('oss', data.category, project.id, addon.id)}
+              class="card card--pad"
+              style="gap:12px;padding:24px"
+            >
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span class="kicker" style="display:inline-flex;align-items:center;gap:7px">
+                  <span
+                    class="dot"
+                    style={`background:${accentFor(addonIds, addon.id).color}`}
+                    aria-hidden="true"
+                  ></span>
+                  {addon.data.location ?? 'Add-on'}
+                </span>
+                {addon.data.price && (
+                  <span style="font-size:var(--text-xs);font-weight:var(--fw-heading);background:var(--bg-hover);border-radius:var(--r-pill);padding:4px 10px">
+                    {addon.data.price}
                   </span>
-                  {addon.data.price && (
-                    <span class="text-[12px]" style="color: var(--ink);">{addon.data.price}</span>
-                  )}
-                </div>
-              </a>
-            ))}
-          </div>
+                )}
+              </div>
+              <h3 style="font-size:var(--text-h4);font-weight:var(--fw-heading)">{addon.data.name}</h3>
+              <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">
+                {addon.data.summary}
+              </p>
+              <span class="link-more" style="margin-top:auto">Learn more →</span>
+            </a>
+          ))}
         </div>
-      </section>
+      </Section>
     )}
 
     {data.faq.length > 0 && (
-      <section class="band band--light" style="border-top: 1px solid var(--border-soft);">
-        <div class="container-x">
-          <div class="max-w-3xl">
-            <Faq items={data.faq} bare />
-          </div>
-        </div>
-      </section>
+      <Section variant="alt" rule="top">
+        <Faq items={data.faq} />
+      </Section>
     )}
+
+    <CtaBanner />
   </main>
   <Footer />
 </BaseLayout>
 
 <style>
-  .addon-hint {
-    transition: background-color 0.1s ease;
+  .product-hero {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-700);
   }
-  .addon-hint:hover {
-    background: color-mix(in srgb, var(--accent-soft) 70%, var(--surface));
+  .fact-grid {
+    margin: 0;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 16px;
+  }
+  .what-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-600);
+  }
+  .addon-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-250);
+  }
+  @media (max-width: 960px) {
+    .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
+    .what-grid { grid-template-columns: 1fr; gap: var(--space-400); }
+    .addon-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .addon-grid { grid-template-columns: 1fr; }
   }
 </style>

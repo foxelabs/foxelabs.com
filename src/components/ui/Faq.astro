@@ -5,8 +5,6 @@ interface Props {
   items: FaqItem[];
   /** Heading above the list. */
   heading?: string;
-  /** Drop the top border + spacing when the section already sits on a divider. */
-  bare?: boolean;
   /** Open the first answer by default, so the pattern is obvious at a glance. */
   openFirst?: boolean;
   class?: string;
@@ -15,7 +13,6 @@ interface Props {
 const {
   items,
   heading = 'Frequently asked questions',
-  bare = false,
   openFirst = true,
   class: className = '',
 } = Astro.props;
@@ -24,24 +21,19 @@ const {
     readers, but fully present for crawlers and answer engines, and it needs
     no JavaScript to work. */}
 {items.length > 0 && (
-  <section
-    class={`prose-foxe ${bare ? '' : 'mt-14 pt-10'} ${className}`}
-    style={bare ? undefined : 'border-top: 1px solid var(--border-soft);'}
-    aria-labelledby="faq-heading"
-  >
-    <h2 id="faq-heading" style="margin-top: 0; padding-top: 0; border-top: none;">{heading}</h2>
-    <div class="faq-list">
+  <div class:list={[className]} style="max-width: var(--measure); margin-inline: auto;">
+    {heading && (
+      <h2 style="margin-bottom: var(--space-400); font-size: var(--text-h2); letter-spacing: -0.6px;">
+        {heading}
+      </h2>
+    )}
+    <div class="faq">
       {items.map((item, i) => (
-        <details class="faq-item" open={openFirst && i === 0}>
-          <summary>
-            <span>{item.q}</span>
-            <svg class="faq-item__chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </summary>
-          <p>{item.a}</p>
+        <details class="faq__item" open={openFirst && i === 0}>
+          <summary class="faq__q">{item.q}</summary>
+          <p class="faq__a">{item.a}</p>
         </details>
       ))}
     </div>
-  </section>
+  </div>
 )}

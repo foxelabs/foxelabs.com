@@ -3,14 +3,14 @@ import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
+import CtaBanner from '../../../components/CtaBanner.astro';
 import EmailForm from '../../../components/EmailForm.astro';
-import Button from '../../../components/ui/Button.astro';
 import PricingCard from '../../../components/ui/PricingCard.astro';
-import { Icon } from 'astro-icon/components';
-import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
+import Section from '../../../components/ui/Section.astro';
 import Faq from '../../../components/ui/Faq.astro';
+import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
-import { accentFor, accentVars } from '../../../config/accents';
+import { accentFor, ACCENTS } from '../../../config/accents';
 
 export async function getStaticPaths() {
   const products = await getCollection(
@@ -36,6 +36,7 @@ const siblingIds = (await getCollection(
 const { data } = product;
 const { Content } = await render(product);
 const cat = categoryMeta('trading', data.category);
+const accent = accentFor(siblingIds, product.id);
 
 const statusLabel: Record<string, string> = {
   live: 'Live now',
@@ -66,163 +67,163 @@ const structuredData = [
   }),
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
+
+const quad = ACCENTS.map((a) => a.color);
+
+const resourceLinks = [
+  data.demoUrl && { href: data.demoUrl, label: data.demoLabel ?? 'Download free demo' },
+  data.docsUrl && { href: data.docsUrl, label: 'Documentation' },
+  data.signalUrl && { href: data.signalUrl, label: 'View live signal' },
+  { href: data.supportUrl ?? '/contact/', label: 'Get support' },
+].filter(Boolean) as { href: string; label: string }[];
 ---
 <BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
-  <main id="main" style={accentVars(accentFor(siblingIds, product.id))}>
-    <div class="band band--light" style="padding-block: var(--space-section-sm);">
-      <div class="container-x">
-        <a href={categoryPath('trading', data.category)} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="19" y1="12" x2="5" y2="12" />
-            <polyline points="12 19 5 12 12 5" />
-          </svg>
-          All {cat?.label ?? 'trading tools'}
-        </a>
+  <main id="main">
+    <!-- Hero -->
+    <section class="band band--sm band--bottom">
+      <div class="container-x product-hero">
+        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
+          <a href={categoryPath('trading', data.category)} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+            ← All {cat?.label ?? 'trading tools'}
+          </a>
 
-        <div class="flex items-center gap-3 mb-5">
-          <span
-            class="lozenge"
-            style="background: var(--accent-soft); color: var(--accent-deep);"
-          >
-            {statusLabel[data.status] ?? data.status}
-          </span>
-          <span class="text-[11px]" style="color: var(--ink-dim);">
-            {data.market} · {data.platform}{data.version ? ` · ${data.version}` : ''}
-          </span>
-        </div>
-
-        <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-4">
-          {data.name}
-        </h1>
-        <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">
-          {data.tagline}
-        </p>
-      </div>
-    </div>
-
-    <!-- Highlights: light tinted band — ADS groups on sunken tint, not a dark band -->
-    {data.highlights.length > 0 && (
-      <section class="band band--alt">
-        <div class="container-x">
-          <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-            {data.highlights.map((h) => (
-              <div>
-                <div
-                  class="w-11 h-11 rounded-[8px] flex items-center justify-center mb-5"
-                  style="background: var(--accent-soft);"
-                >
-                  <Icon name={h.icon} width={20} height={20} style="color: var(--accent-ink);" aria-hidden="true" />
-                </div>
-                <h3 style="font-size: 1.0625rem; font-weight: var(--fw-heading);" class="mb-2.5">{h.title}</h3>
-                <p class="text-[14.5px] m-0" style="color: var(--ink-body);">{h.body}</p>
-              </div>
-            ))}
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="chip chip--sm">
+              <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+              {statusLabel[data.status] ?? data.status}
+            </span>
+            <span class="chip chip--sm chip--muted">{data.market}</span>
+            <span class="chip chip--sm chip--muted">{data.platform}</span>
+            {data.version && <span class="chip chip--sm chip--muted">{data.version}</span>}
           </div>
+
+          <h1 style="font-size:var(--text-title);line-height:1.05;letter-spacing:-1.4px">{data.name}</h1>
+          <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
+            {data.tagline}
+          </p>
+
+          {data.features.length > 0 && (
+            <ul style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+              {data.features.map((f, i) => (
+                <li style="display:flex;align-items:flex-start;gap:10px;font-size:0.9375rem;line-height:1.5">
+                  <span
+                    class="dot"
+                    style={`background:${quad[i % 4]};width:10px;height:10px;margin-top:5px`}
+                    aria-hidden="true"
+                  ></span>
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      </section>
-    )}
 
+        <PricingCard
+          price={data.price}
+          badge={statusLabel[data.status] ?? data.status}
+          benefits={data.benefits}
+        >
+          {data.benefits.length === 0 && (
+            <p style="margin:0;font-size:var(--text-ui);color:var(--text-subtle)">
+              {data.status === 'live'
+                ? 'Available now — lifetime updates included.'
+                : 'Join the waitlist for launch access and early pricing.'}
+            </p>
+          )}
 
-    <section class="band band--light">
-      <div class="container-x">
-        <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
-          <div class="lg:col-span-7">
-            {data.features.length > 0 && (
-              <ul class="list-none m-0 p-0 space-y-3 mb-12">
-                {data.features.map((f) => (
-                  <li class="flex items-start gap-3 text-[15px]" style="color: var(--ink);">
-                    <svg class="mt-1 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    <span>{f}</span>
-                  </li>
+          {data.status === 'live' && data.ctaUrl ? (
+            <>
+              <a href={data.ctaUrl} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+                {data.ctaLabel ?? 'Get it now'}
+              </a>
+              <div style="display:flex;flex-direction:column;gap:10px;padding-top:var(--space-150);border-top:1px solid var(--border)">
+                {resourceLinks.map((l) => (
+                  <a href={l.href} style="font-size:var(--text-ui);font-weight:var(--fw-medium)">{l.label} →</a>
                 ))}
-              </ul>
-            )}
+              </div>
+            </>
+          ) : (
+            <EmailForm id={`product-form-${product.id}`} buttonLabel="Notify me" />
+          )}
 
-            <article class="prose-foxe max-w-none">
-              <Content />
-            </article>
-          </div>
-
-          <aside class="lg:col-span-5">
-            <PricingCard
-              price={data.price}
-              badge={statusLabel[data.status] ?? data.status}
-              benefits={data.benefits}
-            >
-              {data.benefits.length === 0 && (
-                <p class="text-[14px] mb-6 -mt-1" style="color: var(--ink-body);">
-                  {data.status === 'live'
-                    ? 'Available now — lifetime updates included.'
-                    : 'Join the waitlist for launch access and early pricing.'}
-                </p>
-              )}
-
-              {data.status === 'live' && data.ctaUrl ? (
-                <div>
-                  <Button href={data.ctaUrl} variant="primary" arrow class="w-full justify-center">
-                    {data.ctaLabel ?? 'Get it now'}
-                  </Button>
-                  <div class="pricing-links">
-                    {data.demoUrl && (
-                      <a href={data.demoUrl}>
-                        <Icon name="mingcute:download-2-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
-                        {data.demoLabel ?? 'Download free demo'}
-                        <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
-                      </a>
-                    )}
-                    {data.docsUrl && (
-                      <a href={data.docsUrl}>
-                        <Icon name="mingcute:book-2-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
-                        Documentation
-                        <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
-                      </a>
-                    )}
-                    {data.signalUrl && (
-                      <a href={data.signalUrl}>
-                        <Icon name="mingcute:chart-line-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
-                        View live signal
-                        <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
-                      </a>
-                    )}
-                    <a href={data.supportUrl ?? '/contact/'}>
-                      <Icon name="mingcute:chat-1-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
-                      Get support
-                      <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
-                    </a>
-                  </div>
+          {data.specs.length > 0 && (
+            <dl style="margin:0;padding-top:var(--space-150);border-top:1px solid var(--border)">
+              {data.specs.map((s) => (
+                <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;font-size:var(--text-ui);border-bottom:1px solid var(--border)">
+                  <dt style="color:var(--text-subtle)">{s.label}</dt>
+                  <dd style="margin:0;text-align:right;font-weight:var(--fw-medium)">{s.value}</dd>
                 </div>
-              ) : (
-                <EmailForm id={`product-form-${product.id}`} buttonLabel="Notify me" />
-              )}
-
-              {data.specs.length > 0 && (
-                <dl class="m-0 mt-7" style="border-top: 1px solid var(--border-soft);">
-                  {data.specs.map((s) => (
-                    <div class="flex items-center justify-between gap-4 py-3 text-[14px]" style="border-bottom: 1px solid var(--border-soft);">
-                      <dt style="color: var(--ink-body);">{s.label}</dt>
-                      <dd class="text-[13px] m-0 text-right" style="color: var(--ink);">{s.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              )}
-            </PricingCard>
-          </aside>
-        </div>
+              ))}
+            </dl>
+          )}
+        </PricingCard>
       </div>
     </section>
 
-    {data.faq.length > 0 && (
-      <section class="band band--light" style="border-top: 1px solid var(--border-soft);">
-        <div class="container-x">
-          <div class="max-w-3xl">
-            <Faq items={data.faq} bare />
-          </div>
+    <!-- Highlights -->
+    {data.highlights.length > 0 && (
+      <Section variant="alt">
+        <div class="highlight-grid">
+          {data.highlights.map((h, i) => (
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <span class="dot dot--lg" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
+              <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{h.title}</h3>
+              <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">{h.body}</p>
+            </div>
+          ))}
         </div>
-      </section>
+      </Section>
     )}
+
+    <!-- What it does -->
+    <Section>
+      <div class="what-grid">
+        <div>
+          <h2 style="margin-bottom:14px;font-size:1.625rem;letter-spacing:-0.5px">What it does</h2>
+          <p style="margin:0;font-size:0.96875rem;line-height:1.6;color:var(--text-subtle)">{data.summary}</p>
+        </div>
+        <div class="prose-foxe">
+          <Content />
+        </div>
+      </div>
+    </Section>
+
+    {data.faq.length > 0 && (
+      <Section variant="alt" rule="top">
+        <Faq items={data.faq} />
+      </Section>
+    )}
+
+    <CtaBanner
+      secondary={{ href: '/trading/', label: 'Browse trading tools' }}
+    />
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  .product-hero {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-700);
+  }
+  .what-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-600);
+  }
+  .highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-500);
+  }
+  @media (max-width: 960px) {
+    .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
+    .what-grid { grid-template-columns: 1fr; gap: var(--space-400); }
+    .highlight-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 620px) {
+    .highlight-grid { grid-template-columns: 1fr; }
+  }
+</style>

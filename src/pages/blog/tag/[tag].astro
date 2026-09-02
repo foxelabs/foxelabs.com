@@ -9,7 +9,8 @@ import Footer from '../../../components/Footer.astro';
 import PostGrid from '../../../components/PostGrid.astro';
 import PageHeader from '../../../components/ui/PageHeader.astro';
 import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
-import { accentFor, accentVars } from '../../../config/accents';
+import CtaBanner from '../../../components/CtaBanner.astro';
+import { accentFor } from '../../../config/accents';
 import { tagIndex, tagPath, postTopic, topicPath } from '../../../config/blog';
 
 export async function getStaticPaths() {
@@ -51,36 +52,36 @@ const topics = [...new Set(tag.posts.map(postTopic))];
   ]}
 >
   <Nav />
-  <main id="main" style={accentVars(accentFor(order, tag.slug))}>
+  <main id="main">
     <PageHeader
       eyebrow="Tag"
+      color={accentFor(order, tag.slug).color}
       title={tag.label}
       lead={`${tag.posts.length} ${tag.posts.length === 1 ? 'post' : 'posts'} tagged ${tag.label}.`}
     />
 
-    <section class="band" style="padding-block: 0 var(--space-section);">
+    <section class="band">
       <div class="container-x">
         <PostGrid posts={tag.posts} />
 
         {related.length > 0 && (
-          <div class="mt-16 pt-8" style="border-top: 1px solid var(--border-soft);">
-            <h2 class="mb-4" style="font-size: var(--text-h4);">Other tags</h2>
-            <div class="flex flex-wrap gap-2">
+          <div style="margin-top:var(--space-600);padding-top:var(--space-300);border-top:1px solid var(--border)">
+            <h2 style="margin-bottom:var(--space-200);font-size:var(--text-h4)">Other tags</h2>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
               {related.map((t) => (
-                <a href={tagPath(t.slug)} class="term-lozenge">#{t.label}</a>
+                <a href={tagPath(t.slug)} class="chip chip--sm chip--muted">#{t.label}</a>
               ))}
             </div>
           </div>
         )}
 
-        <div class="mt-12 flex flex-wrap items-center gap-x-6 gap-y-2" style="font-size: var(--text-ui);">
-          <a href="/blog/" style="color: var(--ink-dim);">All posts</a>
-          {topics.map((t) => (
-            <a href={topicPath(t)} style="color: var(--ink-dim);">{t}</a>
-          ))}
+        <div style="margin-top:var(--space-600);display:flex;gap:24px;flex-wrap:wrap;font-size:var(--text-ui)">
+          <a href="/blog/">All posts</a>
+          {topics.map((t) => <a href={topicPath(t)}>{t}</a>)}
         </div>
       </div>
     </section>
+    <CtaBanner subtle />
   </main>
   <Footer />
 </BaseLayout>

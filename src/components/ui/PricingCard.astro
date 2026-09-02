@@ -1,8 +1,7 @@
 ---
-// Paid-product pricing card: a big price, a commercial value checklist, and a
-// slot for the CTA(s), resource links and fine print. Used on add-on and
-// trading product pages. Colours follow the surrounding track scope via
-// --accent-ink.
+// Paid-product purchase card: the four-colour rule, a big price, a commercial
+// value checklist, and a slot for the CTA(s), resource links and fine print.
+// Used on add-on and trading product pages.
 interface Props {
   /** e.g. "From $29.99" or "$149 · one-time". Parsed into kicker/amount/qualifier. */
   price?: string;
@@ -22,42 +21,42 @@ const kicker = kickerMatch ? kickerMatch[1] : '';
 const afterKicker = kickerMatch ? raw.slice(kickerMatch[0].length) : raw;
 const [amount, ...qParts] = afterKicker.split('·').map((s) => s.trim());
 const qualifier = qParts.join(' · ');
+
+const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
 ---
-<div class={`card p-7 lg:sticky lg:top-24 ${className}`}>
-  {badge && (
-    <span class="inline-block lozenge mb-5" style="background: var(--accent-soft); color: var(--accent-deep);">
-      {badge}
-    </span>
-  )}
+<div class:list={['card', className]} style="align-self:start">
+  <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
 
-  {amount && (
-    <div class="mb-6">
-      {kicker && (
-        <p class="text-[11px] mb-1" style="color: var(--ink-dim); text-transform: uppercase;">{kicker}</p>
-      )}
-      <div class="flex items-baseline gap-2 flex-wrap">
-        <span class="font-display font-bold" style="font-size: 2.5rem; line-height: 1; letter-spacing: -0.02em; color: var(--ink);">
-          {amount}
-        </span>
-        {qualifier && (
-          <span class="text-[15px]" style="color: var(--ink-dim);">{qualifier}</span>
-        )}
+  <div style="padding:24px;display:flex;flex-direction:column;gap:var(--space-300)">
+    {badge && <span class="chip chip--sm" style="align-self:flex-start">{badge}</span>}
+
+    {amount && (
+      <div>
+        {kicker && <div class="kicker">{kicker}</div>}
+        <div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:4px">
+          <span style="font-size:2.5rem;line-height:1;font-weight:var(--fw-display);letter-spacing:-0.02em">
+            {amount}
+          </span>
+          {qualifier && <span style="font-size:0.9375rem;color:var(--text-subtle)">{qualifier}</span>}
+        </div>
       </div>
-    </div>
-  )}
+    )}
 
-  {benefits.length > 0 && (
-    <ul class="list-none m-0 p-0 space-y-2.5 mb-7">
-      {benefits.map((b) => (
-        <li class="flex items-start gap-2.5 text-[14px]" style="color: var(--ink-body);">
-          <svg class="mt-0.5 shrink-0" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accent-ink)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-          <span>{b}</span>
-        </li>
-      ))}
-    </ul>
-  )}
+    {benefits.length > 0 && (
+      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+        {benefits.map((b, i) => (
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:var(--text-ui);line-height:1.5;color:var(--text-subtle)">
+            <span
+              class="dot"
+              style={`background:${quad[i % 4]};margin-top:4px`}
+              aria-hidden="true"
+            ></span>
+            <span>{b}</span>
+          </li>
+        ))}
+      </ul>
+    )}
 
-  <slot />
+    <slot />
+  </div>
 </div>
