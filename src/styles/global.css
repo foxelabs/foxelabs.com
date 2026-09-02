@@ -782,6 +782,28 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe > h2:first-child,
 .prose-foxe > h3:first-child { margin-top: 0; }
 
+/* Product bodies are short — a handful of 40-to-500-word sections. The blog's
+   reading scale (16.5px at 1.7, 28px section heads, 1.9em above each) stretches
+   them into a long scroll for very little text, so they get a tighter one. */
+.prose-foxe--compact {
+  font-size: var(--text-body);
+  line-height: 1.6;
+}
+.prose-foxe--compact > * + * { margin-top: 1em; }
+.prose-foxe--compact h2 {
+  margin-top: 1.6em;
+  margin-bottom: 0.4em;
+  font-size: 1.25rem;
+  font-weight: var(--fw-heading);
+  letter-spacing: -0.01em;
+}
+.prose-foxe--compact h3 {
+  margin-top: 1.3em;
+  margin-bottom: 0.35em;
+  font-size: 1.0625rem;
+}
+.prose-foxe--compact li { margin-top: 0.35em; }
+
 /* Legal documents are a run of numbered clauses, not a few chapter breaks —
    the article's 28px section heads are far too loud across a dozen of them. */
 .prose-foxe--doc h2 { font-size: var(--text-h3); font-weight: var(--fw-heading); letter-spacing: -0.01em; }

@@ -261,13 +261,13 @@ const quad = ACCENTS.map((a) => a.color);
     </section>
 
     <!-- What it does -->
-    <Section>
+    <Section size="sm">
       <div class="what">
-        <h2 style="margin-bottom:16px;font-size:1.625rem;letter-spacing:-0.5px">What it does</h2>
-        <p style="margin:0 0 var(--space-500);font-size:1.0625rem;line-height:1.6;color:var(--text-subtle)">
+        <h2 style="margin-bottom:12px;font-size:1.5rem;letter-spacing:-0.4px">What it does</h2>
+        <p style="margin:0 0 var(--space-300);font-size:1.0625rem;line-height:1.55;color:var(--text-subtle)">
           {data.summary}
         </p>
-        <div class="prose-foxe">
+        <div class="prose-foxe prose-foxe--compact">
           <Content />
         </div>
       </div>
@@ -352,10 +352,10 @@ const quad = ACCENTS.map((a) => a.color);
     grid-template-columns: 1fr 1fr;
     gap: 18px 16px;
   }
-  /* One measured column. A long body squeezed into half a split view reads
-     as a wall; at 760px it reads as an article. */
+  /* One measured column at the compact reading scale — the bodies here are
+     short sections, not articles, so they get less air than blog prose. */
   .what {
-    max-width: var(--measure);
+    max-width: 720px;
     margin-inline: auto;
   }
   .addon-grid {
