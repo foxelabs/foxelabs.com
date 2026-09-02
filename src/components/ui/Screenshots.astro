@@ -1,6 +1,7 @@
 ---
-// The admin tour: tabbed screens on the ink band. One tab per captured screen,
-// each with the path it lives at, a heading, and a caption.
+// The product tour: one row per captured screen, image and copy trading sides
+// down the page. Every screen is on the page at once — nothing is hidden behind
+// a tab, so the whole tour is readable, linkable and crawlable.
 import { Image } from 'astro:assets';
 
 interface Shot {
@@ -23,115 +24,74 @@ interface Props {
 const { id, shots, heading, lead } = Astro.props;
 const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
 ---
-<div data-tour={id}>
-  <h2 style="margin-bottom:8px;font-size:var(--text-h2);letter-spacing:-0.6px">{heading}</h2>
-  {lead && (
-    <p style="margin:0 0 var(--space-400);font-size:var(--text-body);color:var(--ink-band-subtle)">{lead}</p>
-  )}
+<div id={id}>
+  <div style="max-width:620px;margin-bottom:var(--space-600)">
+    <h2 style="margin-bottom:8px;font-size:var(--text-h2);letter-spacing:-0.6px">{heading}</h2>
+    {lead && (
+      <p style="margin:0;font-size:var(--text-body);line-height:1.55;color:var(--ink-band-subtle)">{lead}</p>
+    )}
+  </div>
 
-  {shots.length > 1 && (
-    <div role="tablist" aria-label={heading} style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
-      {shots.map((shot, i) => (
-        <button
-          type="button"
-          class="tab"
-          role="tab"
-          id={`${id}-tab-${i}`}
-          aria-controls={`${id}-panel-${i}`}
-          aria-selected={i === 0 ? 'true' : 'false'}
-          tabindex={i === 0 ? undefined : '-1'}
-        >
-          {shot.tab}
-        </button>
-      ))}
-    </div>
-  )}
-
-  {shots.map((shot, i) => (
-    <div
-      id={`${id}-panel-${i}`}
-      role="tabpanel"
-      aria-labelledby={`${id}-tab-${i}`}
-      hidden={i !== 0}
-      class="tour-panel"
-    >
-      <div style="border-radius:var(--r-md);overflow:hidden;border:1px solid var(--ink-band-border)">
-        <Image
-          src={shot.src}
-          alt={shot.alt}
-          widths={[640, 960, 1280]}
-          sizes="(max-width: 960px) 100vw, 620px"
-          loading={i === 0 ? 'eager' : 'lazy'}
-          style="display:block;width:100%;height:auto"
-        />
-      </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
-        {shot.crumb && (
+  <div class="tour">
+    {shots.map((shot, i) => (
+      <div class:list={['tour__row', i % 2 === 1 && 'tour__row--flip']}>
+        <div class="tour__shot">
+          <Image
+            src={shot.src}
+            alt={shot.alt}
+            widths={[640, 960, 1280]}
+            sizes="(max-width: 860px) 100vw, 560px"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            style="display:block;width:100%;height:auto"
+          />
+        </div>
+        <div class="tour__copy">
           <span class="chip chip--sm" style="align-self:flex-start">
             <span class="dot" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
-            {shot.crumb}
+            {shot.crumb ?? shot.tab}
           </span>
-        )}
-        <h3 style="font-size:var(--text-h3)">{shot.heading}</h3>
-        <p style="margin:0;font-size:0.9375rem;line-height:1.6;color:var(--ink-band-subtle)">{shot.body}</p>
-        {shot.caption && (
-          <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--ink-band-faint);font-style:italic">
-            {shot.caption}
-          </p>
-        )}
+          <h3 style="font-size:var(--text-h3)">{shot.heading}</h3>
+          <p style="margin:0;font-size:0.9375rem;line-height:1.6;color:var(--ink-band-subtle)">{shot.body}</p>
+          {shot.caption && (
+            <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--ink-band-faint);font-style:italic">
+              {shot.caption}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
-  ))}
+    ))}
+  </div>
 </div>
 
 <style>
-  .tour-panel {
+  .tour {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-800);
+  }
+  .tour__row {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: var(--space-500);
+    grid-template-columns: 1.35fr 1fr;
+    gap: var(--space-600);
     align-items: center;
   }
-  .tour-panel[hidden] { display: none; }
+  /* Odd rows put the copy first, so the eye zig-zags down the page. */
+  .tour__row--flip .tour__shot { order: 2; }
+  .tour__shot {
+    border: 1px solid var(--ink-band-border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+  .tour__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
   @media (max-width: 860px) {
-    .tour-panel { grid-template-columns: 1fr; gap: var(--space-300); }
+    .tour { gap: var(--space-600); }
+    /* Stacked, the alternation reads as inconsistency — every row goes
+       image-then-copy instead. */
+    .tour__row { grid-template-columns: 1fr; gap: var(--space-300); }
+    .tour__row--flip .tour__shot { order: 0; }
   }
 </style>
-
-<script is:inline>
-  // Tabs. Every panel is in the HTML; the buttons only toggle [hidden], so all
-  // of the copy is served whether or not the script runs.
-  (function () {
-    document.querySelectorAll('[data-tour]').forEach(function (tour) {
-      var list = tour.querySelector('[role="tablist"]');
-      if (!list) return;
-      var tabs = Array.prototype.slice.call(list.querySelectorAll('[role="tab"]'));
-      var panels = Array.prototype.slice.call(tour.querySelectorAll('[role="tabpanel"]'));
-
-      function select(index) {
-        tabs.forEach(function (tab, i) {
-          tab.setAttribute('aria-selected', String(i === index));
-          if (i === index) tab.removeAttribute('tabindex');
-          else tab.setAttribute('tabindex', '-1');
-        });
-        panels.forEach(function (panel, i) {
-          panel.hidden = i !== index;
-        });
-      }
-
-      tabs.forEach(function (tab, i) {
-        tab.addEventListener('click', function () {
-          select(i);
-        });
-        tab.addEventListener('keydown', function (event) {
-          var next =
-            event.key === 'ArrowRight' ? i + 1 : event.key === 'ArrowLeft' ? i - 1 : null;
-          if (next === null) return;
-          event.preventDefault();
-          var target = (next + tabs.length) % tabs.length;
-          select(target);
-          tabs[target].focus();
-        });
-      });
-    });
-  })();
-</script>

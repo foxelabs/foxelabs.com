@@ -2,22 +2,14 @@
 interface Props {
   id?: string;
   buttonLabel?: string;
-  tone?: 'light' | 'invert';
 }
-const {
-  id = 'email-form',
-  buttonLabel = 'Get early access',
-  tone = 'light',
-} = Astro.props;
-
-
-const successColor = 'var(--ok)';
-const errorColor = 'var(--bad)';
+const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
 ---
-<form data-email-form id={id} class="w-full max-w-md" novalidate>
+<form data-email-form id={id} novalidate style="width:100%">
   <!-- Honeypot: humans never see it; bots that fill it get a fake 200. -->
-  <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
-  <div data-fields class="flex flex-col sm:flex-row gap-2.5">
+  <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none" />
+
+  <div data-fields class="email-row">
     <input
       type="email"
       name="email"
@@ -25,28 +17,44 @@ const errorColor = 'var(--bad)';
       placeholder="you@domain.com"
       aria-label="Email address"
       aria-describedby={`${id}-error`}
-      class="field" style="flex:1" 
+      class="field"
+      style="flex:1"
     />
-    <button
-      type="submit"
-      data-submit
-      data-label={buttonLabel}
-      class="btn btn--primary shrink-0 justify-center disabled:opacity-60 disabled:cursor-not-allowed"
-    >
+    <button type="submit" data-submit data-label={buttonLabel} class="btn btn--primary" style="flex:none">
       <span data-label-text>{buttonLabel}</span>
-      <svg data-spinner class="hidden animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" stroke-opacity="0.25" />
-        <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
-      </svg>
     </button>
   </div>
-  <p data-success role="status" tabindex="-1" class="hidden mt-3 text-[14px]" style={`color: ${successColor};`}>
+
+  <p
+    data-success
+    role="status"
+    tabindex="-1"
+    hidden
+    style="margin:12px 0 0;font-size:var(--text-ui);color:var(--ok)"
+  >
     You're on the list!
   </p>
-  <p data-error id={`${id}-error`} role="alert" class="hidden mt-3 text-[14px]" style={`color: ${errorColor};`}>
+  <p
+    data-error
+    id={`${id}-error`}
+    role="alert"
+    hidden
+    style="margin:12px 0 0;font-size:var(--text-ui);color:var(--bad)"
+  >
     Something went wrong. Try again.
   </p>
 </form>
+
+<style>
+  .email-row {
+    display: flex;
+    gap: 10px;
+  }
+  .email-row[hidden] { display: none; }
+  @media (max-width: 520px) {
+    .email-row { flex-direction: column; }
+  }
+</style>
 
 <script is:inline>
   (function () {
@@ -57,46 +65,39 @@ const errorColor = 'var(--bad)';
       if (form.dataset.bound === '1') return;
       form.dataset.bound = '1';
 
-      const input = form.querySelector('input[name="email"]');
-      const success = form.querySelector('[data-success]');
-      const errorEl = form.querySelector('[data-error]');
-      const fields = form.querySelector('[data-fields]');
-      const button = form.querySelector('[data-submit]');
-      const labelText = form.querySelector('[data-label-text]');
-      const spinner = form.querySelector('[data-spinner]');
-      const idleLabel = button.getAttribute('data-label') || labelText.textContent;
-      const defaultError = errorEl.textContent;
+      var input = form.querySelector('input[name="email"]');
+      var success = form.querySelector('[data-success]');
+      var errorEl = form.querySelector('[data-error]');
+      var fields = form.querySelector('[data-fields]');
+      var button = form.querySelector('[data-submit]');
+      var labelText = form.querySelector('[data-label-text]');
+      var idleLabel = button.getAttribute('data-label') || labelText.textContent;
+      var defaultError = errorEl.textContent;
 
       function setLoading(loading) {
         button.disabled = loading;
         input.disabled = loading;
-        if (loading) {
-          labelText.textContent = 'Sending…';
-          spinner.classList.remove('hidden');
-        } else {
-          labelText.textContent = idleLabel;
-          spinner.classList.add('hidden');
-        }
+        labelText.textContent = loading ? 'Sending…' : idleLabel;
       }
 
-      form.addEventListener('submit', async (e) => {
+      form.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (form.dataset.submitting === '1') return;
 
         if (!input.value || !input.checkValidity()) {
           errorEl.textContent = 'Please enter a valid email address.';
-          errorEl.classList.remove('hidden');
+          errorEl.hidden = false;
           input.focus();
           return;
         }
 
         form.dataset.submitting = '1';
         errorEl.textContent = defaultError;
-        errorEl.classList.add('hidden');
+        errorEl.hidden = true;
         setLoading(true);
 
         try {
-          const res = await fetch('/api/waitlist', {
+          var res = await fetch('/api/waitlist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -105,11 +106,11 @@ const errorColor = 'var(--bad)';
             }),
           });
           if (!res.ok) throw new Error('request failed');
-          fields.classList.add('hidden');
-          success.classList.remove('hidden');
+          fields.hidden = true;
+          success.hidden = false;
           success.focus();
-        } catch {
-          errorEl.classList.remove('hidden');
+        } catch (err) {
+          errorEl.hidden = false;
           setLoading(false);
           form.dataset.submitting = '0';
         }

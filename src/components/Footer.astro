@@ -49,7 +49,7 @@ const year = new Date().getFullYear();
 const isExternal = (href: string) => href.startsWith('http');
 ---
 
-<footer class:list={['footer', slim && 'footer--slim']} style={slim ? 'padding:24px 0' : undefined}>
+<footer class="footer" style={slim ? 'padding:24px 0' : undefined}>
   <div class="container-x">
     {!slim && (
       <div class="footer__cols">

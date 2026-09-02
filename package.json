@@ -22,11 +22,9 @@
     "@iconify-json/mingcute": "^1.2.7",
     "@iconify-json/mynaui": "^1.2.19",
     "@iconify-json/tdesign": "^1.2.17",
-    "@tailwindcss/vite": "^4.0.0",
     "astro": "^5.0.0",
     "astro-icon": "^1.1.5",
-    "resend": "^4.0.0",
-    "tailwindcss": "^4.0.0"
+    "resend": "^4.0.0"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",

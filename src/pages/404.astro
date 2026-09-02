@@ -17,15 +17,15 @@ const shortcuts = [
   <Nav />
   <main id="main" class="notfound">
     <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-300);max-width:620px">
-      <div style="display:flex;gap:16px;align-items:stretch" aria-hidden="true">
-        <span style="font-size:120px;line-height:1;font-weight:var(--fw-display);letter-spacing:-4px">4</span>
+      <div class="fourohfour" aria-hidden="true">
+        <span class="fourohfour__digit">4</span>
         <span class="quad-block">
           <span style="background:var(--acc-1)"></span>
           <span style="background:var(--acc-2)"></span>
           <span style="background:var(--acc-4)"></span>
           <span style="background:var(--acc-3)"></span>
         </span>
-        <span style="font-size:120px;line-height:1;font-weight:var(--fw-display);letter-spacing:-4px">4</span>
+        <span class="fourohfour__digit">4</span>
       </div>
 
       <h1 style="font-size:2.125rem;letter-spacing:-0.7px">This page doesn't exist.</h1>
@@ -59,8 +59,19 @@ const shortcuts = [
     justify-content: center;
     padding: var(--space-800) var(--container-pad);
   }
+  .fourohfour {
+    display: flex;
+    gap: clamp(0.5rem, 3vw, 1rem);
+    align-items: stretch;
+  }
+  .fourohfour__digit {
+    font-size: clamp(4.5rem, 18vw, 7.5rem);
+    line-height: 1;
+    font-weight: var(--fw-display);
+    letter-spacing: -0.04em;
+  }
   .quad-block {
-    width: 96px;
+    width: clamp(3.5rem, 14vw, 6rem);
     border-radius: var(--r-lg);
     display: grid;
     grid-template-columns: 1fr 1fr;

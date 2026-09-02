@@ -126,7 +126,7 @@ const blog = defineCollection({
     seoDescription: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
-    author: z.string().default('Foxe Labs'),
+    author: z.string().default('Joel James'),
     tags: z.array(z.string()).default([]),
     // Featured image shown on listing cards and atop the single post.
     // Relative path, e.g. 'covers/my-cover.jpg' — optimised via astro:assets.
