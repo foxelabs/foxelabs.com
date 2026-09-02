@@ -6,8 +6,9 @@ export const SITE = {
   url: 'https://foxelabs.com',
   // Square logo for Organization markup.
   logo: 'https://foxelabs.com/icon-512.png',
-  // Default share banner (1200×630).
-  banner: 'https://foxelabs.com/social-banner.jpg',
+  // Default share banner (1200×630) — the generated site card. Per-page cards
+  // live at /og/<path>.png; see config/og.ts.
+  banner: 'https://foxelabs.com/og/index.png',
   twitter: '@foxelabs',
   locale: 'en_US',
   founder: 'Joel James',

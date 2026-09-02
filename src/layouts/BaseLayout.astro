@@ -2,11 +2,13 @@
 import '../styles/global.css';
 import Analytics from '../components/Analytics.astro';
 import { SITE, organizationLd, websiteLd } from '../config/seo';
+import { ogImageFor } from '../config/og';
 
 interface Props {
   title?: string;
   description?: string;
-  /** Absolute or root-relative path to a share image. Defaults to the site banner. */
+  /** Absolute or root-relative path to a share image. Defaults to the page's
+   *  generated share card (see config/og.ts). */
   image?: string;
   /** Alt text for the share image. */
   imageAlt?: string;
@@ -28,7 +30,7 @@ interface Props {
 const {
   title = 'Foxe Labs — Open-Source WordPress Tools & Trading Software',
   description = 'Open-source software and trading tools — WordPress plugins, PHP libraries, expert advisors, and a universal trading journal. Built in-house at Foxe Labs.',
-  image = '/social-banner.jpg',
+  image,
   imageAlt = 'Foxe Labs — open-source software and trading tools',
   imageWidth = 1200,
   imageHeight = 630,
@@ -41,7 +43,8 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site ?? SITE.url).href;
-const ogImage = new URL(image, Astro.site ?? SITE.url).href;
+// Pages that pass no image get the card rendered for their own path.
+const ogImage = new URL(image ?? (await ogImageFor(Astro.url.pathname)), Astro.site ?? SITE.url).href;
 const ogImageType = ogImage.endsWith('.png')
   ? 'image/png'
   : ogImage.endsWith('.webp')

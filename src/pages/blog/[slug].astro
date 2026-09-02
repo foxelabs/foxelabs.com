@@ -46,7 +46,9 @@ const topicPath = data.track === 'oss' ? '/software/' : data.track === 'trading'
 const pageTitle = data.seoTitle ?? data.title;
 const metaDescription = data.seoDescription ?? data.description;
 const postPath = `/blog/${post.id}`;
-const shareImage = data.heroImage?.src ?? '/social-banner.jpg';
+// A real cover beats a generated card; posts without one fall through to the
+// card BaseLayout renders for this path.
+const shareImage = data.heroImage?.src;
 const publishedIso = data.pubDate.toISOString();
 const modifiedIso = (data.updatedDate ?? data.pubDate).toISOString();
 

@@ -127,10 +127,7 @@ const specs = [
 <BaseLayout
   title={pageTitle}
   description={metaDescription}
-  image={data.screenshots[0]?.src.src}
-  imageAlt={data.screenshots[0]?.alt}
-  imageWidth={data.screenshots[0]?.src.width}
-  imageHeight={data.screenshots[0]?.src.height}
+  imageAlt={`${data.name} — ${data.tagline}`}
   jsonLd={structuredData}
 >
   <Nav />
