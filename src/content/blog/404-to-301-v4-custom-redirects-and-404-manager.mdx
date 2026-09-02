@@ -1,0 +1,178 @@
+---
+title: "404 to 301 v4: a complete rewrite for custom redirects and 404 error management"
+description: 404 to 301 v4 is a ground-up rewrite — a React admin, a full custom redirect manager, indexed database tables, a REST API, WP-CLI support, and an official add-ons catalogue.
+seoTitle: "Custom Redirects & 404 Error Manager for WordPress — 404 to 301 v4"
+seoDescription: 404 to 301 v4 brings a custom redirect manager with exact, prefix and regex matching, faster indexed 404 logging, a REST API, WP-CLI commands and official add-ons.
+pubDate: 2026-06-20
+updatedDate: 2026-09-02
+author: Joel James
+track: oss
+heroImage: covers/cover-404-to-301-v4.jpg
+heroImageAlt: A flat magenta illustration of four arrows in a row — the second breaks at a yellow bar and loops up and over to carry on, while the last two sit dark and unreached
+tags:
+  - wordpress
+  - seo
+  - plugins
+faq:
+  - q: How do I create custom redirects in WordPress with 404 to 301?
+    a: "Open the Redirects screen in 404 to 301 and add a rule with a source path, a destination and a match type — exact, prefix or regex. Each rule carries its own redirect status (301, 302, 307 or any other valid code) and can be toggled active or inactive without deleting it."
+  - q: What is the difference between exact, prefix and regex redirect matching?
+    a: "Exact matching targets one specific URL path and nothing else. Prefix matching catches every URL that begins with a given path, which is useful after restructuring a section — for example moving everything under /blog/ to /articles/. Regex matching accepts a full regular expression for complex, pattern-based rules across large URL sets."
+  - q: Does 404 to 301 slow down my WordPress site?
+    a: "No. Redirect resolution uses a hashed, indexed database lookup, and the plugin only does work when a 404 actually occurs — normal, healthy page loads are never touched, even with thousands of redirect rules in place."
+  - q: Can I upgrade to 404 to 301 v4 from version 3?
+    a: "Yes. Back up your database first — v4 creates new dedicated tables for logs and redirects and migrates your existing data on activation."
+  - q: Does 404 to 301 have a REST API and WP-CLI support?
+    a: "Yes. Version 4 ships a REST API at /wp-json/404-to-301/v1/ covering logs, redirects and settings, plus a WP-CLI command set under wp 404-to-301 with logs, redirects and settings subcommands. Multisite is fully supported, with separate redirects, logs and settings per site."
+---
+
+After years of steady iteration, [404 to 301](/software/plugins/404-to-301) v4 is
+here — rebuilt from the ground up with a modern React admin, a full custom redirect
+manager, a faster database layer, a REST API, WP-CLI support, and a growing
+ecosystem of official add-ons. If broken links and 404 errors are costing you SEO
+equity and visitors, this release gives you precise control over every URL on your
+site.
+
+## Why custom redirects and 404 errors matter for SEO
+
+Every 404 error on your WordPress site is a missed opportunity. When a visitor — or
+a search engine crawler — lands on a broken URL, they hit a dead end. The link
+equity built up by that URL evaporates, the visitor leaves, and your bounce rate
+climbs.
+
+Custom redirects — specifically 301 permanent redirects — pass the full SEO value of
+an old URL to the new one. They are essential after a site migration, a URL
+restructure, a domain change, or any redesign that moves pages around. Without them,
+you quietly bleed organic traffic every day.
+
+But redirects alone are not the whole picture. You need to know which links are
+broken before you can fix them. That is where 404 logging comes in — and it is what
+has always made 404 to 301 different from a plain redirect plugin.
+
+> A redirect plugin fixes broken links. 404 to 301 finds them too.
+
+## What's new in v4
+
+Version 4 is a complete rewrite. The old admin has been replaced with a fast, modern
+React-powered interface. The database layer now uses dedicated, indexed tables for
+both logs and redirects, so every operation — matching a redirect, logging a 404,
+running a bulk action — is faster at scale.
+
+- Custom redirect manager with exact, prefix and regex matching
+- Per-redirect type, active/inactive toggle, hit counter and last-hit timestamp
+- Dedicated, indexed database tables for logs and redirects
+- Modern logs and redirects tables with search, filters, bulk actions and pagination
+- Per-log lifecycle status — open, ignored, or fixed
+- Email notifications with a configurable hit threshold
+- REST API at `/wp-json/404-to-301/v1/`
+- WP-CLI command set — `wp 404-to-301 logs|redirects|settings`
+- GDPR-friendly logging with IP masking and path exclusions
+- Official add-ons catalogue for free and premium extensions
+
+## Custom redirect manager
+
+The headline feature in v4 is the built-in redirect manager. You can now create
+unlimited custom redirects directly inside 404 to 301 — no separate plugin needed.
+
+### Three matching modes
+
+Every redirect rule uses one of three match types. **Exact** matching targets one
+specific URL path and nothing else. **Prefix** matching catches any URL that begins
+with the given path — useful after restructuring a section of your site, such as
+moving everything under `/blog/` to `/articles/`. **Regex** matching gives you full
+regular expression support for complex, pattern-based rules, which is particularly
+powerful for developers managing large URL sets.
+
+### Per-redirect control
+
+Each rule carries its own redirect type — 301, 302, 307 or any other valid HTTP
+status — so you are not locked into a single site-wide setting. Toggle any redirect
+active or inactive without deleting it. A hit counter and last-hit timestamp on
+every row show you which rules are actually being used, so you can confidently clean
+up stale rules over time.
+
+### Global 404 fallback
+
+For any 404 that does not match a custom rule, you can set a global fallback
+destination — your homepage, a custom page, or any URL — with the redirect type of
+your choice. It is the safety net that catches everything you have not written an
+explicit rule for.
+
+The matching engine uses a hashed, indexed database lookup so redirect resolution
+stays fast even with thousands of rules in place. Normal, healthy page loads are
+never touched — the plugin only does work when a 404 occurs.
+
+## 404 error logging
+
+Knowing which URLs are broken is just as important as redirecting them. The v4 logs
+table is a significant upgrade.
+
+Every 404 is recorded with the requested URL, referrer, user agent, IP address and
+timestamp. Repeat hits to the same URL are deduplicated — one row per unique URL
+with a running hit count, so a popular broken link does not flood your table with
+thousands of identical rows.
+
+Each log entry carries a lifecycle status — open, ignored, or fixed — so you can
+triage and track your broken link backlog over time. Filter by date range and
+status, search by URL or referrer, and bulk-update or delete entries in a single
+action. You can also turn any logged 404 into a custom redirect in a couple of
+clicks; the URL pre-fills the redirect form so there is no copy-pasting involved.
+
+## Email notifications
+
+You do not need to log into the dashboard to know when broken links appear. The
+built-in email notification sends an alert when a 404 is recorded, with a
+configurable hit threshold so busy sites do not flood your inbox with every single
+occurrence. Set the threshold to five hits and you will only hear about URLs that
+have genuinely failed multiple times — a real problem worth acting on, not a one-off
+crawler hiccup.
+
+## REST API and WP-CLI
+
+Version 4 is built for developers and modern WordPress workflows. A full REST API at
+`/wp-json/404-to-301/v1/` covers every admin operation — querying and managing logs,
+creating and updating redirects, reading and writing settings. If you are building
+headless workflows, automating site maintenance, or feeding 404 data into external
+dashboards or reporting tools, the API gives you a clean interface to work against.
+
+The complete CLI command set is available via `wp 404-to-301`, with subcommands for
+`logs`, `redirects` and `settings`. Multisite is fully supported — each site in the
+network maintains its own separate redirects, logs and settings.
+
+## Official add-ons
+
+v4 ships with an official add-ons catalogue — free and premium extensions that
+integrate directly with the parent plugin. Each add-on does one thing well.
+
+### Free add-ons
+
+- **Redirects Importer** lets you bulk-import custom redirects from a CSV file,
+  or migrate your existing rules directly from other redirect plugins —
+  Redirection by John Godley and 301 Redirects by WebFactory are both supported.
+  No manual re-entry, no copy-pasting.
+- **Logs Exporter** adds a one-click CSV export to the 404 Logs page. The export
+  is filter-aware, so you can export just the rows matching your current search
+  or date range — ready for Google Sheets, Excel, or your SEO team's reports.
+
+### Premium add-ons
+
+- **Logs Cleaner** automatically prunes the 404 log table by age, by row count,
+  or on a recurring schedule. Set it once and the database stays lean without
+  any manual housekeeping — essential for high-traffic sites where the log table
+  would otherwise grow without bound.
+- **Email Reports** delivers scheduled digests of your 404 activity — daily,
+  weekly or monthly — straight to your inbox, each with an attached CSV of the
+  underlying log rows. Stay on top of broken links without logging into the
+  dashboard.
+- **Telegram Alerts** pushes a Telegram message the moment a 404 error is
+  recorded. Alerts are dispatched in the background so visitors never wait on
+  the Telegram API — you get real-time visibility into broken links with no
+  front-end slowdown.
+
+## Get started
+
+404 to 301 is free on WordPress.org. Install it from your plugins screen or download
+it directly. If you are upgrading from v3, back up your database first — v4 creates
+new dedicated tables and migrates your existing data on activation.
+
+[Download 404 to 301 free on WordPress.org →](https://wordpress.org/plugins/404-to-301/)
