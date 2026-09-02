@@ -160,6 +160,11 @@
      inheriting a framework's. Prose re-enables list markers and indents. */
   *, *::before, *::after { box-sizing: border-box; }
 
+  /* Component rules set display, which beats the user agent's [hidden] and
+     leaves anything toggled by script visible. Tailwind's preflight used to
+     cover this; now the reset does. */
+  [hidden] { display: none !important; }
+
   p, figure, blockquote, dl, dd, pre, fieldset { margin: 0; }
   ul, ol { margin: 0; padding: 0; list-style: none; }
   fieldset { border: 0; padding: 0; }

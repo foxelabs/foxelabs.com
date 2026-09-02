@@ -1,5 +1,5 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
@@ -42,7 +42,6 @@ const siblingIds = (await getCollection('addons', (a) => !a.data.draft && a.data
   .sort((a, b) => a.data.order - b.data.order)
   .map((a) => a.id);
 const { data } = addon;
-const { Content } = await render(addon);
 const accent = accentFor(siblingIds, addon.id);
 
 const parentUrl = projectPath('oss', parent.data.category, parent.id);
@@ -163,19 +162,6 @@ const quad = ACCENTS.map((a) => a.color);
       </div>
     </section>
 
-    <!-- What it does -->
-    <Section size="sm">
-      <div class="what">
-        <h2 style="margin-bottom:12px;font-size:1.5rem;letter-spacing:-0.4px">What it does</h2>
-        <p style="margin:0 0 var(--space-300);font-size:1.0625rem;line-height:1.55;color:var(--text-subtle)">
-          {data.summary}
-        </p>
-        <div class="prose-foxe prose-foxe--compact">
-          <Content />
-        </div>
-      </div>
-    </Section>
-
     {data.screenshots.length > 0 && (
       <Section variant="ink">
         <Screenshots
@@ -203,12 +189,6 @@ const quad = ACCENTS.map((a) => a.color);
     display: grid;
     grid-template-columns: 1.4fr 1fr;
     gap: var(--space-700);
-  }
-  /* One measured column at the compact reading scale — the bodies here are
-     short sections, not articles, so they get less air than blog prose. */
-  .what {
-    max-width: 720px;
-    margin-inline: auto;
   }
   @media (max-width: 960px) {
     .addon-hero { grid-template-columns: 1fr; gap: var(--space-500); }
