@@ -141,15 +141,14 @@ const tabbed = shots.length > 1;
 
   .shots__figure { margin: 0; }
 
-  /* The frame is what makes differently-cropped captures read as one set. */
+  /* The frame is what makes differently-cropped captures read as one set.
+     ADS treatment: 8px radius, border + hairline raised shadow, no soft glow. */
   .shots__frame {
     border: 1px solid var(--border);
-    border-radius: var(--r-card-lg);
+    border-radius: var(--r-md);
     overflow: hidden;
     background: var(--surface);
-    box-shadow:
-      0 2px 4px rgba(9, 30, 66, 0.06),
-      0 24px 48px -20px rgba(9, 30, 66, 0.28);
+    box-shadow: var(--shadow-raised);
   }
 
   /* Screenshots are captures of a light WordPress admin and cannot be retaken
@@ -159,7 +158,7 @@ const tabbed = shots.length > 1;
   :global([data-theme='dark']) .shots__frame {
     background: #FFFFFF;
     border-color: var(--n500);
-    box-shadow: 0 24px 48px -20px rgba(0, 0, 0, 0.6);
+    box-shadow: none;
   }
 
   /* The frame stays light all the way through in dark mode — a dark chrome bar
@@ -197,8 +196,8 @@ const tabbed = shots.length > 1;
   }
 
   .shots__crumb {
-    font-family: var(--font-mono); /* wp-admin path — reads as a real breadcrumb */
-    font-size: 10.5px;
+    font-family: var(--font-body);
+    font-size: 11px;
     color: var(--ink-dim);
     white-space: nowrap;
     overflow: hidden;

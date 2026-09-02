@@ -4,7 +4,8 @@
 // clears AA on white and a `soft` tint for fills. Everything here pairs those
 // two so a hue can be used for text, icons, and backgrounds interchangeably.
 //
-// Red is deliberately absent: on a product card it reads as an error state.
+// Red is deliberately absent (reads as an error state) and so is green — a
+// second green next to the lime brand hue reads as a mismatched lime.
 
 import type { OSS_CATEGORIES, TRADING_CATEGORIES } from './tracks';
 
@@ -22,7 +23,6 @@ export interface Accent {
 
 export const ACCENTS: Accent[] = [
   { name: 'blue',   ink: 'var(--b500)',             soft: 'var(--b50)',              deep: 'var(--b700)' },
-  { name: 'green',  ink: 'var(--acc-green-bold)',   soft: 'var(--acc-green-soft)',   deep: 'var(--acc-green-bold)' },
   { name: 'purple', ink: 'var(--acc-purple-bold)',  soft: 'var(--acc-purple-soft)',  deep: 'var(--acc-purple-bold)' },
   { name: 'orange', ink: 'var(--acc-orange-bold)',  soft: 'var(--acc-orange-soft)',  deep: 'var(--acc-orange-bold)' },
   { name: 'teal',   ink: 'var(--acc-teal-bold)',    soft: 'var(--acc-teal-soft)',    deep: 'var(--acc-teal-bold)' },
@@ -33,18 +33,18 @@ export const ACCENTS: Accent[] = [
 const CATEGORY_ACCENT: Record<CategorySlug, string> = {
   plugins: 'blue',
   libraries: 'purple',
-  'expert-advisors': 'green',
-  tools: 'orange',
+  'expert-advisors': 'orange',
+  tools: 'teal',
 };
 
 /**
  * Blog topics. Colour is keyed on the topic rather than on the individual post
- * so the filter row teaches the mapping — a green pill and a green post kicker
- * mean the same thing. Software and Trading match their track's category hues.
+ * so the filter row teaches the mapping — a pill and a post kicker in the
+ * same hue mean the same thing. Software and Trading match their track's category hues.
  */
 const TOPIC_ACCENT: Record<string, string> = {
   Software: 'blue',
-  Trading: 'green',
+  Trading: 'orange',
   Writing: 'purple',
 };
 
@@ -82,6 +82,11 @@ export function accentVars(accent: Accent): string {
     `--accent-deep: ${accent.deep}`,
     `--accent-soft: ${accent.soft}`,
     `--accent-btn: ${accent.ink}`,
+    `--accent-btn-hover: ${accent.deep}`,
     `--accent-press: ${accent.deep}`,
+    // Bold accent fills carry white in light mode and flip to dark ink on
+    // dark, where the ramps lighten — unlike the lime brand fill, which keeps
+    // ink text in both themes.
+    `--accent-on: var(--accent-on-bold)`,
   ].join('; ');
 }

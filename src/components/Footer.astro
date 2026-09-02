@@ -68,7 +68,7 @@ const isExternal = (href: string) => href.startsWith('http');
 {cta && (
   <!-- Atlassian's "Learn how we can help you achieve more." band: one heading,
        one button, sitting directly above the footer on the same sunken surface. -->
-  <section class="track-hub" style="background: var(--surface-sunken); border-top: 1px solid var(--border-soft);">
+  <section style="background: var(--surface-sunken); border-top: 1px solid var(--border-soft);">
     <div class="container-x" style="padding-block: var(--space-section);">
       <div class="max-w-[720px] mx-auto text-center">
         <h2 style="font-size: var(--text-h2); font-weight: var(--fw-display); color: var(--ink);" class="mb-4">
@@ -92,15 +92,15 @@ const isExternal = (href: string) => href.startsWith('http');
 
 <!-- Atlassian footer: brand row on top, a compact link grid under it, then a
      thin bottom bar carrying copyright, legal links, and socials. -->
-<footer class="track-hub" style="background: var(--surface-sunken); border-top: 1px solid var(--border); padding-block: 3rem 2rem;">
+<footer style="background: var(--surface-sunken); border-top: 1px solid var(--border); padding-block: 3rem 2rem;">
   <div class="container-x">
     <a
       href="/"
       class="inline-flex items-center gap-2.5 font-display text-lg"
-      style="color: var(--wordmark); font-weight: var(--fw-display); letter-spacing: -0.01em;"
+      style="color: var(--ink); font-weight: var(--fw-display); letter-spacing: -0.01em;"
     >
       <span class="w-[30px] h-[30px] shrink-0 brand-mark" aria-hidden="true"></span>
-      Foxe <span style="color: var(--wordmark-alt);">Labs</span>
+      Foxe <span class="wordmark-box">Labs</span>
     </a>
 
     <nav

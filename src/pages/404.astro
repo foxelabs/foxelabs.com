@@ -40,7 +40,7 @@ const exits = [
   noindex
 >
   <Nav />
-  <main id="main" class="track-hub">
+  <main id="main">
     <Section variant="light">
       <div class="text-center py-6">
         <!-- The fox, on the hunt -->
@@ -49,11 +49,11 @@ const exits = [
             class="w-28 h-28 md:w-32 md:h-32 rounded-full flex items-center justify-center"
             style="background: var(--surface-alt); border: 1px solid var(--border-soft);"
           >
-            <span class="w-16 h-16 md:w-[72px] md:h-[72px] fox-404 animate-fox-sniff" aria-hidden="true"></span>
+            <span class="w-16 h-16 md:w-[72px] md:h-[72px] fox-404" aria-hidden="true"></span>
           </div>
           <span
             class="absolute -top-1 -right-1 font-display font-bold text-lg w-9 h-9 rounded-full flex items-center justify-center rotate-6"
-            style="background: var(--acc-orange-bold); color: #fff; box-shadow: var(--shadow-card);"
+            style="background: var(--acc-orange-bold); color: #fff;"
           >?</span>
         </div>
 
@@ -68,19 +68,6 @@ const exits = [
           </p>
         </div>
 
-        <!-- Mono easter-egg: one joke per craft -->
-        <div
-          class="inline-block text-left font-code leading-[1.9] px-5 py-4 mb-9 max-w-full overflow-x-auto"
-          style="background: var(--surface-invert); color: var(--ink-invert); font-size: var(--text-small); border-radius: var(--r-md);"
-        >
-          <div><span style="color: var(--chart-up);">$</span> find / -name "this-page"</div>
-          <div style="color: var(--ink-invert-dim);">→ 0 results. Not even in the git history.</div>
-          <div><span style="color: var(--acc-yellow);">$</span> backtest --url ./404</div>
-          <div style="color: var(--ink-invert-dim);">→ max drawdown: 100%. Position closed.</div>
-        </div>
-
-        <!-- The terminal block above is inline-block, so the button needs its own
-             block-level line or it flows alongside it. -->
         <div>
           <Button href="/" variant="primary" size="lg" arrow="back">Back to safety</Button>
         </div>
@@ -108,10 +95,6 @@ const exits = [
 </BaseLayout>
 
 <style>
-  /* Same top-rule treatment the product and category grids use. */
-  .exit-card {
-    border-top: 3px solid var(--accent-ink);
-  }
   .exit-card__label {
     transition: color 0.1s ease;
   }

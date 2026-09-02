@@ -69,8 +69,8 @@ const structuredData = [
 ---
 <BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
   <Nav />
-  <main id="main" class="track-trading" style={accentVars(accentFor(siblingIds, product.id))}>
-    <div class="band band--alt" style="padding-block: var(--space-section-sm);">
+  <main id="main" style={accentVars(accentFor(siblingIds, product.id))}>
+    <div class="band band--light" style="padding-block: var(--space-section-sm);">
       <div class="container-x">
         <a href={categoryPath('trading', data.category)} class="inline-flex items-center gap-1.5 text-[11px] mb-7 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -101,20 +101,21 @@ const structuredData = [
       </div>
     </div>
 
+    <!-- Highlights: light tinted band — ADS groups on sunken tint, not a dark band -->
     {data.highlights.length > 0 && (
-      <section class="band band--invert" data-reveal>
+      <section class="band band--alt">
         <div class="container-x">
           <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
             {data.highlights.map((h) => (
               <div>
                 <div
                   class="w-11 h-11 rounded-[8px] flex items-center justify-center mb-5"
-                  style="background: var(--surface-invert-raised); border: 1px solid var(--border-invert);"
+                  style="background: var(--accent-soft);"
                 >
-                  <Icon name={h.icon} width={20} height={20} style="color: var(--accent);" aria-hidden="true" />
+                  <Icon name={h.icon} width={20} height={20} style="color: var(--accent-ink);" aria-hidden="true" />
                 </div>
                 <h3 style="font-size: 1.0625rem; font-weight: var(--fw-heading);" class="mb-2.5">{h.title}</h3>
-                <p class="text-[14.5px] m-0" style="color: var(--ink-invert-dim);">{h.body}</p>
+                <p class="text-[14.5px] m-0" style="color: var(--ink-body);">{h.body}</p>
               </div>
             ))}
           </div>
@@ -123,7 +124,7 @@ const structuredData = [
     )}
 
 
-    <section class="band band--light" data-reveal>
+    <section class="band band--light">
       <div class="container-x">
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-14">
           <div class="lg:col-span-7">
@@ -160,32 +161,38 @@ const structuredData = [
               )}
 
               {data.status === 'live' && data.ctaUrl ? (
-                <div class="flex flex-col gap-2.5">
+                <div>
                   <Button href={data.ctaUrl} variant="primary" arrow class="w-full justify-center">
                     {data.ctaLabel ?? 'Get it now'}
                   </Button>
-                  {data.signalUrl && (
-                    <Button href={data.signalUrl} variant="ghost" class="w-full justify-center gap-2">
-                      <Icon name="mingcute:chart-line-line" width={16} height={16} aria-hidden="true" />
-                      View live signal
-                    </Button>
-                  )}
-                  {data.demoUrl && (
-                    <Button href={data.demoUrl} variant="ghost" class="w-full justify-center gap-2">
-                      <Icon name="mingcute:download-2-line" width={16} height={16} aria-hidden="true" />
-                      {data.demoLabel ?? 'Download free demo'}
-                    </Button>
-                  )}
-                  {data.docsUrl && (
-                    <Button href={data.docsUrl} variant="ghost" class="w-full justify-center gap-2">
-                      <Icon name="mingcute:book-2-line" width={16} height={16} aria-hidden="true" />
-                      Documentation
-                    </Button>
-                  )}
-                  <Button href={data.supportUrl ?? '/contact'} variant="ghost" class="w-full justify-center gap-2">
-                    <Icon name="mingcute:chat-1-line" width={16} height={16} aria-hidden="true" />
-                    Get support
-                  </Button>
+                  <div class="pricing-links">
+                    {data.demoUrl && (
+                      <a href={data.demoUrl}>
+                        <Icon name="mingcute:download-2-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
+                        {data.demoLabel ?? 'Download free demo'}
+                        <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
+                      </a>
+                    )}
+                    {data.docsUrl && (
+                      <a href={data.docsUrl}>
+                        <Icon name="mingcute:book-2-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
+                        Documentation
+                        <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
+                      </a>
+                    )}
+                    {data.signalUrl && (
+                      <a href={data.signalUrl}>
+                        <Icon name="mingcute:chart-line-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
+                        View live signal
+                        <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
+                      </a>
+                    )}
+                    <a href={data.supportUrl ?? '/contact/'}>
+                      <Icon name="mingcute:chat-1-line" width={15} height={15} class="pricing-links__icon" aria-hidden="true" />
+                      Get support
+                      <Icon name="mingcute:right-line" width={13} height={13} class="pricing-links__chev" aria-hidden="true" />
+                    </a>
+                  </div>
                 </div>
               ) : (
                 <EmailForm id={`product-form-${product.id}`} buttonLabel="Notify me" />
@@ -208,7 +215,7 @@ const structuredData = [
     </section>
 
     {data.faq.length > 0 && (
-      <section class="band band--light" data-reveal style="border-top: 1px solid var(--border-soft);">
+      <section class="band band--light" style="border-top: 1px solid var(--border-soft);">
         <div class="container-x">
           <div class="max-w-3xl">
             <Faq items={data.faq} bare />

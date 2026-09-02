@@ -39,14 +39,14 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
   ]}
 >
   <Nav />
-  <main id="main" class="track-hub">
+  <main id="main">
     {posts.length === 0 ? (
       <section class="band"><div class="container-x"><p style="color: var(--ink-dim);">No posts yet — check back soon.</p></div></section>
     ) : (
       <>
         <!-- Top section: one tinted band holding the page title, the lead story
              and a 2x2 grid of runners-up beside it (atlassian.com/blog). -->
-        <section style="background: var(--surface-sunken); padding-block: var(--space-section);" data-reveal>
+        <section style="background: var(--surface-sunken); padding-block: var(--space-section);">
           <div class="container-x">
             <h1 style="font-size: var(--text-hero-sm); line-height: 1.2;">From the studio</h1>
             <p class="mt-4 mb-0" style="font-size: var(--text-body); color: var(--ink-body);">
@@ -98,7 +98,7 @@ const topics = ['All', ...Array.from(new Set(posts.map((p) => topicOf(p.data.tra
         </section>
 
         <!-- Latest by topic: pill filter over every post, newest first -->
-        <section class="band" data-reveal style="padding-block: var(--space-section-sm) var(--space-section);">
+        <section class="band" style="padding-block: var(--space-section-sm) var(--space-section);">
           <div class="container-x">
             <h2 class="mb-6" style="font-size: var(--text-h2);">Latest by topic</h2>
 

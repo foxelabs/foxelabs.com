@@ -21,14 +21,14 @@ const candles = [
 const UP = 'var(--acc-green)';
 const DOWN = 'var(--acc-red)';
 ---
-<section class="band overflow-hidden" data-reveal style="background: var(--surface);">
+<section class="band overflow-hidden" style="background: var(--surface);">
   <div class="container-x">
     <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
       <div class="lg:col-span-7">
         <Eyebrow class="mb-6">Algo trading tools · new track, since 2025</Eyebrow>
 
         <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-6">
-          Built for traders who run on <span style="color: var(--b400);">edge</span>.
+          Built for traders who run on <span class="hl-accent">edge</span>.
         </h1>
 
         <p class="mb-9 max-w-[520px] leading-relaxed" style="font-size: var(--text-lead-sm); color: var(--ink-body);">
@@ -44,7 +44,7 @@ const DOWN = 'var(--acc-red)';
       </div>
 
       <div class="lg:col-span-5">
-        <div class="tile" style="--accent-soft: var(--n100); padding: var(--space-300);">
+        <div class="tile" style="padding: var(--space-300);">
           <div class="flex items-center justify-between mb-5">
             <span class="text-[14px]" style="color: var(--ink); font-weight: var(--fw-bold);">XAUUSD · M15</span>
             <span class="lozenge">Backtest</span>
@@ -66,7 +66,6 @@ const DOWN = 'var(--acc-red)';
             ))}
 
             <line
-              class="trend-line"
               x1="10" y1="100" x2="216" y2="20"
               stroke="var(--b400)" stroke-width="1.4" stroke-dasharray="4 3" fill="none"
             />

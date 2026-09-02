@@ -1,10 +1,11 @@
 ---
 /** One qualitative trust item. Icons are drawn inline so the bar has no
- *  icon-font dependency; `tint` colours the stroke only (decorative). */
+ *  icon-font dependency. Atlassian pattern: a light sunken strip (their
+ *  "works with" logo bar), neutral ink — not a dark band, no icon tints. */
 interface TrustItem {
   label: string;
   icon: 'code' | 'shield' | 'eye' | 'user' | 'box' | 'doc' | 'refresh';
-  tint: string;
+  tint?: string;
 }
 
 interface Props {
@@ -13,18 +14,18 @@ interface Props {
 
 // Default set = the trading hub's bar.
 const { items = [
-  { label: 'MQL5 + Pine Script', icon: 'code', tint: 'var(--acc-green)' },
-  { label: 'Prop firm ready', icon: 'shield', tint: 'var(--acc-orange)' },
-  { label: 'Documented logic — no black boxes', icon: 'eye', tint: 'var(--acc-red-bright)' },
-  { label: 'Built by live traders', icon: 'user', tint: 'var(--acc-purple)' },
+  { label: 'MQL5 + Pine Script', icon: 'code' },
+  { label: 'Prop firm ready', icon: 'shield' },
+  { label: 'Documented logic — no black boxes', icon: 'eye' },
+  { label: 'Built by live traders', icon: 'user' },
 ] } = Astro.props;
 ---
-<div class="band--invert" style="padding-block: 28px;">
+<div style="background: var(--surface-sunken); padding-block: 28px;">
   <div class="container-x">
     <ul class="flex flex-wrap items-center justify-center gap-x-14 gap-y-4 list-none m-0 p-0">
       {items.map((it) => (
-        <li class="flex items-center gap-2.5" style="font-size: var(--text-ui); font-weight: var(--fw-medium); color: var(--ink-invert-dim);">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={it.tint} stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <li class="flex items-center gap-2.5" style="font-size: var(--text-ui); font-weight: var(--fw-medium); color: var(--ink-body);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--ink-dim)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             {it.icon === 'code' && <><polyline points="8 6 3 12 8 18" /><polyline points="16 6 21 12 16 18" /></>}
             {it.icon === 'shield' && <path d="M12 3l7 3v6c0 4-3 7-7 9-4-2-7-5-7-9V6z" />}
             {it.icon === 'eye' && <><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z" /><circle cx="12" cy="12" r="2.5" /></>}

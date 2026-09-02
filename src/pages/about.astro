@@ -2,10 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import CtaBanner from '../components/CtaBanner.astro';
 import Section from '../components/ui/Section.astro';
 import PageHeader from '../components/ui/PageHeader.astro';
-import Button from '../components/ui/Button.astro';
 import { Icon } from 'astro-icon/components';
 import { breadcrumbLd, personLd } from '../config/seo';
 
@@ -20,16 +18,16 @@ const tracks = [
   {
     icon: 'mynaui:chart-candlestick-solid',
     label: 'Trading',
-    tone: { ink: 'var(--acc-green-bold)', soft: 'var(--acc-green-soft)', deep: 'var(--acc-green-bold)' },
+    tone: { ink: 'var(--b500)', soft: 'var(--b50)', deep: 'var(--b700)' },
     body: 'Expert advisors, a universal journal, and precision utilities — engineered risk-first and traded on my own accounts.',
     href: '/trading',
   },
 ];
 
 const founderLinks = [
-  { href: 'https://x.com/Joel_James', label: 'Joel James on X', icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
-  { href: 'https://instagram.com/joeltalks', label: 'Joel James on Instagram', icon: 'mingcute:instagram-line', brand: '#E1306C' },
-  { href: 'https://github.com/joel-james', label: 'Joel James on GitHub', icon: 'mingcute:github-line', brand: '#8250DF' },
+  { href: 'https://x.com/Joel_James', label: 'Joel James on X', icon: 'mingcute:social-x-line' },
+  { href: 'https://instagram.com/joeltalks', label: 'Joel James on Instagram', icon: 'mingcute:instagram-line' },
+  { href: 'https://github.com/joel-james', label: 'Joel James on GitHub', icon: 'mingcute:github-line' },
 ];
 
 const values = [
@@ -41,7 +39,7 @@ const values = [
   },
   {
     icon: 'mingcute:shield-line',
-    tone: { ink: 'var(--acc-green-bold)', soft: 'var(--acc-green-soft)' },
+    tone: { ink: 'var(--b500)', soft: 'var(--b50)' },
     title: 'Risk before returns',
     body: 'Every trading tool ships with hard risk controls first. A strategy that can blow an account is a countdown, not a strategy.',
   },
@@ -80,7 +78,7 @@ const values = [
   ]}
 >
   <Nav />
-  <main id="main" class="track-hub">
+  <main id="main">
     <PageHeader
       eyebrow="About"
       title="A small studio, "
@@ -119,7 +117,7 @@ const values = [
         <div class="lg:col-span-5">
           <div class="card overflow-hidden lg:max-w-[248px] lg:ml-auto" style="padding: 0;">
             <div class="relative aspect-square">
-              <div class="absolute inset-0 flex items-center justify-center" style="background: linear-gradient(135deg, var(--surface) 0%, var(--surface-alt) 100%);">
+              <div class="absolute inset-0 flex items-center justify-center" style="background: var(--surface-alt);">
                 <Icon name="mingcute:user-4-fill" width={48} height={48} style="color: var(--ink-dim);" aria-hidden="true" />
               </div>
               <img
@@ -151,7 +149,6 @@ const values = [
                       rel="noopener noreferrer"
                       aria-label={l.label}
                       class="founder-link flex items-center justify-center w-8 h-8"
-                      style={`--brand: ${l.brand};`}
                     >
                       <Icon name={l.icon} width={15} height={15} aria-hidden="true" />
                     </a>
@@ -208,13 +205,12 @@ const values = [
       </div>
     </Section>
 
-    <CtaBanner />
   </main>
   <Footer />
 </BaseLayout>
 
 <style>
-  /* Compact social buttons — each lights up in its own network colour. */
+  /* Compact social buttons — neutral, brand-blue on hover. */
   .founder-link {
     border: 1px solid var(--border);
     border-radius: var(--r-sm);
@@ -222,7 +218,7 @@ const values = [
     transition: color 180ms ease, border-color 180ms ease;
   }
   .founder-link:hover {
-    color: var(--brand);
-    border-color: var(--brand);
+    color: var(--accent-ink);
+    border-color: var(--accent-ink);
   }
 </style>

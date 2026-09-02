@@ -1,7 +1,8 @@
 ---
 // Paid-product pricing card: a big price, a commercial value checklist, and a
-// slot for the CTA(s) and fine print. Used on add-on and trading product pages.
-// Colours follow the surrounding track scope via --accent-ink.
+// slot for the CTA(s), resource links and fine print. Used on add-on and
+// trading product pages. Colours follow the surrounding track scope via
+// --accent-ink.
 interface Props {
   /** e.g. "From $29.99" or "$149 · one-time". Parsed into kicker/amount/qualifier. */
   price?: string;
@@ -35,7 +36,7 @@ const qualifier = qParts.join(' · ');
         <p class="text-[11px] mb-1" style="color: var(--ink-dim); text-transform: uppercase;">{kicker}</p>
       )}
       <div class="flex items-baseline gap-2 flex-wrap">
-        <span class="font-display font-bold" style="font-size: clamp(2.75rem, 2rem + 2vw, 3.5rem); line-height: 1; letter-spacing: -0.03em; color: var(--ink);">
+        <span class="font-display font-bold" style="font-size: 2.5rem; line-height: 1; letter-spacing: -0.02em; color: var(--ink);">
           {amount}
         </span>
         {qualifier && (

@@ -39,17 +39,17 @@ const channels = [
 ];
 
 const studioSocials = [
-  { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
-  { href: 'https://github.com/foxelabs',       label: '@foxelabs',  icon: 'mingcute:github-line',   brand: '#8250DF' },
-  { href: 'https://youtube.com/@foxelabs',     label: '@foxelabs',  icon: 'mingcute:youtube-line',  brand: '#FF0000' },
-  { href: 'https://instagram.com/foxelabs',    label: '@foxelabs',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
-  { href: 'https://www.facebook.com/foxelabs', label: '@foxelabs',  icon: 'mingcute:facebook-line', brand: '#1877F2' },
+  { href: 'https://x.com/foxelabs',            label: '@foxelabs',  icon: 'mingcute:social-x-line' },
+  { href: 'https://github.com/foxelabs',       label: '@foxelabs',  icon: 'mingcute:github-line' },
+  { href: 'https://youtube.com/@foxelabs',     label: '@foxelabs',  icon: 'mingcute:youtube-line' },
+  { href: 'https://instagram.com/foxelabs',    label: '@foxelabs',  icon: 'mingcute:instagram-line' },
+  { href: 'https://www.facebook.com/foxelabs', label: '@foxelabs',  icon: 'mingcute:facebook-line' },
 ];
 
 const founderSocials = [
-  { href: 'https://x.com/Joel_James',          label: '@Joel_James', icon: 'mingcute:social-x-line', brand: '#1DA1F2' },
-  { href: 'https://github.com/joel-james',     label: '@joel-james', icon: 'mingcute:github-line',   brand: '#8250DF' },
-  { href: 'https://instagram.com/joeltalks',   label: '@joeltalks',  icon: 'mingcute:instagram-line', brand: '#E1306C' },
+  { href: 'https://x.com/Joel_James',          label: '@Joel_James', icon: 'mingcute:social-x-line' },
+  { href: 'https://github.com/joel-james',     label: '@joel-james', icon: 'mingcute:github-line' },
+  { href: 'https://instagram.com/joeltalks',   label: '@joeltalks',  icon: 'mingcute:instagram-line' },
 ];
 ---
 <BaseLayout
@@ -64,8 +64,8 @@ const founderSocials = [
   ]}
 >
   <Nav />
-  <main id="main" class="track-hub">
-    <Section variant="alt">
+  <main id="main">
+    <Section variant="light">
       <div class="grid lg:grid-cols-12 gap-12 lg:gap-16">
         <div class="lg:col-span-5">
           <Eyebrow class="mb-5">Contact</Eyebrow>
@@ -78,16 +78,6 @@ const founderSocials = [
             of the team that wrote the code.
           </p>
 
-          <!-- Terminal easter-egg -->
-          <div
-            class="font-code leading-[1.9] px-5 py-4 mb-8 overflow-x-auto"
-            style="background: var(--surface-invert); color: var(--ink-invert); font-size: var(--text-small); border-radius: var(--r-md);"
-          >
-            <div><span style="color: var(--chart-up);">$</span> whoami</div>
-            <div style="color: var(--ink-invert-dim);">→ the fox who answers the mail</div>
-            <div><span style="color: var(--acc-yellow);">$</span> uptime --replies</div>
-            <div style="color: var(--ink-invert-dim);">→ usually within a day. IST, fox time.</div>
-          </div>
 
           <div class="grid gap-3 mb-9">
             {channels.map((c) => {
@@ -111,7 +101,7 @@ const founderSocials = [
           </div>
 
           <div class="mb-7">
-            <p class="mb-3" style="font-size: var(--text-small); color: var(--acc-purple-bold); font-weight: var(--fw-heading); text-transform: uppercase; letter-spacing: 0.06em;">
+            <p class="mb-3" style="font-size: var(--text-small); color: var(--ink-dim); font-weight: var(--fw-subhead); text-transform: uppercase; letter-spacing: 0.06em;">
               The studio
             </p>
             <div class="flex flex-wrap gap-2">
@@ -121,7 +111,6 @@ const founderSocials = [
                   target="_blank"
                   rel="noopener noreferrer"
                   class="social-pill inline-flex items-center gap-1.5 lozenge"
-                  style={`--brand: ${s.brand};`}
                 >
                   <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
                 </a>
@@ -130,7 +119,7 @@ const founderSocials = [
           </div>
 
           <div>
-            <p class="mb-3" style="font-size: var(--text-small); color: var(--acc-orange-bold); font-weight: var(--fw-heading); text-transform: uppercase; letter-spacing: 0.06em;">
+            <p class="mb-3" style="font-size: var(--text-small); color: var(--ink-dim); font-weight: var(--fw-subhead); text-transform: uppercase; letter-spacing: 0.06em;">
               The human behind it
             </p>
             <div class="flex flex-wrap gap-2">
@@ -140,7 +129,6 @@ const founderSocials = [
                   target="_blank"
                   rel="noopener noreferrer"
                   class="social-pill inline-flex items-center gap-1.5 lozenge"
-                  style={`--brand: ${s.brand};`}
                 >
                   <Icon name={s.icon} width={14} height={14} class="social-pill__icon" aria-hidden="true" /> {s.label}
                 </a>
@@ -173,39 +161,26 @@ const founderSocials = [
     border-color: var(--row-ink);
   }
 
-  /* Restrained, theme-aligned social pills */
+  /* Restrained, theme-aligned social pills — neutral, no lift. */
   .social-pill {
     background: var(--surface-alt);
     color: var(--ink-body);
     border: 1px solid var(--border);
-    transition: color 180ms ease, border-color 180ms ease,
-      transform 180ms ease;
-    will-change: transform;
+    transition: color 180ms ease, border-color 180ms ease;
   }
   .social-pill__icon {
     color: var(--ink-dim);
-    transition: color 180ms ease, transform 180ms ease;
+    transition: color 180ms ease;
   }
   .social-pill:hover {
     color: var(--ink);
-    border-color: var(--brand);
-    transform: translateY(-2px);
+    border-color: var(--accent-ink);
   }
   .social-pill:hover .social-pill__icon {
-    color: var(--brand);
-    transform: scale(1.1);
+    color: var(--accent-ink);
   }
   .social-pill:focus-visible {
     outline: 2px solid var(--accent-ink);
     outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .social-pill,
-    .social-pill:hover,
-    .social-pill__icon,
-    .social-pill:hover .social-pill__icon {
-      transform: none;
-    }
   }
 </style>

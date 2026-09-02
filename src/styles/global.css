@@ -5,21 +5,18 @@
 @import '@fontsource/jetbrains-mono/500.css';
 
 /* ===========================================================================
-   Atlassian Design System — single source of truth.
-   One brand hue (blue) sitewide: the software/trading split no longer carries
-   colour. The accent hues below are ADS's illustration/lozenge palette only —
-   status chips, category dots, news card fills — never a track identity.
-   Per-item colour comes from config/accents.ts, which rebinds the --accent-
-   tokens for a subtree. The old per-track aliases (--oss and --gold) are gone:
-   both resolved to the same blue, so anything styled "per track" silently
-   rendered identically.
+   Atlassian-toned design system — single source of truth.
+   One brand hue (lime × ink) sitewide: the software/trading split no longer
+   carries colour. The accent hues below are an ADS-style illustration/lozenge
+   palette only — status chips, category dots, card fills — never a track
+   identity. Per-item colour comes from config/accents.ts, which rebinds the
+   --accent- tokens for a subtree.
    =========================================================================== */
 :root {
   /* ---- Neutrals ----
      Atlassian's marketing/blog surfaces run on a NEUTRAL near-black (#101214),
-     not the bluish product navy (#172B4D). Text, borders and greys below are
-     de-blued to match; only --n1100 stays navy, since the dark bands are meant
-     to read blue. */
+     not the bluish product navy. Text, borders and greys are de-blued to
+     match; the dark bands are pure ink (--n1000). */
   --n0:    #FFFFFF;
   --n100:  #F7F7F8;
   --n200:  #F1F1F2;
@@ -31,25 +28,17 @@
   --n800:  #3D4045;   /* body copy */
   --n900:  #26282C;
   --n1000: #101214;   /* headings + primary text — the near-black */
-  --n1100: #091E42;   /* navy, dark bands only */
 
-  /* ---- Brand hue: navy (var names keep the b- prefix; a rename across
-     ~30 files is a separate cleanup) ---- */
-  --b50:  #E9EEF6;
-  --b100: #D3DDEC;
-  --b200: #8FA5C4;
-  --b400: #253858;   /* primary */
-  --b500: #091E42;   /* hovered */
-  --b700: #05132B;   /* pressed */
-
-  /* Wordmark halves. Kept as their own tokens because the lockup has to track
-     the mark's colour, not the body-text ramp: on dark the mark ships pure
-     white, so "Foxe" goes white there while the b- ramp stays put. */
-  --wordmark:     var(--b400);
-  /* The bright cut, not --b200: b200 sits at 2.5:1 on white and 2.4:1 on the
-     sunken footer, so the second half of the lockup failed AA in both places.
-     #3B5A8F clears 6.9:1 and still reads distinctly lighter than "Foxe". */
-  --wordmark-alt: var(--acc-blue-bright);
+  /* ---- Brand hue: lime × ink (var names keep the b- prefix; a rename across
+     ~30 files is a separate cleanup). THE RULE: lime never colours text —
+     type is always ink or the olive cut; lime is the fill behind it, the
+     highlighter around it, the underline beneath it. ---- */
+  --b50:  #F2F8E6;   /* soft tint */
+  --b100: #DDEEC4;   /* light fill */
+  --b200: #A8D95E;   /* bright lime — highlighter, hover fill */
+  --b400: #94C749;   /* primary fill (carries INK text, never white) */
+  --b500: #4C6B1F;   /* olive — the text cut, AA on white */
+  --b700: #33470F;   /* deep olive — pressed text */
 
   /* ---- ADS accent hues — illustration, lozenges, card fills. Not brand. ---- */
   --acc-blue-bright: #3B5A8F;  /* bright brand cut for illustration fills + H1 accent */
@@ -66,8 +55,8 @@
   --surface-alt:    var(--n200);
   --surface-sunken: var(--n100);
   --surface-brand:  var(--b50);
-  --surface-invert: var(--n1100);
-  --surface-invert-raised: #1D2B4D;
+  --surface-invert: var(--n1000);   /* ink band — the black that makes lime glow */
+  --surface-invert-raised: #26282C;
 
   /* ---- Semantic ink ---- */
   --ink:            var(--n1000);
@@ -79,7 +68,7 @@
   --border:      var(--n400);
   --border-soft: var(--n200);
   --border-bold: var(--n600);
-  --border-invert: #344563;
+  --border-invert: #3D4045;
 
   /* ADS form fields. The input border is its own, darker ramp than --border:
      ADS uses color.border.input (#8590A2) so a field reads as interactive. */
@@ -87,35 +76,26 @@
   --field-bg-hover:    var(--n100);
   --field-bg-disabled: rgba(9, 30, 66, 0.03);
   --field-border:      #8590A2;
-  --field-border-focus: #3B5A8F;
+  --field-border-focus: #4C6B1F;
   --field-border-danger: #E2483D;
   --field-ink:         var(--n1000);
   --field-ink-placeholder: var(--n600);
   --field-ink-disabled: rgba(9, 30, 66, 0.31);
   --field-h:           40px;
 
-  /* ---- Brand / accent semantics. Every track resolves here. ---- */
+  /* ---- Brand / accent semantics. Every page resolves here. The lime fill
+     carries INK text; textual accents (links, markers) use the olive cut. ---- */
   --accent:      var(--b400);
-  --accent-ink:  var(--b400);
-  --accent-deep: var(--b500);
+  --accent-ink:  var(--b500);   /* text/icon accents — olive, AA on white */
+  --accent-deep: var(--b700);
   --accent-soft: var(--b50);
   --accent-btn:  var(--b400);
-  --accent-press: var(--b700);
-  --accent-on:   #FFFFFF;
-
-  /* Companion slots resolve to ADS accent hues — decoration, never identity. */
-  --accent-2:      var(--acc-green);
-  --accent-2-ink:  var(--acc-green-bold);
-  --accent-2-deep: var(--acc-green-bold);
-  --accent-2-soft: var(--acc-green-soft);
-  --accent-3:      var(--acc-purple);
-  --accent-3-ink:  var(--acc-purple-bold);
-  --accent-3-deep: var(--acc-purple-bold);
-  --accent-3-soft: var(--acc-purple-soft);
-  /* Homepage news-card fills (from the marketing mockup). */
-  --news-orange: var(--acc-orange);
-  --news-blue:   #1558BC;
-  --news-olive:  #4C6B1F;
+  --accent-btn-hover: var(--b200);
+  --accent-press: #7FAE3B;
+  --accent-on:   #101214;       /* ink on the lime fill (~9:1) */
+  /* Per-product accent scopes rebind --accent-btn to their BOLD cut, which
+     carries white in light mode and dark ink once the ramps lighten on dark. */
+  --accent-on-bold: #FFFFFF;
 
   --green: var(--acc-green-bold);
   --red:   var(--acc-red);
@@ -130,11 +110,14 @@
   --font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
   /* ---- ADS type scale ----
-     heading.xxlarge…xxsmall + body large/default/small. Marketing hero sits one
-     step above ADS xxlarge because the product scale tops out at 35px. Weights
-     are ADS's: 500 on display sizes, 600 below — the old 800 is gone. */
-  --text-hero:   clamp(2.25rem, 1.6rem + 2.8vw, 3.5rem);  /* 36 → 56 */
-  --text-hero-sm: clamp(2rem, 1.6rem + 1.6vw, 2.5rem);    /* 32 → 40 — blog/post titles */
+     heading.xxlarge…xxsmall + body large/default/small. Marketing hero sits
+     well above ADS xxlarge, matching atlassian.com's oversized marketing
+     display (their hero runs 84px at line-height 1.0 — ours stops at 72
+     because Bricolage at 800 carries more visual weight than Charlie at 600).
+     Heading weight is a deliberate brand divergence: 800, Bricolage's
+     heaviest cut, kept over ADS's 500/600 because it suits this face. */
+  --text-hero:   clamp(2.5rem, 1.7rem + 3.6vw, 4.5rem);   /* 40 → 72 */
+  --text-hero-sm: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);   /* 32 → 44 — blog/post titles */
   --text-h1:     2.1875rem;   /* 35 / 40 */
   --text-h2:     1.8125rem;   /* 29 / 32 */
   --text-h3:     1.5rem;      /* 24 / 28 */
@@ -174,12 +157,13 @@
   --container: 1200px;
   --container-pad: 24px;
 
-  /* ---- ADS radius ---- */
+  /* ---- ADS radius ----
+     Marketing buttons are full pills, matching atlassian.com's marketing
+     site (their 4px rectangles are the product-UI spec, not the web one). */
   --r-sm:      4px;    /* border.radius.100 */
-  --r-btn:     4px;
+  --r-btn:     999px;
   --r-md:      8px;    /* border.radius.200 */
   --r-card:    8px;
-  --r-card-lg: 16px;   /* marketing news cards */
   --r-pill:    999px;
 
   /* ---- ADS elevation ---- */
@@ -214,20 +198,15 @@
   --n800:  #B6C2CF;   /* body copy */
   --n900:  #C7D1DB;
   --n1000: #DEE4EA;   /* headings */
-  --n1100: #0D1B33;
 
-  --b50:  #1C2B41;    /* soft fill on dark */
-  --b100: #253858;
-  --b200: #7A93B8;
-  --b400: #8FA9CE;    /* primary on dark */
-  --b500: #B3C7E0;    /* hover moves lighter on dark, not darker */
-  --b700: #D3DDEC;
-
-  /* Matches the mark, which is painted --ink; the second half drops to the
-     dark primary so the two halves read as distinct instead of two
-     near-identical blues. */
-  --wordmark:     var(--ink);
-  --wordmark-alt: var(--b400);
+  /* Lime keeps its light-theme fill on dark — it pops harder on a dark ground
+     and ink-on-lime stays AA. Only the TEXT cuts lighten. */
+  --b50:  #26331A;    /* soft fill on dark */
+  --b100: #3E5321;    /* mid olive — must stay visibly lighter than --b50 */
+  --b200: #A8D95E;
+  --b400: #94C749;    /* fill — still carries ink text */
+  --b500: #A8D95E;    /* text cut lightens on dark */
+  --b700: #C0E585;
 
   /* Bright brand cut stays at its light-theme value: it is a FILL that carries
      white icons, and lightening it would drop that pairing below AA. The
@@ -253,20 +232,20 @@
 
   --field-bg-disabled: rgba(255, 255, 255, 0.04);
   --field-border:       #738496;
-  --field-border-focus: #8FA9CE;
+  --field-border-focus: #A8D95E;
   --field-border-danger: #F87168;
   --field-ink-disabled: rgba(255, 255, 255, 0.28);
-
-  --news-blue:  #1C4C9C;
-  --news-olive: #3E5619;
 
   --green: var(--acc-green);
   --red:   var(--acc-red);
 
   /* ADS puts DARK text on a bold fill in dark mode: the accent ramps lighten,
      so white on them fails contrast. Anything reading --accent-on flips with
-     one line — buttons, active tabs, solid lozenges. */
+     one line — buttons, active tabs, solid lozenges. The lime fill keeps ink
+     text in both themes, so only the bold-cut pairing flips. */
   --accent-on: #1D2125;
+  --accent-on-bold: #1D2125;
+  --accent-press: #7FAE3B;
 
   /* ADS dark elevation is a near-black shadow; the light theme's navy tint
      is invisible on a dark surface. */
@@ -308,8 +287,9 @@
   button { font-family: inherit; cursor: pointer; }
   input, textarea, select { font-family: inherit; }
 
-  /* ADS heading scale — 500 on display sizes, 600 below. Sizes live here so
-     page markup does not have to restate them. */
+  /* Heading scale. Weight 800 everywhere is intentional (brand divergence
+     from ADS's 500/600 — see the weight tokens). Sizes live here so page
+     markup does not have to restate them. */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
     -webkit-font-smoothing: auto;
@@ -317,7 +297,7 @@
     color: var(--ink);
     margin: 0;
   }
-  h1 { font-size: var(--text-h1); line-height: 1.1;  font-weight: var(--fw-display); letter-spacing: -0.025em; }
+  h1 { font-size: var(--text-h1); line-height: 1.05; font-weight: var(--fw-display); letter-spacing: -0.025em; }
   h2 { font-size: var(--text-h2); line-height: 1.12; font-weight: var(--fw-display); letter-spacing: -0.022em; }
   h3 { font-size: var(--text-h3); line-height: 1.18; font-weight: var(--fw-display); letter-spacing: -0.018em; }
   h4 { font-size: var(--text-h4); line-height: 1.24; font-weight: var(--fw-heading); letter-spacing: -0.014em; }
@@ -356,52 +336,8 @@ html { scroll-behavior: smooth; }
   border-radius: var(--r-sm);
 }
 
-[data-reveal] {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
-[data-reveal].is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Stagger cards inside a revealed band — each fades in a beat after the last. */
-[data-reveal] .grid > .card {
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-}
-[data-reveal].is-visible .grid > .card { opacity: 1; transform: translateY(0); }
-[data-reveal].is-visible .grid > .card:nth-child(2) { transition-delay: 90ms; }
-[data-reveal].is-visible .grid > .card:nth-child(3) { transition-delay: 180ms; }
-[data-reveal].is-visible .grid > .card:nth-child(n + 4) { transition-delay: 270ms; }
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  [data-reveal] { opacity: 1; transform: none; transition: none; }
-  [data-reveal] .grid > .card { opacity: 1; transform: none; transition: none; }
-  .trend-line { stroke-dashoffset: 0 !important; animation: none !important; }
-  .animate-fox-sniff { animation: none !important; }
-}
-
-/* 404 fox: a gentle curious wobble, like it's sniffing around for the page. */
-.animate-fox-sniff {
-  transform-origin: 50% 85%;
-  animation: foxSniff 2.8s ease-in-out infinite;
-}
-@keyframes foxSniff {
-  0%, 100% { transform: rotate(-5deg); }
-  50%      { transform: rotate(5deg); }
-}
-
-.trend-line {
-  stroke-dasharray: 400;
-  stroke-dashoffset: 400;
-  animation: drawLine 2s ease-out forwards;
-}
-@keyframes drawLine {
-  to { stroke-dashoffset: 0; }
 }
 
 .container-x {
@@ -423,6 +359,13 @@ html { scroll-behavior: smooth; }
 .band--invert {
   background: var(--surface-invert);
   color: var(--ink-invert-dim);
+  /* Primary buttons stay lime on the ink band — the signature pairing. Ghost
+     text lightens so it reads on black. */
+  --accent-btn: var(--b400);
+  --accent-btn-hover: var(--b200);
+  --accent-on:  #101214;
+  --accent-ink: var(--b200);
+  --accent-deep: #C0E585;
 }
 .band--invert h1,
 .band--invert h2,
@@ -431,7 +374,7 @@ html { scroll-behavior: smooth; }
 .band--invert h5,
 .band--invert h6 { color: var(--ink-invert); }
 
-/* ---- Buttons — ADS: 4px radius, 500 weight, 32/40px heights, no lift ---- */
+/* ---- Buttons — atlassian.com marketing: full pill, 500 weight, no lift ---- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -439,7 +382,7 @@ html { scroll-behavior: smooth; }
   gap: var(--space-100);
   border: none;
   border-radius: var(--r-btn);
-  padding: 0 var(--space-150);
+  padding: 0 var(--space-250);
   height: 40px;
   font-family: var(--font-body);
   font-size: var(--text-ui);
@@ -450,7 +393,7 @@ html { scroll-behavior: smooth; }
 .btn--sm { height: 32px; font-size: var(--text-ui); }
 .btn--lg {
   height: 48px;
-  padding: 0 var(--space-300);
+  padding: 0 var(--space-400);
   font-size: var(--text-body);
 }
 .btn--lg .btn__arrow svg { width: 16px; height: 16px; }
@@ -462,7 +405,7 @@ html { scroll-behavior: smooth; }
   background: var(--accent-btn);
   color: var(--accent-on);
 }
-.btn--primary:hover  { background: var(--accent-deep); }
+.btn--primary:hover  { background: var(--accent-btn-hover, var(--accent-deep)); }
 .btn--primary:active { background: var(--accent-press); }
 
 /* ADS "subtle" button: no border, neutral wash on hover. */
@@ -514,11 +457,12 @@ html { scroll-behavior: smooth; }
   width: 100%;
   min-width: 0;
   height: var(--field-h);
-  padding: 0 var(--space-100);
+  padding: 0 var(--space-150);
   background: var(--field-bg);
   color: var(--field-ink);
   border: 1px solid var(--field-border);
-  border-radius: var(--r-sm);
+  border-radius: var(--r-sm);   /* fields stay crisp rectangles — Atlassian
+                                   pairs pill CTAs with 4px inputs */
   font-family: var(--font-body);
   font-size: var(--text-ui);
   line-height: 20px;
@@ -547,7 +491,7 @@ html { scroll-behavior: smooth; }
 textarea.field {
   height: auto;
   min-height: 96px;
-  padding: var(--space-100);
+  padding: var(--space-100) var(--space-150);
   resize: vertical;
 }
 
@@ -587,15 +531,13 @@ textarea.field {
   transition: background-color 0.1s ease, box-shadow 0.1s ease;
 }
 .card--hover:hover {
-  background: var(--n100);
+  /* A whisper of the card's own accent hue — a plain --n100 hover melted into
+     band--alt, which is the same --n100. Cards without an accent scope fall
+     back to the brand soft. */
+  background: color-mix(in srgb, var(--accent-soft) 35%, var(--surface));
   box-shadow: var(--shadow-raised);
   transform: none;
 }
-.card--invert {
-  background: var(--surface-invert-raised);
-  box-shadow: none;
-}
-
 /* ---- Lozenge — ADS status chip. Small, 3px radius, uppercase, 600. ---- */
 .lozenge {
   display: inline-block;
@@ -611,54 +553,36 @@ textarea.field {
   text-transform: uppercase;
 }
 
-/* ---- Overline (was .eyebrow) — ADS uses body font, not mono ---- */
+/* ---- Overline — atlassian.com kicker: 12px, bold, UPPERCASE. Olive, never
+   raw lime: lime does not colour text on white. ---- */
 .eyebrow {
   font-family: var(--font-body);
-  font-size: var(--text-ui);
-  font-weight: var(--fw-bold);
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--b400);
+  font-size: var(--text-small);
+  font-weight: var(--fw-subhead);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--b500);
 }
 .band--invert .eyebrow { color: var(--b200); }
 
-/* ---- Track scoping is now a no-op ----
-   One brand hue sitewide. These classes stay in the markup (~20 files) but no
-   longer remap anything, so software, trading and the hub read identically. */
-.track-hub,
-.track-oss,
-.track-trading {
-  --accent:      var(--b400);
-  --accent-ink:  var(--b400);
-  --accent-deep: var(--b500);
-  --accent-soft: var(--b50);
-  --accent-btn:  var(--b400);
-  --accent-press: var(--b700);
-  --accent-on:   #FFFFFF;
+/* ---- Lime highlighter: ink text over a lime marker stroke. The one place
+   the brand hue touches a headline. On dark the ink is near-white, so the
+   stroke drops to the mid olive — bright lime under light text is unreadable. ---- */
+.hl-accent {
+  color: var(--ink);
+  background: linear-gradient(transparent 58%, var(--b200) 58%);
+  padding: 0 2px;
 }
-.track-hub .band--invert,
-.track-oss .band--invert,
-.track-trading .band--invert {
-  --accent-btn: #FFFFFF;
-  --accent-on:  var(--surface-invert);
-  /* Hover/press stay light too — without these the white button hovered to
-     --b500 with navy text (~2.5:1). */
-  --accent-deep: rgba(255, 255, 255, 0.88);
-  --accent-press: var(--b100);
+[data-theme='dark'] .hl-accent {
+  background: linear-gradient(transparent 58%, var(--b100) 58%);
 }
 
-/* Tone helpers now shift only the decorative accent hue, never the brand. */
-.tone-2 {
-  --accent-ink:  var(--acc-green-bold);
-  --accent-deep: var(--acc-green-bold);
-  --accent-soft: var(--acc-green-soft);
-  --accent:      var(--acc-green);
-}
-.tone-3 {
-  --accent-ink:  var(--acc-purple-bold);
-  --accent-deep: var(--acc-purple-bold);
-  --accent-soft: var(--acc-purple-soft);
-  --accent:      var(--acc-purple);
+/* ---- Wordmark "Labs" box: ink text on the lime fill. ---- */
+.wordmark-box {
+  background: var(--b400);
+  color: #101214;
+  padding: 0 4px;
+  border-radius: 3px;
 }
 
 /* ---- Flat tinted panel ---- */
@@ -668,22 +592,31 @@ textarea.field {
   padding: var(--space-300);
 }
 
-/* ---- Marketing news card: one solid fill, image on top ---- */
-.card--solid {
-  background: var(--card-fill, var(--b400));
-  border: none;
-  border-radius: var(--r-card-lg);
-  box-shadow: none;
-  overflow: hidden;
-  color: #FFFFFF;
+/* ---- Pricing-card resource links: quiet hairline list under the CTA, so a
+   single primary button owns the card instead of a stack of ghost pills. ---- */
+.pricing-links {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-150);
 }
-.card--solid h1, .card--solid h2, .card--solid h3, .card--solid h4 { color: #FFFFFF; }
-.card--solid:hover { box-shadow: var(--shadow-overlay); }
-.card--solid .lozenge {
-  background: #FFFFFF;
-  color: var(--card-fill, var(--b400));
+.pricing-links a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+  padding: 9px 2px;
+  font-size: var(--text-ui);
+  font-weight: var(--fw-medium);
+  color: var(--ink-body);
+  border-bottom: 1px solid var(--border-soft);
+  transition: color 0.1s ease;
 }
-
+.pricing-links a:last-child { border-bottom: none; }
+.pricing-links a:hover { color: var(--accent-deep); }
+.pricing-links a > svg:first-child,
+.pricing-links a > .pricing-links__icon { color: var(--ink-dim); flex: none; transition: color 0.1s ease; }
+.pricing-links a:hover > svg:first-child,
+.pricing-links a:hover > .pricing-links__icon { color: var(--accent-deep); }
+.pricing-links__chev { margin-left: auto; flex: none; color: var(--ink-dim); }
 
 /* ---- Blog: Atlassian article kicker + topic filter pills ---- */
 /* "Article in Software" — 11px, 500, uppercase, hairline tracking. */
@@ -949,14 +882,6 @@ textarea.field {
   border-color: var(--border-bold);
   box-shadow: none;
 }
-/* The inverted card is the terminal block on the contact page and the dark
-   tile elsewhere. Flattening it to a neutral grey loses the thing it is doing,
-   so on dark it keeps a navy cast and separates by a border instead. */
-[data-theme='dark'] .card--invert {
-  background: #101A2B;
-  border: 1px solid #22304A;
-}
-
 /* The neutral washes below are navy-tinted for light surfaces and vanish on
    dark, so hover and pressed states lose their feedback entirely. */
 [data-theme='dark'] .btn--ghost:hover  { background: rgba(255, 255, 255, 0.08); }
@@ -980,20 +905,10 @@ textarea.field {
   color: var(--shiki-dark);
 }
 
-/* The track classes restate the accent tokens on a wrapper, so a value set on
-   :root alone never reaches a button inside one. The dark theme needs the same
-   flip applied at that level: dark ink on the lightened bold fills. */
-[data-theme='dark'] .track-hub,
-[data-theme='dark'] .track-oss,
-[data-theme='dark'] .track-trading {
-  --accent-on: #1D2125;
-}
-
-/* The invert band's white button keeps dark text, but the band's own surface
-   is now an elevated neutral rather than navy. */
-[data-theme='dark'] .track-hub .band--invert,
-[data-theme='dark'] .track-oss .band--invert,
-[data-theme='dark'] .track-trading .band--invert {
+/* The invert band's white button keeps dark text on dark too — the band's
+   surface is an elevated neutral there, and the light-theme navy --accent-on
+   set at band level would otherwise beat the theme's own token. */
+[data-theme='dark'] .band--invert {
   --accent-on: #161A1D;
 }
 
@@ -1015,12 +930,6 @@ textarea.field {
 }
 [data-theme='dark'] .topic-tab[aria-pressed='true'] .topic-tab__dot {
   background: #1D2125;
-}
-
-/* The nav's Contact button bakes in white text over the blue fill. That fill
-   lightens in dark mode, so the label has to darken with it. */
-[data-theme='dark'] a[href='/contact/'][style*='var(--b400)'] {
-  color: #1D2125 !important;
 }
 
 /* The 404 fox: the full-body drawing of the same mark that sits in the header.
@@ -1067,7 +976,7 @@ textarea.field {
   width: 36px;
   height: 36px;
   border: 1px solid var(--border);
-  border-radius: var(--r-btn);
+  border-radius: var(--r-sm);
   background: transparent;
   color: var(--ink-body);
   transition: background-color 0.1s ease, color 0.1s ease;

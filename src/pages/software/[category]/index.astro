@@ -6,7 +6,7 @@ import Footer from '../../../components/Footer.astro';
 import Section from '../../../components/ui/Section.astro';
 import Eyebrow from '../../../components/ui/Eyebrow.astro';
 import Button from '../../../components/ui/Button.astro';
-import { categoryList, categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
+import { categoryList, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
 import { accentFor, accentVars, categoryAccent } from '../../../config/accents';
 
@@ -47,8 +47,8 @@ const projectsIds = projects.map((p) => p.id);
   ]}
 >
   <Nav />
-  <main id="main" class="track-oss">
-    <section class="band band--alt" data-reveal>
+  <main id="main">
+    <section class="band band--light" style="padding-block: var(--space-section-sm);">
       <div class="container-x">
         <a href="/software/" class="inline-flex items-center gap-1.5 text-[11px] mb-6 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -112,11 +112,6 @@ const projectsIds = projects.map((p) => p.id);
 </BaseLayout>
 
 <style>
-  /* Each card carries its own --accent-*; the top rule makes the hue readable
-     at a glance without tinting the whole card. */
-  .product-card {
-    border-top: 3px solid var(--accent-ink);
-  }
   .product-card h2 {
     transition: color 0.1s ease;
   }

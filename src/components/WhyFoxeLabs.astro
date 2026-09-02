@@ -44,9 +44,9 @@ const items = [
   <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
     {items.map((item, i) => (
       <div style={accentVars(ACCENTS[i % ACCENTS.length])}>
-        <p class="mb-4 pb-4" style="font-size: var(--text-ui); font-weight: var(--fw-bold); color: var(--accent-ink); border-bottom: 2px solid var(--accent-ink);">
-          {item.n}
-        </p>
+        <div class="w-10 h-10 flex items-center justify-center mb-4" style="background: var(--accent-soft); border-radius: var(--r-md);">
+          <span style="font-size: var(--text-ui); font-weight: var(--fw-subhead); color: var(--accent-deep);">{item.n}</span>
+        </div>
         <h3 style="font-size: var(--text-h5); font-weight: var(--fw-heading);" class="mb-2.5">{item.title}</h3>
         <p style="font-size: var(--text-ui); color: var(--ink-body);">{item.body}</p>
       </div>

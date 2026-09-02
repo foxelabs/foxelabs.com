@@ -12,13 +12,14 @@ interface Props {
 
 const { eyebrow, title, titleAccent, lead, narrow = false } = Astro.props;
 ---
-<section class="band band--alt" data-reveal style="padding-block: var(--space-section-sm);">
+<!-- Atlassian inner pages open on WHITE — no tinted header band. -->
+<section class="band band--light" style="padding-block: var(--space-section-sm);">
   <div class="container-x">
     <div class={narrow ? 'max-w-3xl' : 'max-w-4xl'}>
       <Eyebrow class="mb-5">{eyebrow}</Eyebrow>
       <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class={lead ? 'mb-5' : ''}>
         {title}
-        {titleAccent && <span style="color: var(--accent-ink);">{titleAccent}</span>}
+        {titleAccent && <span>{titleAccent}</span>}
       </h1>
       {lead && (
         <p class="max-w-[560px]" style="font-size: var(--text-lead); color: var(--ink-body);">

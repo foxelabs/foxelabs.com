@@ -48,7 +48,7 @@ const categoryBoxes = [
     href: '/contact/',
     icon: 'tdesign:app-filled',
     // Not a real category yet, so it takes the next free hue in the ramp.
-    accent: ACCENTS[4],
+    accent: ACCENTS[3],
   },
 ];
 
@@ -102,15 +102,15 @@ const stats = [
   ]}
 >
   <Nav />
-  <main id="main" class="track-oss">
-    <!-- Hero -->
-    <section class="band band--alt overflow-hidden" data-reveal>
+  <main id="main">
+    <!-- Hero — white opening, Atlassian inner-page pattern -->
+    <section class="band band--light overflow-hidden">
       <div class="container-x">
         <div class="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           <div class="lg:col-span-7">
             <Eyebrow class="mb-5">Software</Eyebrow>
             <h1 style="font-size: var(--text-hero); font-weight: var(--fw-display);" class="mb-5">
-              Tools we've shipped <span style="color: var(--accent-ink);">and kept shipping.</span>
+              Tools we've shipped and kept shipping.
             </h1>
             <p class="max-w-[520px]" style="font-size: var(--text-lead); color: var(--ink-body);">
               Open-source WordPress plugins and PHP libraries — GPL-licensed, documented,
@@ -131,12 +131,12 @@ const stats = [
               </div>
 
               <div class="font-code leading-[1.9] overflow-x-auto" style="font-size: var(--text-small); color: var(--ink);">
-                <div><span style="color: var(--b400);">$</span> composer <span style="color: var(--acc-green-bold);">require</span> <span style="color: var(--acc-purple-bold);">foxelabs/wp-queue-process</span></div>
-                <div style="color: var(--ink-dim);"><span style="color: var(--b400);">✓</span> 1 package installed</div>
+                <div><span style="color: var(--b500);">$</span> composer <span style="color: var(--b500);">require</span> <span style="color: var(--acc-purple-bold);">foxelabs/wp-queue-process</span></div>
+                <div style="color: var(--ink-dim);"><span style="color: var(--b500);">✓</span> 1 package installed</div>
                 <div class="h-3" aria-hidden="true"></div>
-                <div><span style="color: var(--b400);">$</span> wp plugin <span style="color: var(--acc-green-bold);">install</span> <span style="color: var(--acc-purple-bold);">404-to-301</span> --activate</div>
-                <div style="color: var(--ink-dim);"><span style="color: var(--b400);">Success:</span> installed and activated.</div>
-                <div><span style="color: var(--b400);">$</span> <span style="color: var(--b400);">▋</span></div>
+                <div><span style="color: var(--b500);">$</span> wp plugin <span style="color: var(--b500);">install</span> <span style="color: var(--acc-purple-bold);">404-to-301</span> --activate</div>
+                <div style="color: var(--ink-dim);"><span style="color: var(--b500);">Success:</span> installed and activated.</div>
+                <div><span style="color: var(--b500);">$</span> <span style="color: var(--b500);">▋</span></div>
               </div>
 
               <div class="grid grid-cols-3 gap-4 mt-6 pt-5" style="border-top: 1px solid var(--border);">
@@ -157,12 +157,12 @@ const stats = [
       </div>
     </section>
 
-    <!-- Trust bar (black) -->
+    <!-- Trust bar — light sunken strip -->
     <TrustBar items={[
-      { label: 'Open source · GPL', icon: 'code', tint: 'var(--b200)' },
-      { label: 'On WordPress.org & Packagist', icon: 'box', tint: 'var(--acc-green)' },
-      { label: 'Documented & tested', icon: 'doc', tint: 'var(--acc-purple)' },
-      { label: 'Maintained for years', icon: 'refresh', tint: 'var(--acc-orange)' },
+      { label: 'Open source · GPL', icon: 'code' },
+      { label: 'On WordPress.org & Packagist', icon: 'box' },
+      { label: 'Documented & tested', icon: 'doc' },
+      { label: 'Maintained for years', icon: 'refresh' },
     ]} />
 
     <!-- Category boxes -->
@@ -220,9 +220,9 @@ const stats = [
       <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
         {whyItems.map((item, i) => (
           <div style={accentVars(ACCENTS[i % ACCENTS.length])}>
-            <p class="mb-4 pb-4" style="font-size: var(--text-ui); font-weight: var(--fw-bold); color: var(--accent-ink); border-bottom: 2px solid var(--accent-ink);">
-              {item.n}
-            </p>
+            <div class="w-10 h-10 flex items-center justify-center mb-4" style="background: var(--accent-soft); border-radius: var(--r-md);">
+              <span style="font-size: var(--text-ui); font-weight: var(--fw-subhead); color: var(--accent-deep);">{item.n}</span>
+            </div>
             <h3 style="font-size: var(--text-h5); font-weight: var(--fw-heading);" class="mb-2.5">{item.title}</h3>
             <p style="font-size: var(--text-ui); color: var(--ink-body);">{item.body}</p>
           </div>
@@ -231,7 +231,7 @@ const stats = [
     </Section>
 
     <!-- CTA (black) -->
-    <section class="band band--invert" data-reveal>
+    <section class="band band--invert">
       <div class="container-x">
         <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div class="lg:col-span-7">
@@ -261,10 +261,8 @@ const stats = [
 </BaseLayout>
 
 <style>
-  /* Same top-rule treatment the product and add-on grids use. */
   .category-card {
     position: relative;
-    border-top: 3px solid var(--accent-ink);
   }
   /* Stretched link: the Browse button's hit area covers the whole card, so
      the card is clickable anywhere while the button stays the visible cue. */

@@ -53,8 +53,8 @@ const statusLabel: Record<string, string> = {
   ]}
 >
   <Nav />
-  <main id="main" class="track-trading">
-    <section class="band band--alt" data-reveal>
+  <main id="main">
+    <section class="band band--light" style="padding-block: var(--space-section-sm);">
       <div class="container-x">
         <a href="/trading/" class="inline-flex items-center gap-1.5 text-[11px] mb-6 transition-colors hover:text-[var(--ink)]" style="color: var(--ink-dim);">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -108,9 +108,6 @@ const statusLabel: Record<string, string> = {
 </BaseLayout>
 
 <style>
-  .product-card {
-    border-top: 3px solid var(--accent-ink);
-  }
   .product-card h2 {
     transition: color 0.1s ease;
   }
