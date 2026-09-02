@@ -26,6 +26,10 @@ export const ACCENTS: Accent[] = [
   { name: 'purple', ink: 'var(--acc-purple-bold)',  soft: 'var(--acc-purple-soft)',  deep: 'var(--acc-purple-bold)' },
   { name: 'orange', ink: 'var(--acc-orange-bold)',  soft: 'var(--acc-orange-soft)',  deep: 'var(--acc-orange-bold)' },
   { name: 'teal',   ink: 'var(--acc-teal-bold)',    soft: 'var(--acc-teal-soft)',    deep: 'var(--acc-teal-bold)' },
+  // Fifth hue, added last so it only ever lands on a fifth sibling — every
+  // position before it keeps the colour it already had. Loggedin's five
+  // add-ons were the first listing to wrap and repeat.
+  { name: 'yellow', ink: 'var(--acc-yellow-bold)',  soft: 'var(--acc-yellow-soft)',  deep: 'var(--acc-yellow-bold)' },
 ];
 
 /** Fixed hue per category, shared by the nav, category pages, and listings.

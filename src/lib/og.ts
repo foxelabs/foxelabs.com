@@ -35,6 +35,7 @@ export const OG_ACCENTS = {
   purple: '#C97CF4',
   orange: '#FEA362',
   teal: '#6CC3E0',
+  yellow: '#F5CD47',
 } as const;
 
 export type OgAccent = keyof typeof OG_ACCENTS;
