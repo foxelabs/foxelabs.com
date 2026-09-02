@@ -55,7 +55,7 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
       hidden={i !== 0}
       class="tour-panel"
     >
-      <div style="border-radius:var(--r-md);overflow:hidden;border:1px solid var(--ink-band-border)">
+      <div class="tour-panel__shot">
         <Image
           src={shot.src}
           alt={shot.alt}
@@ -65,7 +65,7 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
           style="display:block;width:100%;height:auto"
         />
       </div>
-      <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="tour-panel__copy">
         {shot.crumb && (
           <span class="chip chip--sm" style="align-self:flex-start">
             <span class="dot" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
@@ -84,18 +84,6 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
   ))}
 </div>
 
-<style>
-  .tour-panel {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: var(--space-500);
-    align-items: center;
-  }
-  .tour-panel[hidden] { display: none; }
-  @media (max-width: 860px) {
-    .tour-panel { grid-template-columns: 1fr; gap: var(--space-300); }
-  }
-</style>
 
 <script is:inline>
   // Tabs. Every panel is in the HTML; the buttons only toggle [hidden], so all
