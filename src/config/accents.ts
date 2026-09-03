@@ -32,7 +32,7 @@ export const ACCENTS: Accent[] = [
     the share-card renderer, which rasterises outside the browser. */
 export const ACCENT_HEX: Record<string, string> = {
   blue:   '#1A6BD6',
-  purple: '#A95CE0',
+  purple: '#9C46D6',
   amber:  '#F9A50B',
   lime:   '#97C94E',
 };

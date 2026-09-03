@@ -48,7 +48,7 @@
 
   /* ---- The accent quad. Decoration only — never a track, never body text. ---- */
   --acc-1: #1A6BD6;   /* blue */
-  --acc-2: #A95CE0;   /* purple */
+  --acc-2: #9C46D6;   /* purple — dark enough for AA white text on a fill */
   --acc-3: #F9A50B;   /* amber */
   --acc-4: #97C94E;   /* lime */
 
@@ -135,6 +135,10 @@
   /* Accent buttons step their hue toward this on hover — toward black on a
      light page, toward white on a dark one, so hover always gains emphasis. */
   --accent-mix: #000000;
+
+  /* Text on an accent fill. White holds on the light theme's blue and purple;
+     amber and lime fills must override this to ink at the call site. */
+  --btn-accent-ink: #FFFFFF;
 }
 
 /* ===========================================================================
@@ -175,6 +179,10 @@
   --shadow-menu:  0 16px 32px rgba(0, 0, 0, 0.55);
 
   --accent-mix: #FFFFFF;
+
+  /* The dark theme's lightened quad drops white text below AA on every hue —
+     accent fills carry ink instead. */
+  --btn-accent-ink: #1D1E20;
 }
 
 /* ===========================================================================
@@ -587,14 +595,12 @@
 .btn--accent {
   background: var(--btn-accent);
   border-color: var(--btn-accent);
-  /* Amber and lime are too light for white text — callers using those hues
-     set --btn-accent-ink to the dark ink. Blue and purple keep the default. */
-  color: var(--btn-accent-ink, #FFFFFF);
+  color: var(--btn-accent-ink);
 }
 .btn--accent:hover {
   background: color-mix(in srgb, var(--btn-accent) 86%, var(--accent-mix));
   border-color: color-mix(in srgb, var(--btn-accent) 86%, var(--accent-mix));
-  color: var(--btn-accent-ink, #FFFFFF);
+  color: var(--btn-accent-ink);
 }
 
 .btn--ghost {
