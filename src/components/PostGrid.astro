@@ -14,22 +14,8 @@ interface Props {
 
 const { posts, showExcerpt = true, showDate = true } = Astro.props;
 ---
-<div class="post-grid">
+<div class="grid-3">
   {posts.map((post) => (
-    <PostCard post={post} height={120} showExcerpt={showExcerpt} showDate={showDate} />
+    <PostCard post={post} showExcerpt={showExcerpt} showDate={showDate} />
   ))}
 </div>
-
-<style>
-  .post-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-300);
-  }
-  @media (max-width: 960px) {
-    .post-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 620px) {
-    .post-grid { grid-template-columns: 1fr; }
-  }
-</style>

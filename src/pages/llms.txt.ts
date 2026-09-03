@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
 import { SITE } from '../config/seo';
+import { TOPICS, TOPIC_META, topicPath } from '../config/blog';
 
 // llms.txt — a plain-text map of the site for answer engines (ChatGPT,
 // Perplexity, Claude, AI Overviews). Generated from the same collections the
@@ -31,6 +32,11 @@ export const GET: APIRoute = async () => {
     '',
     'Everything on the software track is open source and free. Premium plugin add-ons are sold through Freemius with a 7-day money-back guarantee. On the trading track, Gold Scalpel is live on the MQL5 Market; the remaining trading products are in development and available by waitlist.',
     '',
+    '## Hubs',
+    line('Software', '/software/', 'All open-source WordPress plugins, PHP libraries, and apps.'),
+    line('Trading', '/trading/', 'All MetaTrader 5 expert advisors and trading tools.'),
+    line('Blog', '/blog/', 'All posts, filterable by topic and tag.'),
+    '',
     '## WordPress plugins',
     ...byCategory('oss', 'plugins'),
     '',
@@ -54,6 +60,9 @@ export const GET: APIRoute = async () => {
     ...posts
       .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
       .map((p) => line(p.data.title, `/blog/${p.id}/`, p.data.description)),
+    '',
+    '## Blog topics',
+    ...TOPICS.map((t) => line(`${t} posts`, topicPath(t), TOPIC_META[t].description)),
     '',
     '## Company',
     line('About', '/about/', 'Who builds Foxe Labs, and how the two tracks fit together.'),

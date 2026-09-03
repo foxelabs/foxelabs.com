@@ -60,6 +60,7 @@ const others = TOPICS.filter((t) => t !== topic);
           {posts.length} {posts.length === 1 ? 'post' : 'posts'} in {topic}.
         </p>
 
+        <h2 class="sr-only">Articles</h2>
         <PostGrid posts={posts} />
 
         {tags.length > 0 && (

@@ -6,13 +6,17 @@ import { topicAccent } from '../config/accents';
 
 interface Props {
   post: CollectionEntry<'blog'>;
-  /** Height of the cover field. */
+  /** Fixed height for the cover field. Omit for the 1200×630 cover ratio. */
   height?: number;
   showExcerpt?: boolean;
   showDate?: boolean;
 }
 
-const { post, height = 140, showExcerpt = false, showDate = false } = Astro.props;
+const { post, height, showExcerpt = false, showDate = false } = Astro.props;
+
+// A row of cards is only as tidy as its covers: the grid gives them the ratio
+// the artwork is drawn at, and the narrower strips are set by the caller.
+const field = height ? `height:${height}px` : 'aspect-ratio:1200/630;width:100%';
 
 const topic = topicOf(post.data.track);
 const accent = topicAccent(topic);
@@ -25,11 +29,12 @@ const date = post.data.pubDate.toLocaleDateString('en-GB', {
 <a href={`/blog/${post.id}/`} class="card" data-post-topic={topic}>
   {/* The cover sits on a field in the topic's hue: a post without an image
       still gets the same block of colour the grid is built around. */}
-  <div class="card__field" style={`height:${height}px;background:${accent.color};padding:0`}>
+  {/* color pins a readable foreground for any future overlay on the hue. */}
+  <div class="card__field" style={`${field};background:${accent.color};color:${accent.ink};padding:0`}>
     {post.data.heroImage && (
       <Image
         src={post.data.heroImage}
-        alt={post.data.heroImageAlt ?? ''}
+        alt={post.data.heroImageAlt ?? post.data.title}
         widths={[360, 720]}
         sizes="(max-width: 760px) 100vw, 340px"
         loading="lazy"
@@ -41,14 +46,29 @@ const date = post.data.pubDate.toLocaleDateString('en-GB', {
       <span class="kicker">{topic}</span>
       {showDate && <span style="font-size:var(--text-xs);color:var(--text-subtle)">{date}</span>}
     </div>
-    <h3 style="font-size:1.03125rem;font-weight:var(--fw-heading);line-height:1.35;letter-spacing:0">
+    <h3 style="font-size:var(--text-body-lg);font-weight:var(--fw-heading);line-height:1.35;letter-spacing:0">
       {post.data.title}
     </h3>
     {showExcerpt && (
-      <p style="margin:0;font-size:var(--text-small);line-height:1.55;color:var(--text-subtle)">
-        {post.data.description}
-      </p>
+      <p class="card__excerpt">{post.data.description}</p>
     )}
     <span class="link-more" style="margin-top:auto">Read more →</span>
   </div>
 </a>
+
+<style>
+  /* Descriptions are written for search results, so they run longer than the
+     two lines the card has room for. Clamping keeps every box the same height
+     rather than letting one long summary set it for the whole row. */
+  .card__excerpt {
+    margin: 0;
+    font-size: var(--text-small);
+    line-height: 1.55;
+    color: var(--text-subtle);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+  }
+</style>

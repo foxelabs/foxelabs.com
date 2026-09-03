@@ -71,7 +71,7 @@ const structuredData = [
     datePublished: publishedIso,
     dateModified: modifiedIso,
     authorName: data.author,
-    image: shareImage,
+    image: shareImage ?? `/og${postPath.replace(/\/$/, '')}.png`,
   }),
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
@@ -112,9 +112,7 @@ const shares = [
     <!-- Article header -->
     <section class="band band--sm band--bottom">
       <div class="measure" style="display:flex;flex-direction:column;gap:var(--space-250)">
-        <a href="/blog/" style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
-          ← Back to all posts
-        </a>
+        <a href="/blog/" class="link-more">← Back to all posts</a>
         <h1 style="font-size:var(--text-h1);line-height:1.12;letter-spacing:-1px">{data.title}</h1>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -131,7 +129,7 @@ const shares = [
           <div style="border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden">
             <Image
               src={data.heroImage}
-              alt={data.heroImageAlt ?? ''}
+              alt={data.heroImageAlt ?? data.title}
               widths={[640, 960, 1280]}
               sizes="(max-width: 800px) 100vw, 760px"
               fetchpriority="high"
@@ -173,7 +171,7 @@ const shares = [
 
         <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-300);margin-top:var(--space-400)">
           <p style="margin:0;font-size:var(--text-ui);color:var(--text-subtle)">By {data.author}</p>
-          <ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:16px">
+          <ul style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:var(--space-200)">
             {shares.map((s) => (
               <li>
                 <a
@@ -198,7 +196,7 @@ const shares = [
           <h2 style="margin-bottom:var(--space-400);font-size:var(--text-h2);letter-spacing:-0.6px">
             Related content
           </h2>
-          <div class="related-grid">
+          <div class="grid-3">
             {related.map((r) => <PostCard post={r} height={110} />)}
           </div>
         </div>
@@ -211,20 +209,11 @@ const shares = [
 </BaseLayout>
 
 <style>
+  /* The post column runs to the same width as every other page's container,
+     rather than the narrower reading measure the legal docs use. */
   .measure {
-    max-width: var(--measure);
+    max-width: var(--container);
     margin-inline: auto;
     padding-inline: var(--container-pad);
-  }
-  .related-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-300);
-  }
-  @media (max-width: 960px) {
-    .related-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 620px) {
-    .related-grid { grid-template-columns: 1fr; }
   }
 </style>

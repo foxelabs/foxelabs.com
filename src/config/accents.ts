@@ -16,13 +16,16 @@ export interface Accent {
   name: string;
   /** CSS colour — a var() reference, so it follows the theme. */
   color: string;
+  /** Readable foreground on a solid field of this hue: white holds on the
+      dark pair, the light pair needs ink. */
+  ink: string;
 }
 
 export const ACCENTS: Accent[] = [
-  { name: 'blue',   color: 'var(--acc-1)' },
-  { name: 'purple', color: 'var(--acc-2)' },
-  { name: 'amber',  color: 'var(--acc-3)' },
-  { name: 'lime',   color: 'var(--acc-4)' },
+  { name: 'blue',   color: 'var(--acc-1)', ink: '#FFFFFF' },
+  { name: 'purple', color: 'var(--acc-2)', ink: '#FFFFFF' },
+  { name: 'amber',  color: 'var(--acc-3)', ink: 'var(--ink-band)' },
+  { name: 'lime',   color: 'var(--acc-4)', ink: 'var(--ink-band)' },
 ];
 
 /** Raw hex per hue, for contexts that cannot resolve a CSS variable —

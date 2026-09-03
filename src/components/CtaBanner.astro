@@ -22,12 +22,12 @@ const {
 <section class:list={['band', subtle && 'band--subtle band--top']}>
   <div class="container-x" style="text-align:center">
     <div
-      style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:20px"
+      style="max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:var(--space-250)"
     >
       <span class="accent-bar" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
       <h2 style="font-size:var(--text-h2-lg);letter-spacing:-0.8px">{heading}</h2>
-      <p style="margin:0;font-size:1.03125rem;line-height:1.55;color:var(--text-subtle)">{body}</p>
-      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+      <p style="margin:0;font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">{body}</p>
+      <div style="display:flex;gap:var(--space-150);margin-top:var(--space-100);flex-wrap:wrap;justify-content:center">
         <a href={primary.href} class="btn btn--primary">{primary.label}</a>
         <a href={secondary.href} class="btn btn--ghost">{secondary.label}</a>
       </div>

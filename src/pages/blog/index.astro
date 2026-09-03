@@ -51,31 +51,32 @@ const tags = tagIndex(posts);
         <!-- Title + the lead story -->
         <section class="band band--sm band--bottom">
           <div class="container-x">
-            <h1 style="font-size:var(--text-title);letter-spacing:-1.2px;margin-bottom:12px">From the studio</h1>
+            <h1 style="font-size:var(--text-title);letter-spacing:-1.2px;margin-bottom:var(--space-150)">From the studio</h1>
             <p style="margin:0 0 var(--space-500);font-size:1.125rem;line-height:1.5;color:var(--text-subtle);max-width:560px">
               Notes on how we build — open-source software, expert advisor design, risk, and the
               occasional release.
             </p>
 
             <a href={`/blog/${lead.id}/`} class="card lead-card">
-              <div class="card__field" style={`background:${leadAccent.color};min-height:260px;padding:0`}>
+              <div class="card__field" style={`background:${leadAccent.color};color:${leadAccent.ink};min-height:260px;padding:0`}>
                 {lead.data.heroImage && (
                   <Image
                     src={lead.data.heroImage}
-                    alt={lead.data.heroImageAlt ?? ''}
+                    alt={lead.data.heroImageAlt ?? lead.data.title}
                     widths={[600, 1200]}
                     sizes="(max-width: 860px) 100vw, 560px"
                     loading="eager"
+                    fetchpriority="high"
                   />
                 )}
               </div>
-              <div style="padding:var(--space-500);display:flex;flex-direction:column;gap:14px;justify-content:center">
+              <div style="padding:var(--space-500);display:flex;flex-direction:column;gap:var(--space-150);justify-content:center">
                 <span class="chip chip--sm" style="align-self:flex-start">
                   <span class="dot" style={`background:${leadAccent.color}`} aria-hidden="true"></span>
                   {leadTopic} · Featured
                 </span>
                 <h2 style="font-size:1.625rem;line-height:1.2;letter-spacing:-0.5px">{lead.data.title}</h2>
-                <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+                <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
                   {lead.data.description}
                 </p>
                 <span class="link-more">Read the article →</span>
@@ -87,9 +88,9 @@ const tags = tagIndex(posts);
         <!-- Topic filter + grid -->
         <section class="band">
           <div class="container-x">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:var(--space-400);flex-wrap:wrap">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-250);margin-bottom:var(--space-400);flex-wrap:wrap">
               <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Latest by topic</h2>
-              <div style="display:flex;gap:8px;flex-wrap:wrap" data-topic-filter>
+              <div role="group" aria-label="Filter posts by topic" style="display:flex;gap:8px;flex-wrap:wrap" data-topic-filter>
                 {filters.map((label) => (
                   <button
                     type="button"
@@ -102,6 +103,9 @@ const tags = tagIndex(posts);
                 ))}
               </div>
             </div>
+
+            {/* Announces the result count to screen readers after filtering. */}
+            <p class="sr-only" role="status" data-filter-status></p>
 
             <PostGrid posts={posts} />
 
@@ -147,6 +151,7 @@ const tags = tagIndex(posts);
     var bar = document.querySelector('[data-topic-filter]');
     if (!bar) return;
     var cards = document.querySelectorAll('[data-post-topic]');
+    var status = document.querySelector('[data-filter-status]');
 
     bar.addEventListener('click', function (event) {
       var button = event.target.closest('[data-topic]');
@@ -156,9 +161,16 @@ const tags = tagIndex(posts);
       bar.querySelectorAll('[data-topic]').forEach(function (b) {
         b.setAttribute('aria-pressed', String(b === button));
       });
+      var shown = 0;
       cards.forEach(function (card) {
-        card.hidden = topic !== 'All' && card.dataset.postTopic !== topic;
+        var hide = topic !== 'All' && card.dataset.postTopic !== topic;
+        card.hidden = hide;
+        if (!hide) shown++;
       });
+      if (status) {
+        status.textContent =
+          shown + (shown === 1 ? ' post' : ' posts') + (topic === 'All' ? '' : ' in ' + topic);
+      }
     });
   })();
 </script>

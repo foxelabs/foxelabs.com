@@ -1,0 +1,27 @@
+---
+// The "how we build" 4-up: an accent mark, a short title, one line of copy.
+// One component for the four pages that render it, so the block cannot drift.
+interface Item {
+  title: string;
+  color: string;
+  body: string;
+}
+interface Props {
+  items: Item[];
+  /** On the ink band the copy uses the band's own subtle colour. */
+  onInk?: boolean;
+}
+const { items, onInk = false } = Astro.props;
+const bodyColor = onInk ? 'var(--ink-band-subtle)' : 'var(--text-subtle)';
+---
+<div class="grid-4">
+  {items.map((p) => (
+    <div style="display:flex;flex-direction:column;gap:var(--space-125)">
+      <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
+      <h3 style="font-size:var(--text-body-lg);font-weight:var(--fw-heading)">{p.title}</h3>
+      <p style={`margin:0;font-size:var(--text-ui);line-height:1.55;color:${bodyColor}`}>
+        {p.body}
+      </p>
+    </div>
+  ))}
+</div>

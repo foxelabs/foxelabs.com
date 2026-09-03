@@ -1,11 +1,21 @@
 // Central SEO constants + JSON-LD (schema.org) builders.
 // Keeps structured data consistent and out of the page templates.
 
+/** Where the company is, off-site. One list: the footer renders it and the
+    Organization node's sameAs is derived from it, so the two cannot drift. */
+export const SOCIALS = [
+  { href: 'https://x.com/foxelabs', label: 'Foxe Labs on X', icon: 'mingcute:social-x-line' },
+  { href: 'https://github.com/foxelabs', label: 'Foxe Labs on GitHub', icon: 'mingcute:github-line' },
+  { href: 'https://youtube.com/@foxelabs', label: 'Foxe Labs on YouTube', icon: 'mingcute:youtube-line' },
+  { href: 'https://instagram.com/foxelabs', label: 'Foxe Labs on Instagram', icon: 'mingcute:instagram-line' },
+  { href: 'https://www.facebook.com/foxelabs', label: 'Foxe Labs on Facebook', icon: 'mingcute:facebook-line' },
+];
+
 export const SITE = {
   name: 'Foxe Labs',
   url: 'https://foxelabs.com',
   // Square logo for Organization markup.
-  logo: 'https://foxelabs.com/icon-512.png',
+  logo: 'https://foxelabs.com/web-app-manifest-512x512.png',
   // Default share banner (1200×630) — the generated site card. Per-page cards
   // live at /og/<path>.png; see config/og.ts.
   banner: 'https://foxelabs.com/og/index.png',
@@ -46,13 +56,7 @@ export function organizationLd() {
     description:
       'A small software studio building open-source WordPress tools and precision trading software.',
     founder: { '@type': 'Person', name: SITE.founder },
-    sameAs: [
-      'https://x.com/foxelabs',
-      'https://github.com/foxelabs',
-      'https://youtube.com/@foxelabs',
-      'https://instagram.com/foxelabs',
-      'https://www.facebook.com/foxelabs',
-    ],
+    sameAs: SOCIALS.map((s) => s.href),
   };
 }
 

@@ -1,5 +1,8 @@
 ---
 import '../styles/global.css';
+// The hashed URL of the one font file every page paints with, so it can be
+// preloaded instead of waiting for the stylesheet to be parsed first.
+import bricolageWoff2 from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 import Analytics from '../components/Analytics.astro';
 import { SITE, organizationLd, websiteLd } from '../config/seo';
 import { ogImageFor } from '../config/og';
@@ -61,14 +64,15 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="preload" href={bricolageWoff2} as="font" type="font/woff2" crossorigin />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     {/* One icon for every theme: white fox head in a rounded black tile, so it
         reads on light and dark tabs alike. .ico is the fallback for browsers
         without SVG icons — Safari never uses the SVG. */}
-    <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="Foxe Labs Blog" href="/rss.xml" />
@@ -129,11 +133,22 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
       (function () {
         const root = document.documentElement;
         const meta = document.querySelector('meta[name="theme-color"]:not([media])');
+        // The accessible name always says what pressing the button will do.
+        function labelToggles() {
+          const label =
+            root.dataset.theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+          document.querySelectorAll('[data-theme-toggle]').forEach(function (button) {
+            button.setAttribute('aria-label', label);
+          });
+        }
+        // This script sits above the footer, so the button does not exist yet.
+        document.addEventListener('DOMContentLoaded', labelToggles);
         document.addEventListener('click', function (event) {
           const button = event.target.closest('[data-theme-toggle]');
           if (!button) return;
           const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
           root.dataset.theme = next;
+          labelToggles();
           if (meta) meta.setAttribute('content', next === 'dark' ? '#15191C' : '#FFFFFF');
           try {
             localStorage.setItem('foxe-theme', next);

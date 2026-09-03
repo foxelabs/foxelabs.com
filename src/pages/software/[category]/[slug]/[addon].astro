@@ -10,7 +10,8 @@ import Faq from '../../../../components/ui/Faq.astro';
 import Screenshots from '../../../../components/ui/Screenshots.astro';
 import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
 import { breadcrumbLd, softwareApplicationLd, faqLd } from '../../../../config/seo';
-import { accentFor, ACCENTS } from '../../../../config/accents';
+import { accentFor } from '../../../../config/accents';
+import { Icon } from 'astro-icon/components';
 
 export async function getStaticPaths() {
   const [addons, projects] = await Promise.all([
@@ -77,7 +78,9 @@ const structuredData = [
     name: `${data.name} — ${parent.data.name} add-on`,
     description: data.summary,
     url: addonPath('oss', parent.data.category, parent.id, addon.id),
-    applicationCategory: 'WordPress Plugin',
+    // Enumerated schema.org value, matching the parent plugin's node — the
+    // freeform 'WordPress Plugin' string is not a recognised category.
+    applicationCategory: 'DeveloperApplication',
     operatingSystem: 'WordPress',
     offerPrice: isFromPrice ? undefined : priceMatch?.[1],
     offerLowPrice: isFromPrice ? priceMatch?.[1] : undefined,
@@ -86,8 +89,6 @@ const structuredData = [
   }),
 ];
 if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
-
-const quad = ACCENTS.map((a) => a.color);
 ---
 <BaseLayout
   title={pageTitle}
@@ -101,7 +102,7 @@ const quad = ACCENTS.map((a) => a.color);
     <section class="band band--sm band--bottom">
       <div class="container-x addon-hero">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
-          <a href={parentUrl} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+          <a href={parentUrl} class="link-more">
             ← All {parent.data.name} add-ons
           </a>
 
@@ -124,14 +125,10 @@ const quad = ACCENTS.map((a) => a.color);
           </p>
 
           {data.features.length > 0 && (
-            <ul style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
-              {data.features.map((f, i) => (
-                <li style="display:flex;align-items:flex-start;gap:10px;font-size:0.9375rem;line-height:1.5">
-                  <span
-                    class="dot"
-                    style={`background:${quad[i % 4]};width:10px;height:10px;margin-top:5px`}
-                    aria-hidden="true"
-                  ></span>
+            <ul class="dot-list" style={`--dot-hue:${accent.color};margin-top:var(--space-150);font-size:var(--text-md);line-height:1.5`}>
+              {data.features.map((f) => (
+                <li>
+                  <Icon name="mingcute:check-line" size={16} style="color:var(--dot-hue);flex:none" aria-hidden="true" />
                   <span>{f}</span>
                 </li>
               ))}
@@ -149,11 +146,11 @@ const quad = ACCENTS.map((a) => a.color);
               Get {data.name}
             </a>
           )}
-          <div style="display:flex;flex-direction:column;gap:10px;padding-top:var(--space-150);border-top:1px solid var(--border)">
-            <a href={docsUrl} target="_blank" rel="noopener noreferrer" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">
+          <div style="display:flex;flex-direction:column;gap:var(--space-125);padding-top:var(--space-150);border-top:1px solid var(--border)">
+            <a href={docsUrl} target="_blank" rel="noopener noreferrer" class="link-more">
               Documentation →
             </a>
-            <a href="/contact/" style="font-size:var(--text-ui);font-weight:var(--fw-medium)">Get support →</a>
+            <a href="/contact/" class="link-more">Get support →</a>
           </div>
           <p style="margin:0;font-size:var(--text-small);color:var(--text-subtle)">
             Requires the free <a href={parentUrl}>{parent.data.name}</a> plugin to be installed and active.

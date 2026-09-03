@@ -8,9 +8,11 @@ import EmailForm from '../../components/EmailForm.astro';
 import Section from '../../components/ui/Section.astro';
 import Eyebrow from '../../components/ui/Eyebrow.astro';
 import Faq from '../../components/ui/Faq.astro';
+import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
+import { Icon } from 'astro-icon/components';
 import { categoryPath, projectPath } from '../../config/tracks';
 import { accentFor, categoryAccent } from '../../config/accents';
-import { breadcrumbLd, faqLd } from '../../config/seo';
+import { breadcrumbLd, collectionPageLd, faqLd } from '../../config/seo';
 
 const products = (await getCollection(
   'projects',
@@ -28,6 +30,7 @@ const categoryBoxes = [
     badge: `${count('expert-advisors')} EAs`,
     href: categoryPath('trading', 'expert-advisors'),
     accent: categoryAccent('expert-advisors'),
+    icon: 'mingcute:stock-line',
   },
   {
     title: 'Trading Tools',
@@ -36,6 +39,7 @@ const categoryBoxes = [
     badge: `${count('tools')} tools`,
     href: categoryPath('trading', 'tools'),
     accent: categoryAccent('tools'),
+    icon: 'mingcute:tool-line',
   },
 ];
 
@@ -104,6 +108,16 @@ const faq = [
       { name: 'Home', path: '/' },
       { name: 'Trading', path: '/trading' },
     ]),
+    collectionPageLd({
+      name: 'MetaTrader 5 Expert Advisors & Trading Tools',
+      description:
+        'Expert advisors, a universal trading journal, and precision tools — engineered for prop firm and serious retail traders.',
+      url: '/trading/',
+      items: products.map((p) => ({
+        name: p.data.name,
+        path: projectPath('trading', p.data.category, p.id),
+      })),
+    }),
     faqLd(faq),
   ]}
 >
@@ -121,7 +135,7 @@ const faq = [
             Expert advisors, a universal trading journal, and precision utilities for MetaTrader 5 —
             built risk-first, pre-tuned, and traded on our own capital first.
           </p>
-          <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;gap:var(--space-150);flex-wrap:wrap">
             <a href={categoryPath('trading', 'expert-advisors')} class="btn btn--primary">Expert Advisors</a>
             <a href="#waitlist" class="btn btn--ghost">Join the waitlist</a>
           </div>
@@ -134,26 +148,29 @@ const faq = [
 
     <!-- Categories -->
     <Section>
-      <h2 style="margin-bottom:12px;font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+      <h2 style="margin-bottom:var(--space-150);font-size:var(--text-h2-lg);letter-spacing:-0.8px">
         Two kinds of tool.
       </h2>
       <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
         One trades for you inside MetaTrader. The other makes sense of what happened afterwards.
       </p>
-      <div class="cat-grid">
+      <div class="grid-2">
         {categoryBoxes.map((box) => (
           <a
             href={box.href}
             class="card card--pad"
-            style={`gap:14px;padding:30px;border-top:4px solid ${box.accent.color}`}
+            style={`gap:var(--space-150);padding:var(--space-400);border-top:4px solid ${box.accent.color}`}
           >
+            <div class="icon-tile" style={`background:color-mix(in srgb, ${box.accent.color} 10%, transparent);color:${box.accent.color}`}>
+              <Icon name={box.icon} size={24} aria-hidden="true" />
+            </div>
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
               <h3 style="font-size:var(--text-h3)">{box.title}</h3>
-              <span style="font-size:var(--text-xs);font-weight:var(--fw-heading);background:var(--bg-hover);border-radius:var(--r-pill);padding:4px 10px;white-space:nowrap">
+              <span class="badge">
                 {box.badge}
               </span>
             </div>
-            <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
               {box.description}
             </p>
             <span class="link-more" style="margin-top:auto">Explore →</span>
@@ -168,16 +185,16 @@ const faq = [
         <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
           What we ship
         </h2>
-        <div class="product-grid">
+        <div class="grid-3">
           {products.map((p) => (
             <a
               href={projectPath('trading', p.data.category, p.id)}
               class="card card--pad"
-              style={`gap:12px;padding:24px;border-top:4px solid ${accentFor(productIds, p.id).color}`}
+              style={`gap:var(--space-150);padding:var(--space-300);border-top:4px solid ${accentFor(productIds, p.id).color}`}
             >
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
                 <span class="kicker">{p.data.platform}</span>
-                <span style="font-size:var(--text-xs);font-weight:var(--fw-heading);background:var(--bg-hover);border-radius:var(--r-pill);padding:4px 10px;white-space:nowrap">
+                <span class="badge">
                   {statusLabel[p.data.status] ?? p.data.status}
                 </span>
               </div>
@@ -201,17 +218,7 @@ const faq = [
       <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
         How these are built
       </h2>
-      <div class="four-col">
-        {principles.map((p) => (
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
-            <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{p.title}</h3>
-            <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--ink-band-subtle)">
-              {p.body}
-            </p>
-          </div>
-        ))}
-      </div>
+      <PrincipleGrid items={principles} onInk />
     </Section>
 
     <!-- Waitlist -->
@@ -232,32 +239,7 @@ const faq = [
       <Faq items={faq} />
     </Section>
 
-    <CtaBanner />
+    <CtaBanner secondary={{ href: '/trading/', label: 'Browse the trading tools' }} />
   </main>
   <Footer />
 </BaseLayout>
-
-<style>
-  .cat-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-300);
-  }
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-300);
-  }
-  .four-col {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-400);
-  }
-  @media (max-width: 960px) {
-    .product-grid { grid-template-columns: repeat(2, 1fr); }
-    .four-col { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 720px) {
-    .cat-grid, .product-grid { grid-template-columns: 1fr; }
-  }
-</style>

@@ -30,7 +30,7 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
     role="status"
     tabindex="-1"
     hidden
-    style="margin:12px 0 0;font-size:var(--text-ui);color:var(--ok)"
+    style="margin:var(--space-150) 0 0;font-size:var(--text-ui);color:var(--ok)"
   >
     You're on the list!
   </p>
@@ -39,7 +39,7 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
     id={`${id}-error`}
     role="alert"
     hidden
-    style="margin:12px 0 0;font-size:var(--text-ui);color:var(--bad)"
+    style="margin:var(--space-150) 0 0;font-size:var(--text-ui);color:var(--bad)"
   >
     Something went wrong. Try again.
   </p>
@@ -48,7 +48,7 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
 <style>
   .email-row {
     display: flex;
-    gap: 10px;
+    gap: var(--space-125);
   }
   .email-row[hidden] { display: none; }
   @media (max-width: 520px) {

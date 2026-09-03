@@ -63,12 +63,19 @@ export const tagSlug = (tag: string): string =>
 export const tagPath = (tag: string): string => `/blog/tag/${tagSlug(tag)}/`;
 
 /** Title case for a tag slug when no post spells it differently, e.g.
- *  'expert-advisors' → 'Expert Advisors'. Acronyms we write in caps stay caps. */
-const ACRONYMS = new Set(['php', 'seo', 'mql5', 'api', 'css', 'html', 'js', 'sql', 'wp', 'ai']);
+ *  'expert-advisors' → 'Expert Advisors'. Words with their own capitalisation
+ *  (acronyms and brand names) come from the map, so a tag page never ships
+ *  'Wordpress' or 'Xauusd' in its title. */
+const CASED: Record<string, string> = {
+  php: 'PHP', seo: 'SEO', mql5: 'MQL5', api: 'API', css: 'CSS', html: 'HTML',
+  js: 'JS', sql: 'SQL', wp: 'WP', ai: 'AI', xauusd: 'XAUUSD',
+  wordpress: 'WordPress', javascript: 'JavaScript', typescript: 'TypeScript',
+  metatrader: 'MetaTrader', mysql: 'MySQL', github: 'GitHub', mt5: 'MT5', mt4: 'MT4',
+};
 export const tagLabel = (tag: string): string =>
   tagSlug(tag)
     .split('-')
-    .map((w) => (ACRONYMS.has(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+    .map((w) => CASED[w] ?? w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 
 type Post = CollectionEntry<'blog'>;

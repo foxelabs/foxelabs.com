@@ -37,6 +37,7 @@ const topics = [...new Set(tag.posts.map(postTopic))];
 <BaseLayout
   title={`${tag.label} Articles | Foxe Labs`}
   description={description}
+  noindex={tag.posts.length < 2}
   jsonLd={[
     breadcrumbLd([
       { name: 'Home', path: '/' },
@@ -62,6 +63,7 @@ const topics = [...new Set(tag.posts.map(postTopic))];
 
     <section class="band">
       <div class="container-x">
+        <h2 class="sr-only">Articles</h2>
         <PostGrid posts={tag.posts} />
 
         {related.length > 0 && (

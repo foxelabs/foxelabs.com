@@ -7,9 +7,11 @@ import CtaBanner from '../../components/CtaBanner.astro';
 import Section from '../../components/ui/Section.astro';
 import Eyebrow from '../../components/ui/Eyebrow.astro';
 import Faq from '../../components/ui/Faq.astro';
-import { categoryPath } from '../../config/tracks';
+import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
+import { Icon } from 'astro-icon/components';
+import { categoryPath, projectPath } from '../../config/tracks';
 import { ACCENTS, categoryAccent } from '../../config/accents';
-import { breadcrumbLd, faqLd } from '../../config/seo';
+import { breadcrumbLd, collectionPageLd, faqLd } from '../../config/seo';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
 const GITHUB_URL: string | null = 'https://github.com/foxelabs';
@@ -26,6 +28,7 @@ const categoryBoxes = [
     badge: `${count('plugins')} plugins`,
     href: categoryPath('oss', 'plugins'),
     accent: categoryAccent('plugins'),
+    icon: 'mingcute:plugin-2-line',
   },
   {
     title: 'PHP Libraries',
@@ -34,6 +37,7 @@ const categoryBoxes = [
     badge: `${count('libraries')} libraries`,
     href: categoryPath('oss', 'libraries'),
     accent: categoryAccent('libraries'),
+    icon: 'mingcute:box-2-line',
   },
   {
     title: 'Apps',
@@ -43,6 +47,7 @@ const categoryBoxes = [
     href: '/contact/',
     // Not a real category yet, so it takes the next free hue in the quad.
     accent: ACCENTS[3],
+    icon: 'mingcute:rocket-line',
   },
 ];
 
@@ -108,6 +113,15 @@ const faq = [
       { name: 'Home', path: '/' },
       { name: 'Software', path: '/software' },
     ]),
+    collectionPageLd({
+      name: 'Open-Source WordPress Plugins & PHP Libraries',
+      description:
+        'WordPress plugins, PHP libraries, and apps by Foxe Labs — open source and GPL-licensed, documented, and actively maintained.',
+      url: '/software/',
+      items: projects
+        .sort((a, b) => a.data.order - b.data.order)
+        .map((p) => ({ name: p.data.name, path: projectPath('oss', p.data.category, p.id) })),
+    }),
     faqLd(faq),
   ]}
 >
@@ -127,7 +141,8 @@ const faq = [
           </p>
           {GITHUB_URL && (
             <a href={GITHUB_URL} class="btn btn--ghost" target="_blank" rel="noopener noreferrer">
-              Browse the source on GitHub
+              <Icon name="mingcute:github-line" size={18} aria-hidden="true" />
+              View on GitHub
             </a>
           )}
         </div>
@@ -139,7 +154,7 @@ const faq = [
       <div class="container-x">
         <div class="stat-row">
           {stats.map((s) => (
-            <div style="padding:28px 24px;text-align:center">
+            <div style="padding:var(--space-350) var(--space-300);text-align:center">
               <div class="stat__value">{s.value}</div>
               <div class="stat__label">{s.label}</div>
             </div>
@@ -150,27 +165,30 @@ const faq = [
 
     <!-- Categories -->
     <Section>
-      <h2 style="margin-bottom:12px;font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+      <h2 style="margin-bottom:var(--space-150);font-size:var(--text-h2-lg);letter-spacing:-0.8px">
         Three shelves, one standard.
       </h2>
       <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
         Everything here is built, documented and supported in-house — whether it runs inside
         WordPress, inside your Composer autoloader, or on our servers.
       </p>
-      <div class="cat-grid">
+      <div class="grid-3">
         {categoryBoxes.map((box) => (
           <a
             href={box.href}
             class="card card--pad"
-            style={`gap:14px;padding:30px;border-top:4px solid ${box.accent.color}`}
+            style={`gap:var(--space-150);padding:var(--space-400);border-top:4px solid ${box.accent.color}`}
           >
+            <div class="icon-tile" style={`background:color-mix(in srgb, ${box.accent.color} 10%, transparent);color:${box.accent.color}`}>
+              <Icon name={box.icon} size={24} aria-hidden="true" />
+            </div>
             <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
               <h3 style="font-size:var(--text-h3)">{box.title}</h3>
-              <span style="font-size:var(--text-xs);font-weight:var(--fw-heading);background:var(--bg-hover);border-radius:var(--r-pill);padding:4px 10px;white-space:nowrap">
+              <span class="badge">
                 {box.badge}
               </span>
             </div>
-            <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
               {box.description}
             </p>
             <span class="link-more" style="margin-top:auto">Explore →</span>
@@ -184,17 +202,7 @@ const faq = [
       <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
         Why these are worth installing
       </h2>
-      <div class="four-col">
-        {principles.map((p) => (
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
-            <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{p.title}</h3>
-            <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--ink-band-subtle)">
-              {p.body}
-            </p>
-          </div>
-        ))}
-      </div>
+      <PrincipleGrid items={principles} onInk />
     </Section>
 
     <Section variant="alt" rule="top">
@@ -211,22 +219,7 @@ const faq = [
     display: grid;
     grid-template-columns: repeat(4, 1fr);
   }
-  .cat-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-300);
-  }
-  .four-col {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-400);
-  }
-  @media (max-width: 960px) {
-    .cat-grid { grid-template-columns: repeat(2, 1fr); }
-    .four-col { grid-template-columns: repeat(2, 1fr); }
-  }
   @media (max-width: 720px) {
     .stat-row { grid-template-columns: 1fr 1fr; }
-    .cat-grid { grid-template-columns: 1fr; }
   }
 </style>

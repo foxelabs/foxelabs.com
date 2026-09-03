@@ -2,6 +2,8 @@
 // Paid-product purchase card: the four-colour rule, a big price, a commercial
 // value checklist, and a slot for the CTA(s), resource links and fine print.
 // Used on add-on and trading product pages.
+import { Icon } from 'astro-icon/components';
+
 interface Props {
   /** e.g. "From $29.99" or "$149 · one-time". Parsed into kicker/amount/qualifier. */
   price?: string;
@@ -27,7 +29,7 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
 <div class:list={['card', className]} style="align-self:start">
   <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
 
-  <div style="padding:24px;display:flex;flex-direction:column;gap:var(--space-300)">
+  <div style="padding:var(--space-300);display:flex;flex-direction:column;gap:var(--space-300)">
     {badge && <span class="chip chip--sm" style="align-self:flex-start">{badge}</span>}
 
     {amount && (
@@ -37,20 +39,16 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
           <span style="font-size:2.5rem;line-height:1;font-weight:var(--fw-display);letter-spacing:-0.02em">
             {amount}
           </span>
-          {qualifier && <span style="font-size:0.9375rem;color:var(--text-subtle)">{qualifier}</span>}
+          {qualifier && <span style="font-size:var(--text-md);color:var(--text-subtle)">{qualifier}</span>}
         </div>
       </div>
     )}
 
     {benefits.length > 0 && (
-      <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+      <ul class="dot-list" style="--dot-hue:var(--acc-1)">
         {benefits.map((b, i) => (
-          <li style="display:flex;align-items:flex-start;gap:10px;font-size:var(--text-ui);line-height:1.5;color:var(--text-subtle)">
-            <span
-              class="dot"
-              style={`background:${quad[i % 4]};margin-top:4px`}
-              aria-hidden="true"
-            ></span>
+          <li style={`--dot-hue:${quad[i % 4]};font-size:var(--text-ui);line-height:1.5;color:var(--text-subtle)`}>
+            <Icon name="mingcute:check-line" size={16} style="color:var(--dot-hue);flex:none" aria-hidden="true" />
             <span>{b}</span>
           </li>
         ))}

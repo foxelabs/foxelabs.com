@@ -1,52 +1,51 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import CtaBanner from '../components/CtaBanner.astro';
 import Section from '../components/ui/Section.astro';
 import Faq from '../components/ui/Faq.astro';
+import PrincipleGrid from '../components/ui/PrincipleGrid.astro';
 import PostCard from '../components/PostCard.astro';
 import { faqLd } from '../config/seo';
-import { trackConfig } from '../config/tracks';
 
 // Latest writing — real published posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
   .slice(0, 3);
 
-// The three names under each track card come from the project collection, so
-// the home page cannot drift from what actually ships.
-const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
-  (a, b) => a.data.order - b.data.order
-);
-const pick = (track: 'oss' | 'trading') =>
-  projects
-    .filter((p) => p.data.track === track)
-    .slice(0, 3)
-    .map((p) => ({
-      href: `${trackConfig[track].basePath}/${p.data.category}/${p.id}/`,
-      label: `${p.data.name} — ${p.data.tagline}`,
-    }));
-
+// The three names on each card are the design's own copy, set here rather than
+// pulled from the project collection: this is a summary line, not an index.
 const tracks = [
   {
     id: 'software',
     title: 'Software',
     color: 'var(--acc-1)',
+    icon: 'mingcute:code-line',
     body:
-      'WordPress plugins and PHP libraries — open source and GPL-licensed, documented, and shipped for years. Paid Pro add-ons and new apps join the same shelf.',
-    links: pick('oss'),
-    cta: { href: '/software/', label: 'Explore software →' },
+      'Open-source WordPress plugins and PHP libraries, GPL-licensed and maintained since 2014. Running on 110,000+ active sites, with the source public on GitHub and support answered by the people who wrote the code.',
+    links: [
+      '404 to 301 — smart redirects, 100,000+ installs',
+      'Loggedin — login and session control',
+      'PHP libraries on Packagist',
+    ],
+    cta: { href: '/software/', label: 'Explore Software' },
   },
   {
     id: 'trading',
     title: 'Trading',
     color: 'var(--acc-2)',
+    icon: 'mingcute:chart-line-line',
     body:
-      'Expert advisors, a universal trading journal, and precision utilities for prop firm and serious retail traders. Engineered risk-first.',
-    links: pick('trading'),
-    cta: { href: '/trading/', label: 'Explore trading →' },
+      'Precision software for MetaTrader 5 — expert advisors, a universal trading journal, and session utilities built for prop firm and serious retail traders. Every system is engineered risk-first and tested before it ships.',
+    links: [
+      'Gold Scalpel — automated XAUUSD scalper',
+      'TickerLog — universal trading journal',
+      'Session tools — MT5 indicators',
+    ],
+    cta: { href: '/trading/', label: 'Explore Trading' },
   },
 ];
 
@@ -94,9 +93,9 @@ const faq = [
       'Foxe Labs is a small software studio based in Kerala, India. We ship two things: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5. The plugins have been maintained since 2014 and run on over 110,000 active sites.',
   },
   {
-    q: 'Are the WordPress plugins free?',
+    q: 'Is Foxe Labs software open source?',
     a:
-      'Yes. Every plugin and library on the software track is free and GPL-2.0-or-later licensed, published on WordPress.org and Packagist with the source on GitHub. Some plugins offer paid add-ons that extend them, but the core plugin is always free.',
+      'The WordPress plugins and PHP libraries are open source under GPL-2.0-or-later, published on WordPress.org and Packagist with the source on GitHub. Core plugins are free; some offer paid add-ons that extend them.',
   },
   {
     q: 'What trading software does Foxe Labs make?',
@@ -113,7 +112,7 @@ const faq = [
 // The decorative grid behind the hero. Colours are assigned by a fixed
 // arithmetic walk rather than at random, so the pattern is stable across builds.
 const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
-const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor(i / 13) * 3) % 4]);
+const heroCells = Array.from({ length: 320 }, (_, i) => quad[(i * 7 + Math.floor(i / 13) * 3) % 4]);
 ---
 
 <BaseLayout jsonLd={faqLd(faq)}>
@@ -128,11 +127,11 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
         class="container-x"
         style="position:relative;padding-block:var(--space-800) var(--band-pad-sm);display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--space-300);pointer-events:none"
       >
-        <span class="chip chip--muted">
-          <span class="dot" style="background:var(--acc-4);border-radius:2px;width:8px;height:8px" aria-hidden="true"></span>
+        <span class="chip chip--muted chip--solid">
+          <span class="dot dot--sm" style="background:var(--acc-4)" aria-hidden="true"></span>
           Lines of code · Lines on the chart
         </span>
-        <h1 style="font-size:var(--text-hero);line-height:1.08;letter-spacing:-1.5px;max-width:820px">
+        <h1 data-hero-heading style="font-size:var(--text-hero);line-height:1.08;letter-spacing:-1.5px;max-width:820px">
           Engineering in the open — and in the markets.
         </h1>
         <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle);max-width:620px">
@@ -145,8 +144,8 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">
           {tags.map((tag) => (
-            <span class="chip">
-              <span class="dot" style={`background:${tag.color};width:10px;height:10px`} aria-hidden="true"></span>
+            <span class="chip chip--solid">
+              <span class="dot" style={`background:${tag.color}`} aria-hidden="true"></span>
               {tag.label}
             </span>
           ))}
@@ -159,13 +158,13 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
       <div class="container-x">
         <div class="stat-row">
           {stats.map((s) => (
-            <div style="padding:28px 24px;text-align:center">
+            <div style="padding:var(--space-350) var(--space-300);text-align:center">
               <div class="stat__value">{s.value}</div>
               <div class="stat__label">{s.label}</div>
             </div>
           ))}
         </div>
-        <p style="margin:0;text-align:center;font-size:var(--text-small);color:var(--text-subtle);padding:0 24px 20px">
+        <p style="margin:0;text-align:center;font-size:var(--text-small);color:var(--text-subtle);padding:0 var(--space-300) var(--space-250)">
           Public on WordPress.org · Packagist · GitHub — open source since 2014
         </p>
       </div>
@@ -173,7 +172,7 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
 
     <!-- Two tracks -->
     <Section id="tracks">
-      <h2 style="margin-bottom:12px;font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+      <h2 style="margin-bottom:var(--space-150);font-size:var(--text-h2-lg);letter-spacing:-0.8px">
         One studio, two disciplines.
       </h2>
       <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:640px">
@@ -187,16 +186,30 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
             id={track.id}
             style={`gap:var(--space-200);border-top:4px solid ${track.color}`}
           >
+            <div class="icon-tile" style={`background:color-mix(in srgb, ${track.color} 10%, transparent);color:${track.color}`}>
+              <Icon name={track.icon} size={24} aria-hidden="true" />
+            </div>
             <h3 style="font-size:var(--text-h3)">{track.title}</h3>
-            <p style="margin:0;font-size:0.9375rem;line-height:1.55;color:var(--text-subtle)">
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
               {track.body}
             </p>
-            <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:0.90625rem">
+            <ul class="dot-list track-list" style={`--dot-hue:${track.color}`}>
               {track.links.map((link) => (
-                <li><a href={link.href}>{link.label}</a></li>
+                <li>
+                  <span class="dot" aria-hidden="true"></span>
+                  {link}
+                </li>
               ))}
             </ul>
-            <a href={track.cta.href} class="link-more" style="margin-top:auto">{track.cta.label}</a>
+            <div style="margin-top:auto;padding-top:var(--space-100)">
+              <a
+                href={track.cta.href}
+                class="btn btn--sm btn--accent"
+                style={`--btn-accent:${track.color}`}
+              >
+                {track.cta.label}
+              </a>
+            </div>
           </div>
         ))}
       </div>
@@ -207,27 +220,17 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
       <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
         How we build
       </h2>
-      <div class="four-col">
-        {principles.map((p) => (
-          <div style="display:flex;flex-direction:column;gap:10px">
-            <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
-            <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{p.title}</h3>
-            <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--ink-band-subtle)">
-              {p.body}
-            </p>
-          </div>
-        ))}
-      </div>
+      <PrincipleGrid items={principles} onInk />
     </Section>
 
     <!-- Latest writing -->
     {posts.length > 0 && (
       <Section id="blog">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin-bottom:var(--space-500);flex-wrap:wrap">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-200);margin-bottom:var(--space-500);flex-wrap:wrap">
           <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Latest from the studio</h2>
           <a href="/blog/" class="link-more">Read the blog →</a>
         </div>
-        <div class="three-col">
+        <div class="grid-3">
           {posts.map((post) => <PostCard post={post} height={140} />)}
         </div>
       </Section>
@@ -253,32 +256,144 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
     grid-template-columns: 1fr 1fr;
     gap: var(--space-300);
   }
-  .three-col {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-300);
-  }
-  .four-col {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--space-400);
-  }
-  @media (max-width: 960px) {
-    .three-col { grid-template-columns: repeat(2, 1fr); }
-    .four-col  { grid-template-columns: repeat(2, 1fr); }
-  }
+  .track-list { font-size: var(--text-md); }
   @media (max-width: 720px) {
     .stat-row { grid-template-columns: 1fr 1fr; }
-    .two-col, .three-col { grid-template-columns: 1fr; }
+    .two-col { grid-template-columns: 1fr; }
   }
 </style>
 
 <script is:inline>
-  // Hovering a cell flashes its colour, then lets it fade back out. Purely
+  // Fixed clusters painted into the hero grid — a dense one in the top right, a
+  // light counterweight in the bottom left — and hovering any cell flashes its
+  // own colour before settling back to whatever it was painted. Purely
   // decorative: the grid is aria-hidden and sits behind the copy.
   (function () {
     var grid = document.querySelector('[data-cellgrid]');
     if (!grid) return;
+
+    var B = 'var(--acc-1)';
+    var P = 'var(--acc-2)';
+    var Y = 'var(--acc-3)';
+    var G = 'var(--acc-4)';
+
+    // Every fill is [colour, strength]. Strength is resolved at paint time so a
+    // narrow screen can run the whole arrangement lighter, where the copy sits
+    // over the full width of the grid rather than clear of it.
+    function fill(color, strength) {
+      return [color, strength];
+    }
+
+    // Wide: five rows of five in the columns nearest the right edge, plus three
+    // cells low on the left.
+    var wideBlock = [
+      [null, fill(Y, 35), null, fill(B, 100), null],
+      [fill(P, 100), null, fill(G, 100), fill(B, 20), fill(Y, 100)],
+      [null, fill(G, 35), fill(Y, 100), null, fill(P, 25)],
+      [fill(B, 25), null, fill(P, 35), fill(G, 100), null],
+      [null, fill(G, 100), null, fill(Y, 20), fill(B, 100)],
+    ];
+    var wideAccents = [
+      [0, 1, fill(G, 100)],
+      [0, 2, fill(B, 25)],
+      [1, 1, fill(P, 20)],
+    ];
+
+    // Narrow: two rows against the right edge, sat behind the headline, plus an
+    // echo on the last rows at the left. All four hues appear, and the whole
+    // arrangement runs light enough for the type to stay the loudest thing.
+    var narrowBlock = [
+      [fill(P, 55), null, fill(Y, 70), fill(B, 100)],
+      [fill(G, 100), fill(B, 45), null, fill(Y, 45)],
+    ];
+    var narrowAccents = [
+      [0, 1, fill(G, 100)],
+      [0, 2, fill(B, 45)],
+      [1, 0, fill(P, 70)],
+    ];
+
+    function css(spec, scale) {
+      var strength = Math.round(spec[1] * scale);
+      if (strength >= 100) return spec[0];
+      return 'color-mix(in srgb, ' + spec[0] + ' ' + strength + '%, transparent)';
+    }
+
+    function paint() {
+      var cells = grid.children;
+      if (!cells.length) return;
+
+      // The grid auto-fills, so the column count is only knowable after layout.
+      // Two rects (grid + first cell) are enough to derive it — no per-cell
+      // measurement, so the paint never forces a layout per cell.
+      var gridBox = grid.getBoundingClientRect();
+      var first = cells[0].getBoundingClientRect();
+      if (!first.height || !first.width) return;
+      var cols = Math.max(1, Math.round(gridBox.width / first.width));
+      var rows = Math.max(1, Math.round(gridBox.height / first.height));
+
+      // Below the phone breakpoint — the same one that gives the grid its finer
+      // cells — the wide block has nowhere to sit without crossing the copy, so
+      // the compact arrangement takes over, and runs lighter with it.
+      var narrow = window.matchMedia('(max-width: 640px)').matches;
+      var block = narrow ? narrowBlock : wideBlock;
+      var accents = narrow ? narrowAccents : wideAccents;
+      var scale = narrow ? 0.7 : 1;
+      var right = narrow ? 0 : 2;
+
+      // On a phone the block is placed against the headline itself rather than
+      // at a fixed row, so it stays put however the title wraps.
+      var top = narrow ? 0 : 1;
+      if (narrow) {
+        var heading = document.querySelector('[data-hero-heading]');
+        if (heading) {
+          var box = heading.getBoundingClientRect();
+          top = Math.max(0, Math.round((box.top - gridBox.top) / first.height) + 1);
+        }
+      }
+
+      var fills = {};
+      block.forEach(function (row, r) {
+        row.forEach(function (spec, k) {
+          if (!spec) return;
+          var col = cols - right - row.length + k;
+          if (col < 0 || top + r >= rows) return;
+          fills[(top + r) * cols + col] = css(spec, scale);
+        });
+      });
+      accents.forEach(function (a) {
+        var row = rows - 1 - a[0];
+        var col = a[1];
+        if (row < 0 || col >= cols) return;
+        fills[row * cols + col] = css(a[2], scale);
+      });
+
+      for (var j = 0; j < cells.length; j++) {
+        var value = fills[j] || 'transparent';
+        cells[j].dataset.bg = value;
+        cells[j].style.backgroundColor = value;
+      }
+    }
+
+    // Painting is idempotent, so it is driven from every signal that the hero
+    // may have changed size — but coalesced to one paint per frame, so a burst
+    // of resize/observer events costs a single pass.
+    var queued = false;
+    function schedulePaint() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(function () {
+        queued = false;
+        paint();
+      });
+    }
+    schedulePaint();
+    window.addEventListener('load', schedulePaint);
+    if (window.ResizeObserver) {
+      new ResizeObserver(schedulePaint).observe(grid);
+    } else {
+      window.addEventListener('resize', schedulePaint);
+    }
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     grid.addEventListener('mouseover', function (event) {
@@ -289,7 +404,7 @@ const heroCells = Array.from({ length: 180 }, (_, i) => quad[(i * 7 + Math.floor
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           cell.style.transition = 'background-color 1.4s ease-out';
-          cell.style.backgroundColor = 'transparent';
+          cell.style.backgroundColor = cell.dataset.bg || 'transparent';
         });
       });
     });

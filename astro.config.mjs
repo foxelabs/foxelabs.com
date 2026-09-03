@@ -4,6 +4,8 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import icon from 'astro-icon';
 import rehypeExternalLinks from 'rehype-external-links';
+import { codeTheme, rehypeCodePanel } from './src/lib/codePanel.mjs';
+import minifyInlineScripts from './src/lib/minifyInline.mjs';
 
 export default defineConfig({
   output: 'static',
@@ -24,19 +26,21 @@ export default defineConfig({
       }),
     }),
     icon(),
+    minifyInlineScripts(),
   ],
   // Open every external link in Markdown/MDX prose in a new tab, safely.
   markdown: {
     rehypePlugins: [
       [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
+      // Wrap the highlighted block in the same chrome-bar panel the hand-written
+      // markup uses, so a fenced block in Markdown lands on the identical slab.
+      rehypeCodePanel,
     ],
-    // Two themes, emitted together. `defaultColor: false` makes Shiki write
-    // --shiki-light and --shiki-dark custom properties on every token instead
-    // of a colour, so global.css can pick a set per theme without a second
-    // build or a flash on load.
+    // One theme, not two: the slab is dark in both site themes, so a light
+    // variant would never be used. The theme paints the same five token colours
+    // the --code-* custom properties carry.
     shikiConfig: {
-      themes: { light: 'github-light', dark: 'github-dark' },
-      defaultColor: false,
+      theme: codeTheme,
     },
   },
 });

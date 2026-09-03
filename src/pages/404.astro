@@ -29,17 +29,17 @@ const shortcuts = [
       </div>
 
       <h1 style="font-size:2.125rem;letter-spacing:-0.7px">This page doesn't exist.</h1>
-      <p style="margin:0;font-size:1.03125rem;line-height:1.6;color:var(--text-subtle)">
+      <p style="margin:0;font-size:var(--text-body-lg);line-height:1.6;color:var(--text-subtle)">
         The link is broken, moved, or never was. We literally wrote the plugin for this — 404 to 301
         redirects a hundred thousand sites past dead ends like this one. Consider yourself redirected.
       </p>
 
-      <div style="display:flex;gap:12px;margin-top:4px;flex-wrap:wrap;justify-content:center">
+      <div style="display:flex;gap:var(--space-150);margin-top:4px;flex-wrap:wrap;justify-content:center">
         <a href="/" class="btn btn--primary">Go to the homepage</a>
         <a href="/blog/" class="btn btn--ghost">Read the blog</a>
       </div>
 
-      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:var(--space-150)">
         {shortcuts.map((s) => (
           <a href={s.href} class="chip">
             <span class="dot" style={`background:${s.color}`} aria-hidden="true"></span>

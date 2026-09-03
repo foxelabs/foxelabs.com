@@ -11,6 +11,7 @@ import Faq from '../../../components/ui/Faq.astro';
 import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
 import { accentFor, ACCENTS } from '../../../config/accents';
+import { Icon } from 'astro-icon/components';
 
 export async function getStaticPaths() {
   const products = await getCollection(
@@ -77,14 +78,19 @@ const resourceLinks = [
   { href: data.supportUrl ?? '/contact/', label: 'Get support' },
 ].filter(Boolean) as { href: string; label: string }[];
 ---
-<BaseLayout title={pageTitle} description={metaDescription} jsonLd={structuredData}>
+<BaseLayout
+  title={pageTitle}
+  description={metaDescription}
+  imageAlt={`${data.name} — ${data.tagline}`}
+  jsonLd={structuredData}
+>
   <Nav />
   <main id="main">
     <!-- Hero -->
     <section class="band band--sm band--bottom">
       <div class="container-x product-hero">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
-          <a href={categoryPath('trading', data.category)} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
+          <a href={categoryPath('trading', data.category)} class="link-more">
             ← All {cat?.label ?? 'trading tools'}
           </a>
 
@@ -104,14 +110,10 @@ const resourceLinks = [
           </p>
 
           {data.features.length > 0 && (
-            <ul style="margin:12px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
-              {data.features.map((f, i) => (
-                <li style="display:flex;align-items:flex-start;gap:10px;font-size:0.9375rem;line-height:1.5">
-                  <span
-                    class="dot"
-                    style={`background:${quad[i % 4]};width:10px;height:10px;margin-top:5px`}
-                    aria-hidden="true"
-                  ></span>
+            <ul class="dot-list" style={`--dot-hue:${accent.color};margin-top:var(--space-150);font-size:var(--text-md);line-height:1.5`}>
+              {data.features.map((f) => (
+                <li>
+                  <Icon name="mingcute:check-line" size={16} style="color:var(--dot-hue);flex:none" aria-hidden="true" />
                   <span>{f}</span>
                 </li>
               ))}
@@ -137,25 +139,14 @@ const resourceLinks = [
               <a href={data.ctaUrl} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
                 {data.ctaLabel ?? 'Get it now'}
               </a>
-              <div style="display:flex;flex-direction:column;gap:10px;padding-top:var(--space-150);border-top:1px solid var(--border)">
+              <div style="display:flex;flex-direction:column;gap:var(--space-125);padding-top:var(--space-150);border-top:1px solid var(--border)">
                 {resourceLinks.map((l) => (
-                  <a href={l.href} style="font-size:var(--text-ui);font-weight:var(--fw-medium)">{l.label} →</a>
+                  <a href={l.href} class="link-more">{l.label} →</a>
                 ))}
               </div>
             </>
           ) : (
             <EmailForm id={`product-form-${product.id}`} buttonLabel="Notify me" />
-          )}
-
-          {data.specs.length > 0 && (
-            <dl style="margin:0;padding-top:var(--space-150);border-top:1px solid var(--border)">
-              {data.specs.map((s) => (
-                <div style="display:flex;justify-content:space-between;gap:16px;padding:10px 0;font-size:var(--text-ui);border-bottom:1px solid var(--border)">
-                  <dt style="color:var(--text-subtle)">{s.label}</dt>
-                  <dd style="margin:0;text-align:right;font-weight:var(--fw-medium)">{s.value}</dd>
-                </div>
-              ))}
-            </dl>
           )}
         </PricingCard>
       </div>
@@ -164,11 +155,12 @@ const resourceLinks = [
     <!-- Highlights -->
     {data.highlights.length > 0 && (
       <Section variant="alt">
-        <div class="highlight-grid">
+        <h2 class="sr-only">Highlights</h2>
+        <div class="grid-3" style="gap:var(--space-500)">
           {data.highlights.map((h, i) => (
-            <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:var(--space-125)">
               <span class="dot dot--lg" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
-              <h3 style="font-size:1.0625rem;font-weight:var(--fw-heading)">{h.title}</h3>
+              <h3 style="font-size:var(--text-body-lg);font-weight:var(--fw-heading)">{h.title}</h3>
               <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">{h.body}</p>
             </div>
           ))}
@@ -179,13 +171,29 @@ const resourceLinks = [
     <!-- What it does -->
     <Section size="sm">
       <div class="what">
-        <h2 style="margin-bottom:12px;font-size:1.5rem;letter-spacing:-0.4px">What it does</h2>
-        <p style="margin:0 0 var(--space-300);font-size:1.0625rem;line-height:1.55;color:var(--text-subtle)">
+        <h2 style="margin-bottom:var(--space-150);font-size:1.5rem;letter-spacing:-0.4px">What it does</h2>
+        <p style="margin:0 0 var(--space-300);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
           {data.summary}
         </p>
         <div class="prose-foxe prose-foxe--compact">
           <Content />
         </div>
+
+        {data.specs.length > 0 && (
+          <>
+            <h2 style="margin:var(--space-500) 0 var(--space-200);font-size:1.5rem;letter-spacing:-0.4px">
+              Specifications
+            </h2>
+            <dl class="spec-grid">
+              {data.specs.map((s) => (
+                <div class="spec-grid__row">
+                  <dt>{s.label}</dt>
+                  <dd>{s.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </>
+        )}
       </div>
     </Section>
 
@@ -203,6 +211,29 @@ const resourceLinks = [
 </BaseLayout>
 
 <style>
+  /* Two columns of label/value pairs. Each row keeps its own hairline so the
+     pairs stay legible when the grid reflows to one column. */
+  .spec-grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 var(--space-500);
+  }
+  .spec-grid__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-200);
+    padding: 11px 0;
+    font-size: var(--text-ui);
+    border-bottom: 1px solid var(--border);
+  }
+  .spec-grid dt { color: var(--text-subtle); }
+  .spec-grid dd { margin: 0; text-align: right; font-weight: var(--fw-medium); }
+  @media (max-width: 620px) {
+    .spec-grid { grid-template-columns: 1fr; }
+  }
+
   .product-hero {
     display: grid;
     grid-template-columns: 1.4fr 1fr;
@@ -214,16 +245,7 @@ const resourceLinks = [
     max-width: 720px;
     margin-inline: auto;
   }
-  .highlight-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-500);
-  }
   @media (max-width: 960px) {
     .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
-    .highlight-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 620px) {
-    .highlight-grid { grid-template-columns: 1fr; }
   }
 </style>

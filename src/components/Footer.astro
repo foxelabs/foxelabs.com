@@ -1,4 +1,7 @@
 ---
+import { Icon } from 'astro-icon/components';
+import { SOCIALS } from '../config/seo';
+
 interface Props {
   /** The compact single-row footer, for pages that fill the viewport themselves (404). */
   slim?: boolean;
@@ -49,45 +52,65 @@ const year = new Date().getFullYear();
 const isExternal = (href: string) => href.startsWith('http');
 ---
 
-<footer class="footer" style={slim ? 'padding:24px 0' : undefined}>
+<footer class:list={['footer', slim && 'footer--slim']}>
   <div class="container-x">
     {!slim && (
       <div class="footer__cols">
         <div class="footer__col">
           <span class="brand">
             <span class="brand-mark" style="width:24px;height:24px" aria-hidden="true"></span>
-            <span class="brand__name" style="font-size:0.9375rem">Foxe Labs</span>
+            <span class="brand__name" style="font-size:var(--text-md)">Foxe Labs</span>
           </span>
           <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--text-subtle);max-width:220px">
             Software provided as-is. Trading carries risk — not financial advice.
           </p>
-        </div>
-        {columns.map((col) => (
-          <div class="footer__col">
-            <span class="kicker">{col.title}</span>
-            {col.links.map((link) => (
+          <div class="footer__social">
+            {SOCIALS.map((s) => (
               <a
-                href={link.href}
-                class="footer__link"
-                target={isExternal(link.href) ? '_blank' : undefined}
-                rel={isExternal(link.href) ? 'noopener noreferrer' : undefined}
+                href={s.href}
+                class="social-btn"
+                aria-label={s.label}
+                target="_blank"
+                rel="noopener noreferrer"
               >
-                {link.label}
+                <Icon name={s.icon} width={16} height={16} aria-hidden="true" />
               </a>
             ))}
           </div>
+        </div>
+        {columns.map((col) => (
+          <nav class="footer__col" aria-label={col.title}>
+            <span class="kicker">{col.title}</span>
+            <ul class="footer__list">
+              {col.links.map((link) => (
+                <li>
+                  <a
+                    href={link.href}
+                    class="footer__link"
+                    target={isExternal(link.href) ? '_blank' : undefined}
+                    rel={isExternal(link.href) ? 'noopener noreferrer' : undefined}
+                  >
+                    {link.label}
+                    {isExternal(link.href) && (
+                      <Icon name="mingcute:external-link-line" size={12} aria-hidden="true" />
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
         ))}
       </div>
     )}
 
     <div class="footer__bar" style={slim ? 'margin-top:0;padding-top:0;border-top:none' : undefined}>
       <span>© {year} Foxe Labs LLP · Kerala, India</span>
-      <button class="theme-toggle" type="button" data-theme-toggle>
-        <span class="theme-toggle__light">Dark mode</span>
-        <span class="theme-toggle__dark">Light mode</span>
-      </button>
-      <div style="display:flex;gap:16px">
+      <div class="footer__legal">
         {legal.map((l) => <a href={l.href}>{l.label}</a>)}
+        <button class="theme-toggle" type="button" aria-label="Switch to dark theme" data-theme-toggle>
+          <Icon name="mingcute:moon-line" class="theme-toggle__light" size={16} aria-hidden="true" />
+          <Icon name="mingcute:sun-line" class="theme-toggle__dark" size={16} aria-hidden="true" />
+        </button>
       </div>
     </div>
   </div>

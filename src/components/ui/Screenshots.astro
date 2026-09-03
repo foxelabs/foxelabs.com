@@ -30,7 +30,7 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
   )}
 
   {shots.length > 1 && (
-    <div role="tablist" aria-label={heading} style="display:flex;gap:8px;margin-bottom:28px;flex-wrap:wrap">
+    <div role="tablist" aria-label={heading} aria-orientation="horizontal" style="display:flex;gap:8px;margin-bottom:var(--space-350);flex-wrap:wrap">
       {shots.map((shot, i) => (
         <button
           type="button"
@@ -53,6 +53,7 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
       role="tabpanel"
       aria-labelledby={`${id}-tab-${i}`}
       hidden={i !== 0}
+      tabindex="0"
       class="tour-panel"
     >
       <div class="tour-panel__shot">
@@ -73,7 +74,7 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
           </span>
         )}
         <h3 style="font-size:var(--text-h3)">{shot.heading}</h3>
-        <p style="margin:0;font-size:0.9375rem;line-height:1.6;color:var(--ink-band-subtle)">{shot.body}</p>
+        <p style="margin:0;font-size:var(--text-md);line-height:1.6;color:var(--ink-band-subtle)">{shot.body}</p>
         {shot.caption && (
           <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--ink-band-faint);font-style:italic">
             {shot.caption}
@@ -112,7 +113,11 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
         });
         tab.addEventListener('keydown', function (event) {
           var next =
-            event.key === 'ArrowRight' ? i + 1 : event.key === 'ArrowLeft' ? i - 1 : null;
+            event.key === 'ArrowRight' ? i + 1
+            : event.key === 'ArrowLeft' ? i - 1
+            : event.key === 'Home' ? 0
+            : event.key === 'End' ? tabs.length - 1
+            : null;
           if (next === null) return;
           event.preventDefault();
           var target = (next + tabs.length) % tabs.length;

@@ -1,68 +1,320 @@
 ---
-// Site header. A single flat row: brand, four section links, one primary
-// action. The mega-menus are gone — the track trees live on the hub pages
-// they belong to, not in the chrome of every page.
+// Site header. Brand, four section links, one primary action — with a mega
+// menu behind Software and Trading, built from the project collection so the
+// chrome cannot drift from what actually ships.
+import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import { trackConfig, type Track } from '../config/tracks';
+import { accentFor, categoryAccent } from '../config/accents';
+
 const path = Astro.url.pathname;
 const isActive = (href: string) => (path === href || path.startsWith(href + '/') ? 'page' : undefined);
 
-const links = [
-  { href: '/software/', label: 'Software' },
-  { href: '/trading/', label: 'Trading' },
+const projects = (await getCollection('projects', ({ data }) => !data.draft)).sort(
+  (a, b) => a.data.order - b.data.order
+);
+
+/** The two projects each category leads with in the menu. The column header
+    links to the category page, so the menu is a taste of the shelf rather than
+    the shelf itself. A category missing here falls back to its first two by order. */
+const MEGA_FEATURED: Record<string, string[]> = {
+  plugins: ['loggedin', 'lazy-load-for-comments'],
+  libraries: ['wp-review-notice', 'wp-queue-process'],
+};
+
+/** One column per category, two rows per column. */
+const columnsFor = (track: Track) => {
+  const { basePath, categories } = trackConfig[track];
+  return Object.entries(categories)
+    .sort(([, a], [, b]) => a.order - b.order)
+    .map(([slug, meta]) => {
+      const items = projects.filter((p) => p.data.track === track && p.data.category === slug);
+      // The hue still comes from the item's place in the full category, so a row
+      // keeps the colour it has on the category page.
+      const ids = items.map((p) => p.id);
+      const featured = MEGA_FEATURED[slug];
+      const shown = featured
+        ? featured.map((id) => items.find((p) => p.id === id)).filter((p) => !!p)
+        : items.slice(0, 2);
+      return {
+        title: meta.label,
+        href: `${basePath}/${slug}/`,
+        color: categoryAccent(slug).color,
+        items: shown.map((p) => ({
+          name: p.data.name,
+          tagline: p.data.tagline,
+          href: `${basePath}/${slug}/${p.id}/`,
+          tint: `color-mix(in srgb, ${accentFor(ids, p.id).color} 12%, transparent)`,
+        })),
+      };
+    })
+    .filter((column) => column.items.length > 0);
+};
+
+const menus = [
+  {
+    id: 'software',
+    label: 'Software',
+    href: '/software/',
+    columns: columnsFor('oss'),
+    promo: {
+      eyebrow: 'Open source',
+      color: 'var(--acc-4)',
+      title: 'Every plugin and library in one place',
+      body: 'GPL-licensed WordPress plugins and PHP packages, maintained in the open.',
+      cta: 'Browse all software',
+      href: '/software/',
+    },
+  },
+  {
+    id: 'trading',
+    label: 'Trading',
+    href: '/trading/',
+    columns: columnsFor('trading'),
+    promo: {
+      eyebrow: 'Risk-first',
+      color: 'var(--acc-2)',
+      title: 'Engineering discipline, pointed at the markets',
+      body:
+        'Every system is tested before it ships. Trading carries substantial risk — nothing here is financial advice.',
+      cta: 'Browse all trading',
+      href: '/trading/',
+    },
+  },
+];
+
+const plainLinks = [
   { href: '/blog/', label: 'Blog' },
   { href: '/about/', label: 'About' },
 ];
 ---
 
-<header class="nav">
-  <a href="/" class="brand" aria-label="Foxe Labs — home">
-    <span class="brand-mark" style="width:28px;height:28px" aria-hidden="true"></span>
-    <span class="brand__name">Foxe Labs</span>
-  </a>
+<div class="nav-shell" data-nav-shell>
+  <header class="nav">
+    <a href="/" class="brand" aria-label="Foxe Labs — home">
+      <span class="brand-mark" style="width:28px;height:28px" aria-hidden="true"></span>
+      <span class="brand__name">Foxe Labs</span>
+    </a>
 
-  <button
-    class="nav__toggle"
-    type="button"
-    aria-label="Menu"
-    aria-expanded="false"
-    aria-controls="nav-links"
-    data-nav-toggle
-  >
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-      <path d="M3 6h18M3 12h18M3 18h18" />
-    </svg>
-  </button>
+    <nav class="nav__links" aria-label="Main">
+      {menus.map((menu) => (
+        <a
+          href={menu.href}
+          class="nav__link nav__link--menu"
+          aria-current={isActive(menu.href)}
+          aria-expanded="false"
+          aria-controls={`mega-${menu.id}`}
+          data-mega-trigger={menu.id}
+        >
+          {menu.label}
+          <Icon name="mingcute:down-line" class="nav__chevron" size={12} aria-hidden="true" />
+        </a>
+      ))}
+      {plainLinks.map((l) => (
+        <a href={l.href} class="nav__link" aria-current={isActive(l.href)} data-mega-trigger="">{l.label}</a>
+      ))}
+    </nav>
 
-  <nav class="nav__links" id="nav-links" aria-label="Main">
-    {links.map((l) => (
-      <a href={l.href} class="nav__link" aria-current={isActive(l.href)}>{l.label}</a>
+    <a href="/contact/" class="btn btn--primary btn--sm nav__cta" aria-current={isActive('/contact/')}>Contact</a>
+
+    <button
+      class="nav__toggle"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="nav-mobile"
+      data-nav-toggle
+    >
+      <Icon name="mingcute:menu-line" size={18} aria-hidden="true" />
+    </button>
+  </header>
+
+  {menus.map((menu) => (
+    <div class="mega" id={`mega-${menu.id}`} data-mega={menu.id} hidden>
+      <div class="mega__inner">
+        {menu.columns.map((column) => (
+          <div class="mega__col">
+            <a href={column.href} class="mega__title" style={`--mega-hue:${column.color}`}>
+              {column.title}
+              <Icon name="mingcute:right-small-line" size={14} aria-hidden="true" />
+            </a>
+            <div class="mega__items">
+              {column.items.map((item) => (
+                <a href={item.href} class="mega__item" style={`--mega-tint:${item.tint}`}>
+                  <span class="mega__name">{item.name}</span>
+                  <span class="mega__desc">{item.tagline}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div class="mega__promo">
+          <span class="mega__eyebrow" style={`color:${menu.promo.color}`}>{menu.promo.eyebrow}</span>
+          <span class="mega__promo-title">{menu.promo.title}</span>
+          <span class="mega__promo-body">{menu.promo.body}</span>
+          <a href={menu.promo.href} class="btn btn--primary btn--sm mega__promo-cta" style="align-self:flex-start">
+            {menu.promo.cta}
+          </a>
+        </div>
+      </div>
+    </div>
+  ))}
+
+  <!-- Narrow screens: the same tree as an accordion. -->
+  <nav class="nav-mobile" id="nav-mobile" aria-label="Main menu" hidden>
+    {menus.map((menu) => (
+      <>
+        <button
+          class="nav-mobile__row"
+          type="button"
+          aria-expanded="false"
+          aria-controls={`nav-mobile-${menu.id}`}
+          data-accordion={menu.id}
+        >
+          {menu.label}
+          <Icon name="mingcute:down-line" class="nav__chevron" size={14} aria-hidden="true" />
+        </button>
+        <div class="nav-mobile__panel" id={`nav-mobile-${menu.id}`} hidden>
+          <a href={menu.href} class="nav-mobile__sub">All {menu.label.toLowerCase()}</a>
+          {menu.columns.map((column) => (
+            <a href={column.href} class="nav-mobile__sub">{column.title}</a>
+          ))}
+        </div>
+      </>
     ))}
+    {plainLinks.map((l) => (
+      <a href={l.href} class="nav-mobile__row nav-mobile__row--link">{l.label}</a>
+    ))}
+    <a href="/contact/" class="nav-mobile__row nav-mobile__row--cta">Contact</a>
   </nav>
-
-  <a href="/contact/" class="btn btn--primary btn--sm">Contact</a>
-</header>
+</div>
 
 <script is:inline>
-  // The narrow-screen menu. The list is hidden by the [hidden] attribute so it
-  // is closed before hydration and stays closed with JavaScript off — where the
-  // toggle button is never shown either.
+  // Two menus off one header: a hover/focus mega panel on wide screens, and an
+  // accordion sheet on narrow ones. Both are closed by the [hidden] attribute
+  // before hydration, so the page is complete with JavaScript off — where the
+  // triggers are plain links to the hub pages and the toggle is never shown.
   (function () {
-    var button = document.querySelector('[data-nav-toggle]');
-    var list = document.getElementById('nav-links');
-    if (!button || !list) return;
+    var shell = document.querySelector('[data-nav-shell]');
+    if (!shell) return;
 
-    var mq = window.matchMedia('(max-width: 760px)');
-    var sync = function () {
-      // Above the breakpoint the row is always visible; below it, closed.
-      list.hidden = mq.matches;
-      button.setAttribute('aria-expanded', 'false');
-    };
-    sync();
-    mq.addEventListener('change', sync);
+    var panels = shell.querySelectorAll('[data-mega]');
+    var triggers = shell.querySelectorAll('[data-mega-trigger]');
+    var wide = window.matchMedia('(min-width: 861px)');
 
-    button.addEventListener('click', function () {
-      var open = list.hidden;
-      list.hidden = !open;
-      button.setAttribute('aria-expanded', String(open));
+    function openMega(id) {
+      panels.forEach(function (panel) {
+        panel.hidden = panel.dataset.mega !== id;
+      });
+      triggers.forEach(function (trigger) {
+        var on = !!id && trigger.dataset.megaTrigger === id;
+        trigger.setAttribute('aria-expanded', String(on));
+      });
+    }
+    var closeMega = function () { openMega(null); };
+
+    triggers.forEach(function (trigger) {
+      var id = trigger.dataset.megaTrigger;
+      trigger.addEventListener('mouseenter', function () {
+        if (wide.matches) openMega(id || null);
+      });
+      // Keyboard: the trigger is a link to the hub page, so opening the panel
+      // is bound to focus rather than to activating it.
+      trigger.addEventListener('focus', function () {
+        if (wide.matches) openMega(id || null);
+      });
+      // Touch has no hover: the first tap opens the panel instead of
+      // navigating, the second follows the link.
+      trigger.addEventListener('click', function (event) {
+        if (!wide.matches || !id) return;
+        if (trigger.getAttribute('aria-expanded') !== 'true') {
+          event.preventDefault();
+          openMega(id);
+        }
+      });
+    });
+
+    shell.addEventListener('mouseleave', closeMega);
+    shell.addEventListener('focusout', function (event) {
+      if (!shell.contains(event.relatedTarget)) closeMega();
+    });
+    // A click anywhere off the header closes whatever is open.
+    document.addEventListener('click', function (event) {
+      if (!shell.contains(event.target)) {
+        closeMega();
+        closeSheet();
+      }
+    });
+    wide.addEventListener('change', closeMega);
+
+    // ---- Narrow screens ----
+    var toggle = shell.querySelector('[data-nav-toggle]');
+    var sheet = document.getElementById('nav-mobile');
+
+    function panelFor(row) {
+      return document.getElementById(row.getAttribute('aria-controls') || '');
+    }
+
+    function closeSheet() {
+      if (!toggle || !sheet) return;
+      sheet.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', 'Open menu');
+      sheet.querySelectorAll('[data-accordion]').forEach(function (row) {
+        row.setAttribute('aria-expanded', 'false');
+        var panel = panelFor(row);
+        if (panel) panel.hidden = true;
+      });
+    }
+
+    // Escape closes whichever menu is open and hands focus back to what
+    // opened it, so a keyboard user is not dropped at the top of the page.
+    document.addEventListener('keydown', function (event) {
+      if (event.key !== 'Escape') return;
+      var openTrigger = shell.querySelector('[data-mega-trigger][aria-expanded="true"]');
+      closeMega();
+      if (openTrigger) openTrigger.focus();
+      if (sheet && !sheet.hidden) {
+        closeSheet();
+        if (toggle) toggle.focus();
+      }
+    });
+
+    if (!toggle || !sheet) return;
+
+    closeSheet();
+    wide.addEventListener('change', closeSheet);
+
+    toggle.addEventListener('click', function () {
+      if (sheet.hidden) {
+        sheet.hidden = false;
+        toggle.setAttribute('aria-expanded', 'true');
+        toggle.setAttribute('aria-label', 'Close menu');
+      } else {
+        closeSheet();
+      }
+    });
+
+    // An in-page link (e.g. /trading/#waitlist) keeps the sheet open on the
+    // same document — close it on any link tap inside the sheet.
+    sheet.addEventListener('click', function (event) {
+      if (event.target.closest('a')) closeSheet();
+    });
+
+    sheet.querySelectorAll('[data-accordion]').forEach(function (row) {
+      row.addEventListener('click', function () {
+        var panel = panelFor(row);
+        if (!panel) return;
+        var open = panel.hidden;
+        // One section at a time, as in the design.
+        sheet.querySelectorAll('[data-accordion]').forEach(function (other) {
+          other.setAttribute('aria-expanded', 'false');
+          var otherPanel = panelFor(other);
+          if (otherPanel) otherPanel.hidden = true;
+        });
+        panel.hidden = !open;
+        row.setAttribute('aria-expanded', String(open));
+      });
     });
   })();
 </script>
