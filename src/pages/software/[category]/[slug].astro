@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Nav from '../../../components/Nav.astro';
 import Footer from '../../../components/Footer.astro';
@@ -75,6 +76,10 @@ const primaryCta = data.websiteUrl
     ? { href: data.url, label: registryLabel }
     : null;
 const registryLink = data.url && data.websiteUrl ? { href: data.url, label: registryLabel } : null;
+
+// The WordPress mark, shown on the registry button so the destination reads at
+// a glance. Path from Simple Icons (CC0); mingcute has no WordPress glyph.
+const isWpRegistry = data.registry === 'WordPress.org';
 
 // Keyword-first <title>; falls back to the product name.
 const pageTitle = `${data.seoTitle ?? data.name} | Foxe Labs`;
@@ -156,6 +161,9 @@ const facts = [
           <div style="display:flex;gap:var(--space-150);margin-top:4px;flex-wrap:wrap">
             {primaryCta && (
               <a href={primaryCta.href} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+                {isWpRegistry && !data.websiteUrl && (
+                  <Fragment set:html={`<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11m-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C4.911 3.15 8.235 1.215 12 1.215c2.809 0 5.365 1.072 7.286 2.833-.046-.003-.091-.009-.141-.009-1.06 0-1.812.923-1.812 1.914 0 .89.513 1.643 1.06 2.531.411.72.89 1.643.89 2.977 0 .915-.354 1.994-.821 3.479l-1.075 3.585-3.9-11.61.001.014zM12 22.784c-1.059 0-2.081-.153-3.048-.437l3.237-9.406 3.315 9.087c.024.053.05.101.078.149-1.12.393-2.325.607-3.582.607M1.211 12c0-1.564.336-3.05.935-4.39L7.29 21.709C3.694 19.96 1.212 16.271 1.211 12M12 0C5.385 0 0 5.385 0 12s5.385 12 12 12 12-5.385 12-12S18.615 0 12 0"/></svg>`} />
+                )}
                 {primaryCta.label}
               </a>
             )}
@@ -283,14 +291,12 @@ const facts = [
               class="card card--pad"
               style="gap:var(--space-150);padding:var(--space-300)"
             >
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                <span class="kicker" style="display:inline-flex;align-items:center;gap:7px">
-                  <span
-                    class="dot"
-                    style={`background:${accentFor(addonIds, addon.id).color}`}
-                    aria-hidden="true"
-                  ></span>
-                  {addon.data.location ?? 'Add-on'}
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <span
+                  class="icon-tile icon-tile--sm"
+                  style={`background:color-mix(in srgb, ${accentFor(addonIds, addon.id).color} 14%, transparent);color:${accentFor(addonIds, addon.id).color}`}
+                >
+                  <Icon name={addon.data.icon ?? 'mingcute:plugin-2-line'} size={20} aria-hidden="true" />
                 </span>
                 {addon.data.price && (
                   <span class="badge">
@@ -298,7 +304,8 @@ const facts = [
                   </span>
                 )}
               </div>
-              <h3 style="font-size:var(--text-h4);font-weight:var(--fw-heading)">{addon.data.name}</h3>
+              <span class="kicker">{addon.data.location ?? 'Add-on'}</span>
+              <h3 style="margin-top:-6px;font-size:var(--text-h4);font-weight:var(--fw-heading)">{addon.data.name}</h3>
               <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">
                 {addon.data.summary}
               </p>

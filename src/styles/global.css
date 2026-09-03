@@ -1083,6 +1083,11 @@ textarea.field { resize: vertical; min-height: 120px; }
   justify-content: center;
   flex-shrink: 0;
 }
+/* Smaller cut for the principle grid and add-on cards. */
+.icon-tile--sm {
+  width: 40px;
+  height: 40px;
+}
 
 /* ---- Code blocks ------------------------------------------------------- */
 /* A dark slab with a small chrome bar. Used by hand-written markup and by the
