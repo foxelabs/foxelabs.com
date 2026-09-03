@@ -1,6 +1,9 @@
 @import '@fontsource-variable/bricolage-grotesque';
 @import '@fontsource-variable/public-sans';
-@import '@fontsource/jetbrains-mono/400.css';
+/* Latin subset only. The full import pulls cyrillic, greek and vietnamese too,
+   and the small ones get base64-inlined into this render-blocking stylesheet —
+   11 KB of code-block font on every page, most of it for scripts we never set. */
+@import '@fontsource/jetbrains-mono/latin-400.css';
 
 /* Metrics-adjusted local fallbacks: until the webfonts arrive, text renders in
    Arial resized to their metrics, so the swap barely moves the layout. */

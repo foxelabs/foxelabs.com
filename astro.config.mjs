@@ -9,6 +9,13 @@ import minifyInlineScripts from './src/lib/minifyInline.mjs';
 
 export default defineConfig({
   output: 'static',
+  build: {
+    // The stylesheet is one small shared bundle, so a separate request for it
+    // costs a full round trip before the page can paint. Inlining it removes
+    // that blocking request; the bytes are small enough that losing the
+    // cross-page cache hit is the cheaper side of the trade.
+    inlineStylesheets: 'always',
+  },
   site: 'https://foxelabs.com',
   adapter: vercel(),
   integrations: [
