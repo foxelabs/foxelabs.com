@@ -71,7 +71,7 @@ const tileIcon = categoryIcon[category] ?? 'mingcute:box-2-line';
           {projects.map((p) => (
             <a href={projectPath('oss', p.data.category, p.id)} class="card card--pad" style={`gap:var(--space-150);padding:var(--space-300);border-top:4px solid ${accentFor(projectIds, p.id).color}`}>
               <div class="icon-tile" style={`background:color-mix(in srgb, ${accentFor(projectIds, p.id).color} 10%, transparent);color:${accentFor(projectIds, p.id).color}`}>
-                <Icon name={tileIcon} size={24} aria-hidden="true" />
+                <Icon name={p.data.icon ?? tileIcon} size={24} aria-hidden="true" />
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
                 <span class="kicker">{p.data.kind}</span>

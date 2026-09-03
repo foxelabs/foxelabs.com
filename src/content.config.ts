@@ -9,6 +9,9 @@ const base = {
   tagline: z.string(),
   // Short summary shown on listing cards.
   summary: z.string(),
+  // Iconify name for the listing card's tile, e.g. 'mingcute:route-line'.
+  // Falls back to the category's own icon when unset.
+  icon: z.string().optional(),
   // SEO overrides (affect <title>/meta only, never visible copy).
   // seoTitle is the keyword-first lead; templates append " | Foxe Labs".
   seoTitle: z.string().optional(),

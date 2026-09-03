@@ -80,7 +80,7 @@ const statusLabel: Record<string, string> = {
               style={`gap:var(--space-150);padding:var(--space-300);border-top:4px solid ${accentFor(productIds, p.id).color}`}
             >
               <div class="icon-tile" style={`background:color-mix(in srgb, ${accentFor(productIds, p.id).color} 10%, transparent);color:${accentFor(productIds, p.id).color}`}>
-                <Icon name={tileIcon} size={24} aria-hidden="true" />
+                <Icon name={p.data.icon ?? tileIcon} size={24} aria-hidden="true" />
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
                 <span class="kicker">{p.data.platform}</span>
