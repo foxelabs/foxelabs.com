@@ -12,7 +12,7 @@ const ICON = 360;
 
 // Brand fonts first; fall back to whatever the rasterizer has installed.
 const DISPLAY = "'Bricolage Grotesque', 'Space Grotesk', system-ui, sans-serif";
-const BODY = "'IBM Plex Sans', 'Inter', system-ui, sans-serif";
+const BODY = "'Public Sans', 'IBM Plex Sans', system-ui, sans-serif";
 
 const svg = `<svg width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">
   <defs>

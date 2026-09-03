@@ -1,7 +1,8 @@
 ---
 import '../styles/global.css';
-// The hashed URL of the one font file every page paints with, so it can be
-// preloaded instead of waiting for the stylesheet to be parsed first.
+// Only the display face is preloaded. Headings are usually the LCP element and
+// their swap is the loud one; body text swaps in from a metrics-matched Arial,
+// which shifts nothing, so it does not need to compete for connection priority.
 import bricolageWoff2 from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
 import Analytics from '../components/Analytics.astro';
 import { SITE, organizationLd, websiteLd } from '../config/seo';
