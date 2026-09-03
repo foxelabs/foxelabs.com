@@ -58,7 +58,7 @@ const tags = tagIndex(posts);
             </p>
 
             <a href={`/blog/${lead.id}/`} class="card lead-card">
-              <div class="card__field" style={`background:${leadAccent.color};color:${leadAccent.ink};min-height:260px;padding:0`}>
+              <div class="card__field" style={`background:${leadAccent.color};color:${leadAccent.ink};padding:0`}>
                 {lead.data.heroImage && (
                   <Image
                     src={lead.data.heroImage}
@@ -138,6 +138,12 @@ const tags = tagIndex(posts);
   .lead-card {
     display: grid;
     grid-template-columns: 1.1fr 1fr;
+  }
+  /* Show the whole cover, uncropped: the image sets its own height from its
+     aspect ratio instead of being stretched to fill a fixed-height box. */
+  .lead-card .card__field img {
+    height: auto;
+    object-fit: contain;
   }
   @media (max-width: 860px) {
     .lead-card { grid-template-columns: 1fr; }
