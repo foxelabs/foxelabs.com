@@ -63,8 +63,8 @@ const fonts = [
   { name: 'Bricolage', data: asset('src/assets/fonts/bricolage-800.ttf'), weight: 800 as const, style: 'normal' as const },
 ];
 
-// Rasterised from public/white-rounded.svg, which satori cannot read. Build
-// input only, so it lives in src/assets rather than being served.
+// Rasterised from public/foxe.svg, which satori cannot read. A build input
+// only, so it lives in src/assets rather than being served.
 const MARK = 'src/assets/og/mark.png';
 
 /** Satori takes React elements; this is the smallest thing shaped like one. */
