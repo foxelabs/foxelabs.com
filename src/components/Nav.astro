@@ -92,7 +92,7 @@ const plainLinks = [
 <div class="nav-shell" data-nav-shell>
   <header class="nav">
     <a href="/" class="brand" aria-label="Foxe Labs — home">
-      <span class="brand-mark" style="width:28px;height:28px" aria-hidden="true"></span>
+      <img class="brand-logo" src="/white-rounded.svg" width="28" height="28" alt="" aria-hidden="true" />
       <span class="brand__name">Foxe Labs</span>
     </a>
 
@@ -188,6 +188,16 @@ const plainLinks = [
     <a href="/contact/" class="nav-mobile__row nav-mobile__row--cta">Contact</a>
   </nav>
 </div>
+
+<style>
+  /* The badge carries its own colour, so one asset serves both themes — the
+     quadrants hold their own contrast against a light or a dark header. */
+  .brand-logo {
+    display: block;
+    width: 28px;
+    height: 28px;
+  }
+</style>
 
 <script is:inline>
   // Two menus off one header: a hover/focus mega panel on wide screens, and an
