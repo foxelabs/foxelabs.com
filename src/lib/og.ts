@@ -27,8 +27,7 @@ const FAINT = '#777A81';
  * card ground is ink, and the light cuts are fills for white pages that vanish
  * against it. All four carry ink text at AA, which the lozenge needs.
  *
- * 'blue' is the brand hue's historical name — it resolves to lime, as it does
- * everywhere else since the rebrand.
+ * 'blue' is also the fallback for an unknown accent name.
  */
 export const OG_ACCENTS = {
   blue: '#4C93EE',
@@ -64,7 +63,9 @@ const fonts = [
   { name: 'Bricolage', data: asset('src/assets/fonts/bricolage-800.ttf'), weight: 800 as const, style: 'normal' as const },
 ];
 
-const MARK = 'public/mark-white.png';
+// Rasterised from public/white-rounded.svg, which satori cannot read. Build
+// input only, so it lives in src/assets rather than being served.
+const MARK = 'src/assets/og/mark.png';
 
 /** Satori takes React elements; this is the smallest thing shaped like one. */
 const el = (type: string, props: Record<string, unknown>, ...children: unknown[]) => ({
@@ -128,7 +129,7 @@ function template({ eyebrow, title, subtitle, accent = 'blue', background }: OgC
           style: { position: 'absolute', left: 0, top: 0 },
         })
       : null,
-    // Masthead. The mark is white already, so it needs no filter on ink.
+    // Masthead. The badge carries its own colour, so it needs no filter on ink.
     el(
       'div',
       { style: { display: 'flex', alignItems: 'center', gap: '14px' } },
