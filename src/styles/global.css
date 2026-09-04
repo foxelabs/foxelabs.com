@@ -349,15 +349,11 @@
   letter-spacing: -0.2px;
 }
 
-/* The fox mark, painted through a mask so one asset serves both themes.
-   Guarded: without mask support a browser would paint a bare colour box. */
-@supports (mask-image: url('')) or (-webkit-mask-image: url('')) {
-  .brand-mark {
-    display: inline-block;
-    background-color: var(--text);
-    -webkit-mask: url('/mark.png') center / contain no-repeat;
-    mask: url('/mark.png') center / contain no-repeat;
-  }
+/* The fox badge. It carries its own colour, so one asset serves both themes —
+   the quadrants hold their own contrast on a light or a dark ground. Size is
+   set per use through the width/height attributes. */
+.brand-logo {
+  display: block;
 }
 
 /* ---- Navigation -------------------------------------------------------- */
