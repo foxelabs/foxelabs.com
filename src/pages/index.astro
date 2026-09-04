@@ -8,13 +8,30 @@ import CtaBanner from '../components/CtaBanner.astro';
 import Section from '../components/ui/Section.astro';
 import Faq from '../components/ui/Faq.astro';
 import PrincipleGrid from '../components/ui/PrincipleGrid.astro';
-import PostCard from '../components/PostCard.astro';
+import { Image } from 'astro:assets';
 import { faqLd } from '../config/seo';
+import { topicOf } from '../config/tracks';
+import { accentToken, topicAccent } from '../config/accents';
 
 // Latest writing — real published posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
   .slice(0, 3);
+
+// The blog section leads with the newest post; the next two stack beside it
+// as compact overlay cards drawn on their own cover colours.
+const [lead, ...stack] = posts;
+const postMeta = (post: (typeof posts)[number]) => {
+  const topic = topicOf(post.data.track);
+  const mins = Math.max(1, Math.round((post.body ?? '').trim().split(/\s+/).length / 200));
+  return {
+    topic,
+    accent: topicAccent(topic),
+    fill: post.data.heroColor ? accentToken(post.data.heroColor) : topicAccent(topic).color,
+    date: post.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+    mins,
+  };
+};
 
 // The three names on each card are the design's own copy, set here rather than
 // pulled from the project collection: this is a summary line, not an index.
@@ -24,28 +41,30 @@ const tracks = [
     title: 'Software',
     color: 'var(--acc-1)',
     icon: 'mingcute:code-line',
+    kicker: '01 / Open source',
     body:
       'Open-source WordPress plugins and PHP libraries, GPL-licensed and maintained since 2014. Running on 110,000+ active sites, with the source public on GitHub and support answered by the people who wrote the code.',
     links: [
-      '404 to 301 — smart redirects, 100,000+ installs',
-      'Loggedin — login and session control',
-      'PHP libraries on Packagist',
+      { name: '404 to 301', desc: 'smart redirects, 100,000+ installs' },
+      { name: 'Loggedin', desc: 'login and session control' },
+      { name: 'PHP libraries', desc: 'on Packagist' },
     ],
-    cta: { href: '/software/', label: 'Explore Software' },
+    cta: { href: '/software/', label: 'Explore software →' },
   },
   {
     id: 'trading',
     title: 'Trading',
     color: 'var(--acc-2)',
     icon: 'mingcute:chart-line-line',
+    kicker: '02 / Markets',
     body:
       'Precision software for MetaTrader 5 — expert advisors, a universal trading journal, and session utilities built for prop firm and serious retail traders. Every system is engineered risk-first and tested before it ships.',
     links: [
-      'Gold Scalpel — automated XAUUSD scalper',
-      'TickerLog — universal trading journal',
-      'Session tools — MT5 indicators',
+      { name: 'Gold Scalpel', desc: 'automated XAUUSD scalper' },
+      { name: 'TickerLog', desc: 'universal trading journal' },
+      { name: 'Session tools', desc: 'MT5 indicators' },
     ],
-    cta: { href: '/trading/', label: 'Explore Trading' },
+    cta: { href: '/trading/', label: 'Explore trading →' },
   },
 ];
 
@@ -135,10 +154,10 @@ const heroCells = Array.from({ length: 320 }, (_, i) => quad[(i * 7 + Math.floor
           <span class="dot dot--sm" style="background:var(--acc-4)" aria-hidden="true"></span>
           Lines of code · Lines on the chart
         </span>
-        <h1 data-hero-heading style="font-size:var(--text-hero);line-height:1.08;letter-spacing:-1.5px;max-width:820px">
+        <h1 data-hero-heading style="font-size:var(--text-hero);line-height:1.08;letter-spacing:-1.5px;max-width:820px;pointer-events:auto">
           Engineering in the open — and in the markets.
         </h1>
-        <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle);max-width:620px">
+        <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle);max-width:620px;pointer-events:auto">
           Foxe Labs is a small software studio. Open-source tools with a decade-long track record,
           and the same engineering discipline brought to trading software.
         </p>
@@ -185,32 +204,27 @@ const heroCells = Array.from({ length: 320 }, (_, i) => quad[(i * 7 + Math.floor
       </p>
       <div class="two-col">
         {tracks.map((track) => (
-          <div
-            class="card card--pad"
-            id={track.id}
-            style={`gap:var(--space-200);border-top:4px solid ${track.color}`}
-          >
-            <div class="icon-tile" style={`background:color-mix(in srgb, ${track.color} 10%, transparent);color:${track.color}`}>
-              <Icon name={track.icon} size={24} aria-hidden="true" />
+          <div class="card card--pad track-card" id={track.id} style={`--track:${track.color}`}>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-200)">
+              <div class="track-card__tile">
+                <Icon name={track.icon} size={24} aria-hidden="true" />
+              </div>
+              <span class="track-card__kicker">{track.kicker}</span>
             </div>
             <h3 style="font-size:var(--text-h3)">{track.title}</h3>
             <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
               {track.body}
             </p>
-            <ul class="dot-list track-list" style={`--dot-hue:${track.color}`}>
+            <ul class="track-card__list">
               {track.links.map((link) => (
                 <li>
-                  <span class="dot" aria-hidden="true"></span>
-                  {link}
+                  <span class="track-card__dot" aria-hidden="true"></span>
+                  <span><strong>{link.name}</strong> — {link.desc}</span>
                 </li>
               ))}
             </ul>
-            <div style="margin-top:auto;padding-top:var(--space-100)">
-              <a
-                href={track.cta.href}
-                class="btn btn--sm btn--accent"
-                style={`--btn-accent:${track.color}`}
-              >
+            <div style="margin-top:auto;padding-top:var(--space-200)">
+              <a href={track.cta.href} class="btn btn--sm btn--accent track-card__cta" style={`--btn-accent:${track.color}`}>
                 {track.cta.label}
               </a>
             </div>
@@ -234,8 +248,60 @@ const heroCells = Array.from({ length: 320 }, (_, i) => quad[(i * 7 + Math.floor
           <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Latest from the studio</h2>
           <a href="/blog/" class="link-more">Read the blog →</a>
         </div>
-        <div class="grid-3">
-          {posts.map((post) => <PostCard post={post} height={140} />)}
+        <div class="studio-grid">
+          {lead && (() => {
+            const m = postMeta(lead);
+            return (
+              <a href={`/blog/${lead.id}/`} class="card studio-lead">
+                <div class="card__field" style={`background:${m.fill};padding:0;aspect-ratio:1200/630;width:100%`}>
+                  {lead.data.heroImage && (
+                    <Image
+                      src={lead.data.heroImage}
+                      alt={lead.data.heroImageAlt ?? lead.data.title}
+                      widths={[600, 1200]}
+                      sizes="(max-width: 860px) 100vw, 560px"
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+                <div class="studio-lead__body">
+                  <div style="display:flex;align-items:center;gap:var(--space-150)">
+                    <span class="studio-chip" style={`color:${m.accent.ink};background:${m.accent.color}`}>{m.topic}</span>
+                    <span class="studio-meta">{m.date} · {m.mins} min read</span>
+                  </div>
+                  <h3 style="font-size:1.375rem;line-height:1.25;letter-spacing:-0.3px">{lead.data.title}</h3>
+                  <span class="link-more">Read the post →</span>
+                </div>
+              </a>
+            );
+          })()}
+          <div class="studio-stack">
+            {stack.map((post) => {
+              const m = postMeta(post);
+              return (
+                <a href={`/blog/${post.id}/`} class="card studio-mini" style={`background:${m.fill}`}>
+                  {post.data.heroImage && (
+                    <Image
+                      src={post.data.heroImage}
+                      alt={post.data.heroImageAlt ?? post.data.title}
+                      widths={[420, 840]}
+                      sizes="(max-width: 860px) 100vw, 420px"
+                      loading="lazy"
+                      class="studio-mini__img"
+                    />
+                  )}
+                  <div class="studio-mini__scrim" style={`--fill:${m.fill}`} aria-hidden="true"></div>
+                  <div class="studio-mini__body">
+                    <div style="display:flex;align-items:center;gap:var(--space-150)">
+                      <span class="studio-chip studio-chip--light">{m.topic}</span>
+                      <span class="studio-meta studio-meta--light">{m.date} · {m.mins} min</span>
+                    </div>
+                    <h3 style="font-size:var(--text-body-lg);line-height:1.35;color:#fff">{post.data.title}</h3>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
         </div>
       </Section>
     )}
@@ -260,10 +326,159 @@ const heroCells = Array.from({ length: 320 }, (_, i) => quad[(i * 7 + Math.floor
     grid-template-columns: 1fr 1fr;
     gap: var(--space-300);
   }
+  /* ---- Track cards ---- */
+  .track-card {
+    gap: var(--space-200);
+    /* A wash of the track colour at the top, fading into the card ground. */
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--track) 9%, var(--bg)) 0%,
+      var(--bg) 45%
+    );
+  }
+  .track-card__tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--track);
+    color: #fff;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--track) 35%, transparent);
+  }
+  .track-card__kicker {
+    font-size: var(--text-xs);
+    font-weight: var(--fw-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--track);
+    padding-top: 4px;
+  }
+  .track-card__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-150);
+    font-size: var(--text-md);
+  }
+  .track-card__list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: var(--space-150) var(--space-200);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    line-height: 1.45;
+  }
+  .track-card__dot {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--track);
+  }
+  .track-card__cta {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* ---- Latest from the studio ---- */
+  .studio-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: var(--space-300);
+    /* The stacked pair sets the row height; the lead card stretches to match,
+       its cover flexing while the body keeps its natural height. */
+    align-items: stretch;
+  }
+  .studio-lead { min-height: 100%; }
+  .studio-lead .card__field {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    aspect-ratio: auto !important; /* height comes from the row, not the artwork */
+  }
+  .studio-lead .card__field img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  /* Body stays as short as its content; every spare pixel goes to the cover. */
+  .studio-lead__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-100);
+    padding: var(--space-250);
+    flex: none;
+  }
+  .studio-chip {
+    font-size: 0.625rem;
+    font-weight: var(--fw-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 2px 7px;
+    border-radius: var(--r-sm);
+  }
+  .studio-chip--light {
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--ink-band);
+  }
+  .studio-meta { font-size: var(--text-xs); color: var(--text-subtle); }
+  .studio-meta--light { color: rgba(255, 255, 255, 0.85); }
+  .studio-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-300);
+  }
+  /* Overlay cards: the cover is the card, the copy sits on a scrim that
+     darkens the cover's own colour so image and text read as one surface. */
+  .studio-mini {
+    position: relative;
+    border: none;
+    min-height: 180px;
+    justify-content: flex-end;
+  }
+  .studio-mini__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .studio-mini__scrim {
+    position: absolute;
+    inset: 0;
+    /* Keeps a trace of the cover hue but stays dark enough for AA white text
+       even on the light pair (amber, lime). */
+    background: linear-gradient(
+      180deg,
+      transparent 30%,
+      color-mix(in srgb, var(--fill) 25%, rgba(0, 0, 0, 0.88)) 100%
+    );
+  }
+  .studio-mini__body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-150);
+    padding: var(--space-250);
+  }
   .track-list { font-size: var(--text-md); }
   @media (max-width: 720px) {
     .stat-row { grid-template-columns: 1fr 1fr; }
     .two-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .studio-grid { grid-template-columns: 1fr; }
+    /* Stacked: the lead cover gets its natural ratio back. */
+    .studio-lead .card__field { aspect-ratio: 1200/630 !important; flex: none; }
+    .studio-lead .card__field img { position: static; height: auto; }
   }
 </style>
 

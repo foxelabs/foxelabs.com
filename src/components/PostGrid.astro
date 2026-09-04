@@ -6,8 +6,6 @@ import PostCard from './PostCard.astro';
 
 interface Props {
   posts: CollectionEntry<'blog'>[];
-  /** Three across on the blog index; the archives use the same width. */
-  columns?: 3;
   showExcerpt?: boolean;
   showDate?: boolean;
 }

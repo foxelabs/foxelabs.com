@@ -70,7 +70,7 @@ const tags = tagIndex(posts);
                   />
                 )}
               </div>
-              <div style="padding:var(--space-500);display:flex;flex-direction:column;gap:var(--space-150);justify-content:center">
+              <div class="lead-card__body">
                 <span class="chip chip--sm" style="align-self:flex-start">
                   <span class="dot" style={`background:${leadAccent.color}`} aria-hidden="true"></span>
                   {leadTopic} · Featured
@@ -139,11 +139,27 @@ const tags = tagIndex(posts);
     display: grid;
     grid-template-columns: 1.1fr 1fr;
   }
-  /* Show the whole cover, uncropped: the image sets its own height from its
-     aspect ratio instead of being stretched to fill a fixed-height box. */
+  /* The cover sets the card height: full width, uncropped, natural aspect
+     ratio. The text column stays compact enough to fit beside it. */
   .lead-card .card__field img {
+    width: 100%;
     height: auto;
     object-fit: contain;
+    display: block;
+  }
+  .lead-card .lead-card__body {
+    padding: var(--space-300) var(--space-500);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-150);
+    justify-content: center;
+  }
+  /* Keep the text column shorter than the cover so no filler band appears. */
+  .lead-card .lead-card__body p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
   @media (max-width: 860px) {
     .lead-card { grid-template-columns: 1fr; }

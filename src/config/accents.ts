@@ -69,6 +69,16 @@ export function accentHex(accent: Accent): string {
   return ACCENT_HEX[accent.name] ?? ACCENT_HEX.blue;
 }
 
+/** Canonical hex back to its theme token, so a colour stored in content
+    frontmatter still lightens on the dark theme. Unknown values pass through. */
+const HEX_TO_TOKEN: Record<string, string> = Object.fromEntries(
+  ACCENTS.map((a) => [ACCENT_HEX[a.name].toUpperCase(), a.color])
+);
+
+export function accentToken(hex: string): string {
+  return HEX_TO_TOKEN[hex.toUpperCase()] ?? hex;
+}
+
 /**
  * Hue for one item, taken from its position among its siblings so a listing
  * never repeats a colour until it runs past the quad. Both a grid and the page

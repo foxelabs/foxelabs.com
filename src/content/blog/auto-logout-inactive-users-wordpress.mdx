@@ -1,0 +1,339 @@
+---
+title: "How to automatically log out inactive users in WordPress"
+description: WordPress keeps a login alive for 2 days — 14 with "Remember Me" — no matter how long the browser sits untouched. Here are four ways to add an idle timeout that signs inactive users out, from a one-line snippet to a full warning-countdown setup, with honest pros and cons for each.
+seoTitle: How to automatically log out inactive users in WordPress
+seoDescription: Four ways to auto logout idle WordPress users — shorten the session cookie, a PHP idle-timeout snippet, a JavaScript timer, or a per-role admin tool — with the pros and cons of each.
+pubDate: 2026-09-04
+author: Joel James
+track: oss
+heroImage: covers/cover-auto-logout-inactive-users-wordpress.png
+heroImageAlt: A flat illustration of a white clock face with its minute hand sweeping toward a keyhole, beside a dimmed user avatar fading out
+heroColor: "#9C46D6"
+heroInk: "#FFFFFF"
+tags:
+  - wordpress
+  - security
+  - loggedin
+faq:
+  - q: How do I automatically log out inactive users in WordPress?
+    a: WordPress has no built-in idle timeout, so you have to add one. You can shorten the session cookie with the auth_cookie_expiration filter, write a PHP snippet that tracks last activity and destroys stale sessions, or install the free Loggedin plugin with its Auto Logout add-on, which adds an idle timeout in minutes, a warning countdown, and per-role rules from the admin.
+  - q: How long does a WordPress login session last by default?
+    a: 48 hours, or 14 days if the user ticks "Remember Me" on the login form. Both values are hard-coded in core and apply to every user and role. They can be changed with the auth_cookie_expiration filter or a plugin that wraps it.
+  - q: Does WordPress log users out when they close the browser?
+    a: No. The session token stays valid on the server until it expires or is destroyed, so reopening the browser within the cookie lifetime resumes the session. Making the cookie session-only (expire on browser close) still doesn't end the server-side session — the token remains usable until its expiration passes.
+  - q: What is a good idle timeout for a WordPress site?
+    a: Fifteen minutes is a sensible default for logged-in work. Compliance-driven setups (PCI DSS, HIPAA-adjacent) commonly use 5–15 minutes for privileged roles like administrators and shop managers, and an hour or more for low-risk roles that are only reading content.
+  - q: Can I set a different auto logout time per user role in WordPress?
+    a: Not with core APIs alone — auth_cookie_expiration can branch on the user, but a true per-role idle timeout needs activity tracking per user. The Auto Logout add-on for the free Loggedin plugin does this from the admin, with the shortest timeout winning when a user holds multiple roles.
+  - q: Does a JavaScript inactivity timer actually secure a WordPress session?
+    a: Not by itself. A script that redirects to the logout URL after X idle minutes stops working the moment the tab is closed, the laptop lid drops, or JavaScript is disabled — and the server-side session stays valid the whole time. Real enforcement has to happen server-side, with the browser timer only handling the visible countdown.
+---
+
+Walk away from a logged-in WordPress dashboard and nothing happens. Not after
+lunch, not overnight, not the next day. Out of the box, a WordPress login lasts
+**48 hours** — and **14 days** if the user ticked "Remember Me" — regardless of
+whether anyone touched the keyboard in between. There is no idle timeout, no
+"you've been signed out due to inactivity" screen, nothing.
+
+For a personal blog, fine. For plenty of real sites, not fine:
+
+- A clinic, school, or office where shared and public computers are normal, and
+  a walked-away-from dashboard is an open door.
+- A WooCommerce store where shop managers handle customer addresses and order
+  history, and PCI-flavoured checklists ask for a 15-minute idle timeout on
+  anything touching cardholder data.
+- A membership or LMS site where one login left open on a library machine is
+  everyone's problem.
+- Any site where an audit, an insurer, or a compliance framework asks the
+  question "are inactive sessions terminated?" and the honest answer is "no,
+  they last two weeks."
+
+This guide covers four ways to automatically log out inactive users on a
+WordPress website — from a one-line filter to a complete idle-timeout setup with
+a warning countdown — with honest pros and cons for each.
+
+## First, how WordPress decides you're still logged in
+
+When a user signs in, WordPress generates a *session token*, stores it in the
+`wp_usermeta` table under the `session_tokens` key, and puts a matching
+authentication cookie in the browser. Every request compares cookie to token.
+As long as both exist and the token hasn't expired, the user is signed in.
+
+The details that matter for auto logout:
+
+- **Expiry is fixed at login time.** The token gets an expiration timestamp when
+  it's created — 2 days, or 14 with "Remember Me" — and nothing about the user's
+  activity moves it. WordPress never asks "when were you last active?", only
+  "has your token expired yet?"
+- **Closing the browser changes nothing.** The token lives server-side.
+  Reopen the browser within the cookie lifetime and the session resumes.
+- **There is no inactivity concept anywhere in core.** No last-activity
+  timestamp, no idle check, no filter that fires when a user "goes quiet."
+
+So "auto logout after inactivity" is really two separate problems:
+
+1. **Shorten how long a login lasts overall** (the session lifetime).
+2. **End a session that goes unused** (the idle timeout) — which requires
+   tracking activity yourself, because core doesn't.
+
+The methods below climb that ladder.
+
+## Method 1 — Shorten the session with auth_cookie_expiration
+
+The `auth_cookie_expiration` filter controls how long the login cookie (and the
+matching server token) lasts. Drop this into a small companion plugin:
+
+```php
+add_filter( 'auth_cookie_expiration', function ( $expiration, $user_id, $remember ) {
+	// 4 hours for everyone, "Remember Me" or not.
+	return 4 * HOUR_IN_SECONDS;
+}, 10, 3 );
+```
+
+You can respect "Remember Me" while still tightening both values:
+
+```php
+add_filter( 'auth_cookie_expiration', function ( $expiration, $user_id, $remember ) {
+	return $remember ? DAY_IN_SECONDS : 2 * HOUR_IN_SECONDS;
+}, 10, 3 );
+```
+
+New durations apply from each user's *next* login — existing tokens keep the
+expiry they were minted with.
+
+<div class="pros">
+
+**Pros**
+
+- Core API, three lines, no dependencies.
+- Genuinely server-side. No JavaScript involved, nothing the user can bypass.
+- Solves the "two weeks is absurd" half of the problem outright.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- **It is not an idle timeout.** A 4-hour session lasts 4 hours whether the user works the whole time or leaves immediately. Set it to 15 minutes and you'll log out people mid-sentence; set it to 4 hours and an abandoned machine stays open for 4 hours.
+- No warning. The session just dies, and unsaved work in a half-written post dies with it.
+- One value for the whole site unless you write role-branching logic yourself.
+
+</div>
+
+Use this filter when the requirement is "logins shouldn't last two weeks."
+When the requirement is "log out *inactive* users," keep reading.
+
+## Method 2 — A PHP snippet that tracks activity and ends stale sessions
+
+A real idle timeout needs two pieces: record when each user was last active,
+and end the session once that timestamp is older than your limit. Here's a
+minimal server-side version:
+
+```php
+const MY_IDLE_TIMEOUT = 15 * MINUTE_IN_SECONDS;
+
+// 1. Record activity (throttled to one write per minute).
+add_action( 'init', function () {
+	if ( ! is_user_logged_in() || wp_doing_ajax() || wp_doing_cron() ) {
+		return;
+	}
+
+	$user_id = get_current_user_id();
+	$last    = (int) get_user_meta( $user_id, 'my_last_active', true );
+
+	if ( time() - $last > MINUTE_IN_SECONDS ) {
+		update_user_meta( $user_id, 'my_last_active', time() );
+	}
+}, 1 );
+
+// 2. Enforce the timeout before recording new activity.
+add_action( 'init', function () {
+	if ( ! is_user_logged_in() || wp_doing_ajax() || wp_doing_cron() ) {
+		return;
+	}
+
+	$user_id = get_current_user_id();
+	$last    = (int) get_user_meta( $user_id, 'my_last_active', true );
+
+	if ( $last && ( time() - $last ) > MY_IDLE_TIMEOUT ) {
+		wp_destroy_current_session();
+		wp_clear_auth_cookie();
+		wp_safe_redirect( wp_login_url() );
+		exit;
+	}
+}, 0 );
+```
+
+<div class="pros">
+
+**Pros**
+
+- An actual inactivity timeout, enforced server-side. Closing the tab or disabling JavaScript doesn't help an attacker — the next request from that browser is dead.
+- You own the code and can tune every rule.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- **The logout only happens on the next request.** An idle dashboard sits there looking signed-in until someone clicks; only then do they land on the login screen. Fixing that requires a JavaScript companion (Method 3).
+- No warning countdown, so long-form editors lose unsaved work.
+- The timestamp is *per user*, but sessions are *per device* — `wp_destroy_current_session()` only ends the requesting device, while activity on a phone keeps the timestamp fresh for an abandoned laptop too. Per-session tracking means storing timestamps per token, which is where the snippet stops being short.
+- Edge cases are on you: AJAX-heavy admin screens, the Heartbeat API firing from background tabs (count it as activity and an unattended dashboard never idles out), REST requests, multi-role users, WP-CLI.
+- It's custom code the next developer has to discover and maintain.
+
+</div>
+
+This snippet is the honest core of every idle-logout plugin ever written. The
+gap between it and a finished tool is the last 80%: the warning, per-role rules,
+per-session accuracy, and the Heartbeat problem.
+
+## Method 3 — A JavaScript inactivity timer (and why it can't stand alone)
+
+The approach most tutorials reach for: a script that watches for mouse and
+keyboard events and redirects to the logout URL after X quiet minutes.
+
+```js
+(function () {
+	const IDLE_MS = 15 * 60 * 1000;
+	let timer;
+
+	function reset() {
+		clearTimeout( timer );
+		timer = setTimeout( () => {
+			window.location.href = myVars.logoutUrl; // localised wp_logout_url() + nonce
+		}, IDLE_MS );
+	}
+
+	[ 'mousemove', 'keydown', 'scroll', 'click', 'touchstart' ].forEach(
+		( evt ) => document.addEventListener( evt, reset, { passive: true } )
+	);
+
+	reset();
+})();
+```
+
+(The logout URL must be generated with `wp_logout_url()` server-side and passed
+via `wp_localize_script`, because it carries a nonce.)
+
+<div class="pros">
+
+**Pros**
+
+- The logout happens *on time*, visibly, right in front of the user — no waiting for a next request.
+- Easy to extend into a warning dialog: show a countdown at 14 minutes, redirect at 15.
+- The only method that can clean up the screen the moment time runs out.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- **It is not security — it's UI.** Close the tab, drop the laptop lid, kill JavaScript, or block the redirect, and the server-side session remains fully valid for its whole 2–14 day life. Anyone reopening that browser is still signed in.
+- Every tab runs its own timer. Typing in tab A while tab B's timer expires logs you out of both, unless you sync activity across tabs (BroadcastChannel / localStorage events) — more code.
+- The logout nonce expires after 24 hours, so a day-old tab redirects to a "link has expired" screen instead of logging out.
+
+</div>
+
+The right mental model: **the server decides, the browser performs.** A
+JavaScript timer is the correct way to make the logout visible and punctual, and
+the wrong way to make it real. It needs Method 2 behind it — which means
+building and maintaining both halves, plus the cross-tab sync between them.
+
+## Method 4 — A per-role idle timeout from the admin (recommended)
+
+Everything above converges on one design: server-side activity tracking and
+enforcement, a JavaScript layer for the countdown and punctual logout, throttled
+writes so tracking doesn't hammer the database, and per-role rules because an
+administrator and a subscriber don't warrant the same timeout. That's precisely
+what the [Auto Logout add-on](/software/plugins/loggedin/auto-logout) for the
+free [Loggedin plugin](/software/plugins/loggedin) ships as a settings panel:
+
+- **Idle timeout in minutes** — from 1 minute up to 30 days, off by default so
+  installing it never logs anyone out by surprise.
+- **A warning countdown** — a dialog appears before time runs out, with **Stay
+  signed in** (renews the session) and **Sign out now** buttons. Ignore it and
+  the logout happens at zero.
+- **Per-role timeouts** — an hour for admins, fifteen minutes for authors,
+  nothing for subscribers. Unlisted roles keep the global value; when a user
+  holds several roles with rules, the shortest timeout wins.
+- **Custom session lengths** — replaces WordPress's hard-coded 2-day and 14-day
+  durations with your own values (Method 1, without the code snippet).
+- **Server-side enforcement** — the idle check runs early on every
+  authenticated request, so closing the tab or disabling JavaScript doesn't
+  extend a session. The browser script only makes the logout punctual and
+  visible.
+- **The edge cases handled** — Heartbeat, AJAX, and REST requests are checked
+  but never counted as activity (so a background admin tab can't keep a session
+  alive forever); WP-CLI and cron are exempt; activity in one tab keeps other
+  tabs alive with no extra requests; and writes are throttled to roughly one
+  small database write per user per quarter of the timeout.
+
+It lives on the **Users → Loggedin → Settings** screen. Set the minutes, save,
+done.
+
+### How the methods compare
+
+<div class="table-wrap">
+
+| | auth_cookie_expiration | PHP snippet | JS timer | Auto Logout |
+| --- | :---: | :---: | :---: | :---: |
+| True idle timeout (not just shorter sessions) | — | ✓ | looks like one | ✓ |
+| Enforced server-side | ✓ | ✓ | — | ✓ |
+| Logout happens on time, visibly | — | — | ✓ | ✓ |
+| Warning countdown before logout | — | — | manual | ✓ |
+| Per-role rules | manual | manual | manual | ✓ |
+| Heartbeat/AJAX handled correctly | n/a | manual | — | ✓ |
+| Non-technical owners can configure it | — | — | — | ✓ |
+
+</div>
+
+The snippet methods are perfectly good for a developer who wants one specific
+behaviour and owns the codebase. The add-on is the same architecture with the
+last 80% finished — worth it the moment "log out idle users" is a requirement
+someone will audit rather than a weekend experiment.
+
+## Picking a sensible timeout
+
+Numbers that hold up in practice:
+
+- **5–15 minutes** for privileged roles — administrators, shop managers, anyone
+  who can see customer data. PCI DSS's own idle-session guidance is 15 minutes,
+  and shared-computer environments (clinics, schools, front desks) sit at the
+  low end.
+- **15–30 minutes** for editorial roles, paired with a warning countdown so a
+  slow writing session doesn't eat a draft.
+- **An hour or more, or no idle timeout at all**, for subscribers and customers
+  who are only reading — aggressive logouts here cost you logins-per-visit and
+  goodwill for little security gain.
+- **Session length** (the Method 1 value) can stay comparatively generous —
+  a day, say — once a real idle timeout exists, because the idle rule catches
+  abandoned sessions long before the cookie expires.
+
+And whatever you choose, roll it out with the warning enabled. The difference
+between "the site signed me out and lost my work" and "the site told me it was
+about to sign me out" is the difference between a support ticket and a shrug.
+
+## Wrapping up
+
+WordPress ships with no inactivity logout — a login lasts 2 days, or 14 with
+"Remember Me," no matter how long the browser sits untouched. You can shorten
+that lifetime with one `auth_cookie_expiration` filter, build a true idle
+timeout with a PHP activity tracker, and make it punctual with a JavaScript
+countdown — and now you know exactly which half of the problem each piece
+solves, and where the sharp edges are (Heartbeat, multi-tab sync, per-session
+tracking, expired nonces).
+
+For a site where idle logout is a requirement rather than an experiment, the
+[Auto Logout add-on](/software/plugins/loggedin/auto-logout) packages that whole
+architecture — server-side enforcement, warning countdown, per-role timeouts,
+custom session lengths — into one settings panel on top of the free
+[Loggedin plugin](/software/plugins/loggedin). And if you also want to see who's
+signed in right now, or end a specific session yourself, that's the
+[Active Sessions add-on](/software/plugins/loggedin/active-sessions) — covered
+in [its own guide](/blog/view-active-login-sessions-wordpress).
+
+— JJ

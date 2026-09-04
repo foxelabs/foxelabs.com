@@ -135,6 +135,12 @@ const blog = defineCollection({
     // Relative path, e.g. 'covers/my-cover.jpg' — optimised via astro:assets.
     heroImage: image().optional(),
     heroImageAlt: z.string().optional(),
+    // The cover's own background hex, sampled from the artwork. Listing cards
+    // paint their accent band in this colour so image and band read as one
+    // block; unset falls back to the topic accent.
+    heroColor: z.string().optional(),
+    // Text colour on heroColor. Defaults to white; set dark for light fills.
+    heroInk: z.string().optional(),
     // Which track a post belongs to (for filtering + hub feed). Optional.
     track: z.enum(['oss', 'trading']).optional(),
     // Q&A pairs rendered as a visible FAQ section + FAQPage JSON-LD (SEO rich
