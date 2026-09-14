@@ -11,7 +11,6 @@ import Screenshots from '../../../components/ui/Screenshots.astro';
 import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
 import { accentFor } from '../../../config/accents';
-import { Icon } from 'astro-icon/components';
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -131,7 +130,8 @@ const facts = [
   <Nav />
   <main id="main">
     <!-- Hero -->
-    <section class="band band--sm band--bottom">
+    <section class="page-hero">
+      <div class="cellgrid" aria-hidden="true"></div>
       <div class="container-x product-hero">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
           <a href={categoryPath('oss', data.category)} class="link-more">
@@ -139,21 +139,15 @@ const facts = [
           </a>
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <span class="chip chip--sm">
-              <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+            <span class="chip chip--sm chip--muted chip--solid">
+              <span class="dot dot--sm" style={`background:${accent.color};border-radius:999px`} aria-hidden="true"></span>
               {data.kind}
             </span>
-            <span class="chip chip--sm">
-              <span class="dot" style="background:var(--acc-4)" aria-hidden="true"></span>
-              Open source · {data.license}
-            </span>
-            <span class="chip chip--sm">
-              <span class="dot" style="background:var(--acc-2)" aria-hidden="true"></span>
-              {data.language}
-            </span>
+            <span class="chip chip--sm chip--muted">Open source · {data.license}</span>
+            <span class="chip chip--sm chip--muted">{data.language}</span>
           </div>
 
-          <h1 style="font-size:var(--text-title);line-height:1.05;letter-spacing:-1.4px">{data.name}</h1>
+          <h1 style="font-size:var(--text-title);line-height:1.05">{data.name}</h1>
           <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
             {data.tagline}
           </p>
@@ -213,7 +207,6 @@ const facts = [
 
         <div style="display:flex;flex-direction:column;gap:var(--space-200)">
           <div class="card">
-            <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
             {facts.length > 0 && (
               <dl class="fact-grid">
                 {facts.map((f) => (
@@ -263,10 +256,11 @@ const facts = [
     </section>
 
     {data.screenshots.length > 0 && (
-      <Section id="screenshots" variant="ink">
+      <Section id="screenshots" variant="alt" rule="top">
         <Screenshots
           id={`shots-${project.id}`}
           shots={data.screenshots}
+          hue={accent.color}
           heading={`${data.name} in the WordPress admin`}
           lead={`Everything ${data.name} adds to wp-admin, and where to find it.`}
         />
@@ -274,9 +268,9 @@ const facts = [
     )}
 
     {addons.length > 0 && (
-      <Section id="addons">
+      <Section id="addons" rule="top">
         <span class="eyebrow">Add-ons</span>
-        <h2 style="margin:8px 0 var(--space-150);font-size:var(--text-h2-lg);letter-spacing:-0.7px">
+        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">
           Extend {data.name} when you need more.
         </h2>
         <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
@@ -288,28 +282,23 @@ const facts = [
           {addons.map((addon) => (
             <a
               href={addonPath('oss', data.category, project.id, addon.id)}
-              class="card card--pad"
-              style="gap:var(--space-150);padding:var(--space-300)"
+              class="card card--pad card--hover"
+              style="gap:var(--space-150)"
             >
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
-                <span
-                  class="icon-tile icon-tile--sm"
-                  style={`background:color-mix(in srgb, ${accentFor(addonIds, addon.id).color} 14%, transparent);color:${accentFor(addonIds, addon.id).color}`}
-                >
+                <span class="icon-tile icon-tile--sm tint" style={`--hue:${accentFor(addonIds, addon.id).color}`}>
                   <Icon name={addon.data.icon ?? 'mingcute:plugin-2-line'} size={20} aria-hidden="true" />
                 </span>
                 {addon.data.price && (
-                  <span class="badge">
-                    {addon.data.price}
-                  </span>
+                  <span class="mono" style="font-size:var(--text-xs);color:var(--text-faint)">{addon.data.price}</span>
                 )}
               </div>
-              <span class="kicker">{addon.data.location ?? 'Add-on'}</span>
-              <h3 style="margin-top:-6px;font-size:var(--text-h4);font-weight:var(--fw-heading)">{addon.data.name}</h3>
-              <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">
+              <span class="kicker" style={`color:${accentFor(addonIds, addon.id).color}`}>{addon.data.location ?? 'Add-on'}</span>
+              <h3 style="font-size:1.25rem">{addon.data.name}</h3>
+              <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">
                 {addon.data.summary}
               </p>
-              <span class="link-more" style="margin-top:auto">Learn more →</span>
+              <span class="link-more">Learn more →</span>
             </a>
           ))}
         </div>

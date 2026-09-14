@@ -99,7 +99,8 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
   <Nav />
   <main id="main">
     <!-- Hero -->
-    <section class="band band--sm band--bottom">
+    <section class="page-hero">
+      <div class="cellgrid" aria-hidden="true"></div>
       <div class="container-x addon-hero">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
           <a href={parentUrl} class="link-more">
@@ -107,19 +108,14 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
           </a>
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <span class="chip chip--sm">
-              <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+            <span class="chip chip--sm chip--muted chip--solid">
+              <span class="dot dot--sm" style={`background:${accent.color};border-radius:999px`} aria-hidden="true"></span>
               {parent.data.name} add-on
             </span>
-            {data.location && (
-              <span class="chip chip--sm">
-                <span class="dot" style="background:var(--acc-3)" aria-hidden="true"></span>
-                {data.location}
-              </span>
-            )}
+            {data.location && <span class="chip chip--sm chip--muted">{data.location}</span>}
           </div>
 
-          <h1 style="font-size:var(--text-title);line-height:1.05;letter-spacing:-1.4px">{data.name}</h1>
+          <h1 style="font-size:var(--text-title);line-height:1.05">{data.name}</h1>
           <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
             {data.tagline}
           </p>
@@ -140,6 +136,7 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
           price={data.price}
           badge={data.tier === 'premium' ? 'Premium add-on' : data.tier === 'free' ? 'Free add-on' : undefined}
           benefits={benefits}
+          hue={accent.color}
         >
           {data.url && (
             <a href={data.url} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
@@ -160,10 +157,11 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
     </section>
 
     {data.screenshots.length > 0 && (
-      <Section variant="ink">
+      <Section variant="alt" rule="top">
         <Screenshots
           id={`shots-${addon.id}`}
           shots={data.screenshots}
+          hue={accent.color}
           heading={`${data.name} in the WordPress admin`}
           lead={`Every screen ${data.name} adds, and where to find it.`}
         />

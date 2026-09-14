@@ -34,9 +34,9 @@ const tracks = [
 ];
 
 const founderLinks = [
-  { href: 'https://x.com/Joel_James', label: 'X' },
-  { href: 'https://github.com/joel-james', label: 'GitHub' },
-  { href: 'https://instagram.com/joeltalks', label: 'Instagram' },
+  { href: 'https://x.com/Joel_James', label: 'X', icon: 'mingcute:social-x-line' },
+  { href: 'https://github.com/joel-james', label: 'GitHub', icon: 'mingcute:github-line' },
+  { href: 'https://instagram.com/joeltalks', label: 'Instagram', icon: 'mingcute:instagram-line' },
 ];
 
 const principles = [
@@ -134,26 +134,25 @@ const principles = [
           <Image
             src={joelImg}
             alt="Joel James, founder of Foxe Labs"
-            widths={[420, 840]}
+            widths={[480, 800]}
             sizes="(max-width: 960px) 100vw, 420px"
             loading="lazy"
             decoding="async"
-            style="display:block;width:100%;height:280px;object-fit:cover;border-bottom:1px solid var(--border)"
+            style="display:block;width:100%;height:auto;aspect-ratio:1/1;border-bottom:1px solid var(--border)"
           />
           <div style="padding:var(--space-300) var(--space-300);display:flex;flex-direction:column;gap:6px">
             <h2 style="font-size:1.25rem">Joel James</h2>
             <span class="mono" style="font-size:var(--text-xs);color:var(--text-faint)">founder · engineer · trader — Kerala, India</span>
-            <div style="display:flex;gap:var(--space-150);margin-top:var(--space-125)">
+            <div style="display:flex;gap:var(--space-100);margin-top:var(--space-125)">
               {founderLinks.map((l) => (
                 <a
                   href={l.href}
+                  class="social-btn"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Joel James on ${l.label}`}
-                  class="link-more"
-                  style="font-size:var(--text-small)"
                 >
-                  {l.label} →
+                  <Icon name={l.icon} width={16} height={16} aria-hidden="true" />
                 </a>
               ))}
             </div>
@@ -220,7 +219,7 @@ const principles = [
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: var(--space-800);
-    align-items: center;
+    align-items: start;
     padding-block: clamp(4rem, 8vw, 6rem);
   }
   @media (max-width: 960px) {

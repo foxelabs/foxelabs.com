@@ -1,5 +1,5 @@
 ---
-// Paid-product purchase card: the four-colour rule, a big price, a commercial
+// Paid-product purchase card: a big price, a commercial
 // value checklist, and a slot for the CTA(s), resource links and fine print.
 // Used on add-on and trading product pages.
 import { Icon } from 'astro-icon/components';
@@ -11,10 +11,12 @@ interface Props {
   badge?: string;
   /** Commercial "what you get" lines (licensing/updates/support) — not features. */
   benefits?: string[];
+  /** Hue for the checklist ticks — the product's own. */
+  hue?: string;
   class?: string;
 }
 
-const { price = '', badge, benefits = [], class: className = '' } = Astro.props;
+const { price = '', badge, benefits = [], hue = 'var(--hue-emerald)', class: className = '' } = Astro.props;
 
 // Split "From $29.99 · one-time" → kicker "From", amount "$29.99", qualifier "one-time".
 const raw = price.trim();
@@ -24,13 +26,15 @@ const afterKicker = kickerMatch ? raw.slice(kickerMatch[0].length) : raw;
 const [amount, ...qParts] = afterKicker.split('·').map((s) => s.trim());
 const qualifier = qParts.join(' · ');
 
-const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
 ---
 <div class:list={['card', className]} style="align-self:start">
-  <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
-
   <div style="padding:var(--space-300);display:flex;flex-direction:column;gap:var(--space-300)">
-    {badge && <span class="chip chip--sm" style="align-self:flex-start">{badge}</span>}
+    {badge && (
+      <span class="chip chip--sm chip--muted chip--solid" style="align-self:flex-start">
+        <span class="sync-dot" aria-hidden="true"></span>
+        {badge}
+      </span>
+    )}
 
     {amount && (
       <div>
@@ -45,9 +49,9 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
     )}
 
     {benefits.length > 0 && (
-      <ul class="dot-list" style="--dot-hue:var(--acc-1)">
-        {benefits.map((b, i) => (
-          <li style={`--dot-hue:${quad[i % 4]};font-size:var(--text-ui);line-height:1.5;color:var(--text-subtle)`}>
+      <ul class="dot-list" style={`--dot-hue:${hue}`}>
+        {benefits.map((b) => (
+          <li style={`font-size:var(--text-ui);line-height:1.5;color:var(--text-subtle)`}>
             <Icon name="mingcute:check-line" size={16} style="color:var(--dot-hue);flex:none" aria-hidden="true" />
             <span>{b}</span>
           </li>

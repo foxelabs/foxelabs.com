@@ -10,7 +10,7 @@ import Section from '../../../components/ui/Section.astro';
 import Faq from '../../../components/ui/Faq.astro';
 import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
-import { accentFor, ACCENTS } from '../../../config/accents';
+import { accentFor } from '../../../config/accents';
 import { Icon } from 'astro-icon/components';
 
 export async function getStaticPaths() {
@@ -69,8 +69,6 @@ const structuredData = [
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
 
-const quad = ACCENTS.map((a) => a.color);
-
 const resourceLinks = [
   data.demoUrl && { href: data.demoUrl, label: data.demoLabel ?? 'Download free demo' },
   data.docsUrl && { href: data.docsUrl, label: 'Documentation' },
@@ -87,7 +85,8 @@ const resourceLinks = [
   <Nav />
   <main id="main">
     <!-- Hero -->
-    <section class="band band--sm band--bottom">
+    <section class="page-hero">
+      <div class="cellgrid" aria-hidden="true"></div>
       <div class="container-x product-hero">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
           <a href={categoryPath('trading', data.category)} class="link-more">
@@ -95,8 +94,8 @@ const resourceLinks = [
           </a>
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <span class="chip chip--sm">
-              <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+            <span class="chip chip--sm chip--muted chip--solid">
+              <span class="sync-dot" aria-hidden="true"></span>
               {statusLabel[data.status] ?? data.status}
             </span>
             <span class="chip chip--sm chip--muted">{data.market}</span>
@@ -104,7 +103,7 @@ const resourceLinks = [
             {data.version && <span class="chip chip--sm chip--muted">{data.version}</span>}
           </div>
 
-          <h1 style="font-size:var(--text-title);line-height:1.05;letter-spacing:-1.4px">{data.name}</h1>
+          <h1 style="font-size:var(--text-title);line-height:1.05">{data.name}</h1>
           <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
             {data.tagline}
           </p>
@@ -123,8 +122,8 @@ const resourceLinks = [
 
         <PricingCard
           price={data.price}
-          badge={statusLabel[data.status] ?? data.status}
           benefits={data.benefits}
+          hue={accent.color}
         >
           {data.benefits.length === 0 && (
             <p style="margin:0;font-size:var(--text-ui);color:var(--text-subtle)">
@@ -155,13 +154,14 @@ const resourceLinks = [
     <!-- Highlights -->
     {data.highlights.length > 0 && (
       <Section variant="alt">
-        <h2 class="sr-only">Highlights</h2>
-        <div class="grid-3" style="gap:var(--space-500)">
+        <span class="eyebrow">Highlights</span>
+        <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">Why traders run it</h2>
+        <div class="grid-3">
           {data.highlights.map((h, i) => (
-            <div style="display:flex;flex-direction:column;gap:var(--space-125)">
-              <span class="dot dot--lg" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
-              <h3 style="font-size:var(--text-body-lg);font-weight:var(--fw-heading)">{h.title}</h3>
-              <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">{h.body}</p>
+            <div class="card card--pad" style="gap:var(--space-150)">
+              <span class="step-chip tint" style={`--hue:${accent.color};align-self:flex-start`}>{String(i + 1).padStart(2, '0')}</span>
+              <h3 style="font-size:1.25rem">{h.title}</h3>
+              <p style="margin:0;font-size:var(--text-md);line-height:1.55">{h.body}</p>
             </div>
           ))}
         </div>
@@ -169,9 +169,10 @@ const resourceLinks = [
     )}
 
     <!-- What it does -->
-    <Section size="sm">
+    <Section rule="top">
       <div class="what">
-        <h2 style="margin-bottom:var(--space-150);font-size:1.5rem;letter-spacing:-0.4px">What it does</h2>
+        <span class="eyebrow">Overview</span>
+        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">What it does</h2>
         <p style="margin:0 0 var(--space-300);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
           {data.summary}
         </p>
@@ -181,7 +182,7 @@ const resourceLinks = [
 
         {data.specs.length > 0 && (
           <>
-            <h2 style="margin:var(--space-500) 0 var(--space-200);font-size:1.5rem;letter-spacing:-0.4px">
+            <h2 style="margin:var(--space-500) 0 var(--space-200);font-size:var(--text-h3)">
               Specifications
             </h2>
             <dl class="spec-grid">

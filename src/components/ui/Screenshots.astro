@@ -1,5 +1,5 @@
 ---
-// The admin tour: tabbed screens on the ink band. One tab per captured screen,
+// The admin tour: tabbed screens on a subtle band. One tab per captured screen,
 // each with the path it lives at, a heading, and a caption.
 import { Image } from 'astro:assets';
 
@@ -18,15 +18,17 @@ interface Props {
   shots: Shot[];
   heading: string;
   lead?: string;
+  /** The product's hue, for the crumb dots. */
+  hue?: string;
 }
 
-const { id, shots, heading, lead } = Astro.props;
-const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
+const { id, shots, heading, lead, hue = 'var(--hue-blue)' } = Astro.props;
 ---
 <div data-tour={id}>
-  <h2 style="margin-bottom:8px;font-size:var(--text-h2);letter-spacing:-0.6px">{heading}</h2>
+  <span class="eyebrow">Product tour</span>
+  <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">{heading}</h2>
   {lead && (
-    <p style="margin:0 0 var(--space-400);font-size:var(--text-body);color:var(--ink-band-subtle)">{lead}</p>
+    <p style="margin:0 0 var(--space-400);font-size:var(--text-body);color:var(--text-subtle)">{lead}</p>
   )}
 
   {shots.length > 1 && (
@@ -68,15 +70,15 @@ const quad = ['var(--acc-1)', 'var(--acc-2)', 'var(--acc-3)', 'var(--acc-4)'];
       </div>
       <div class="tour-panel__copy">
         {shot.crumb && (
-          <span class="chip chip--sm" style="align-self:flex-start">
-            <span class="dot" style={`background:${quad[i % 4]}`} aria-hidden="true"></span>
+          <span class="chip chip--sm chip--muted mono" style="align-self:flex-start">
+            <span class="dot dot--sm" style={`background:${hue};border-radius:999px`} aria-hidden="true"></span>
             {shot.crumb}
           </span>
         )}
         <h3 style="font-size:var(--text-h3)">{shot.heading}</h3>
-        <p style="margin:0;font-size:var(--text-md);line-height:1.6;color:var(--ink-band-subtle)">{shot.body}</p>
+        <p style="margin:0;font-size:var(--text-md);line-height:1.6;color:var(--text-subtle)">{shot.body}</p>
         {shot.caption && (
-          <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--ink-band-faint);font-style:italic">
+          <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--text-faint);font-style:italic">
             {shot.caption}
           </p>
         )}
