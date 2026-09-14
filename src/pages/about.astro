@@ -4,31 +4,32 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import CtaBanner from '../components/CtaBanner.astro';
 import Section from '../components/ui/Section.astro';
-import Eyebrow from '../components/ui/Eyebrow.astro';
-import PrincipleGrid from '../components/ui/PrincipleGrid.astro';
 import { Image } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import { breadcrumbLd, personLd } from '../config/seo';
 import joelImg from '../assets/joel.jpg';
 
+// Two doors — same card language as the home page.
 const tracks = [
   {
-    label: 'Software',
-    color: 'var(--acc-1)',
+    title: 'Software',
+    hue: 'var(--hue-emerald)',
     icon: 'mingcute:code-line',
+    label: 'Open source · GPL',
     body:
       'Open-source WordPress plugins and PHP libraries — documented, maintained, and shipped release after release for years.',
+    trail: 'Explore the software',
     href: '/software/',
-    cta: 'Explore Software',
   },
   {
-    label: 'Trading',
-    color: 'var(--acc-2)',
+    title: 'Trading',
+    hue: 'var(--hue-amber)',
     icon: 'mingcute:chart-line-line',
+    label: 'Risk-first',
     body:
       'Expert advisors, a universal journal, and precision utilities — engineered risk-first and traded on my own accounts.',
+    trail: 'Explore the trading tools',
     href: '/trading/',
-    cta: 'Explore Trading',
   },
 ];
 
@@ -40,30 +41,34 @@ const founderLinks = [
 
 const principles = [
   {
-    title: 'Open by default',
+    n: '01',
+    hue: 'var(--hue-blue)',
     icon: 'mingcute:code-line',
-    color: 'var(--acc-1)',
+    title: 'Open by default',
     body:
       'The software track is open source. Read it, fork it, trust it — the source is right there, not behind a promise.',
   },
   {
-    title: 'Risk before returns',
+    n: '02',
+    hue: 'var(--hue-amber)',
     icon: 'mingcute:shield-line',
-    color: 'var(--acc-2)',
+    title: 'Risk before returns',
     body:
       'Every trading tool ships with hard risk controls first. A strategy that can blow an account is a countdown, not a strategy.',
   },
   {
-    title: 'A real lab',
+    n: '03',
+    hue: 'var(--hue-emerald)',
     icon: 'mingcute:flask-line',
-    color: 'var(--acc-3)',
+    title: 'A real lab',
     body:
       'Everything is developed, tested, and released here — small, sharp tools that do one thing well, not bloated platforms.',
   },
   {
-    title: 'I use it myself',
+    n: '04',
+    hue: 'var(--hue-purple)',
     icon: 'mingcute:user-heart-line',
-    color: 'var(--acc-4)',
+    title: 'I use it myself',
     body:
       'I trade with these tools on my own capital. Nothing ships that I would not put in front of my own account.',
   },
@@ -92,14 +97,18 @@ const principles = [
   <Nav />
   <main id="main">
     <!-- Story + the person -->
-    <section class="band band--sm band--bottom">
+    <section class="about-hero">
+      <div class="cellgrid" aria-hidden="true"></div>
       <div class="container-x about-top">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
-          <Eyebrow chip color="var(--acc-2)">About</Eyebrow>
-          <h1 style="font-size:var(--text-title);line-height:1.06;letter-spacing:-1.3px">
+          <span class="chip chip--muted chip--solid" style="align-self:flex-start">
+            <span class="sync-dot" aria-hidden="true"></span>
+            About the studio
+          </span>
+          <h1 style="font-size:var(--text-hero);line-height:1.05">
             A small studio, two crafts.
           </h1>
-          <p style="margin:0;font-size:var(--text-body-lg);line-height:1.6">
+          <p style="margin:0;font-size:var(--text-lead);line-height:1.55;color:var(--text-subtle)">
             Foxe Labs is the studio of <strong>Joel James</strong>, a software engineer from Kerala,
             India. It is a workshop of one — every project here is designed, built, and supported by
             the same pair of hands.
@@ -122,7 +131,6 @@ const principles = [
         </div>
 
         <div class="card" style="align-self:start">
-          <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
           <Image
             src={joelImg}
             alt="Joel James, founder of Foxe Labs"
@@ -130,12 +138,11 @@ const principles = [
             sizes="(max-width: 960px) 100vw, 420px"
             loading="lazy"
             decoding="async"
-            style="display:block;width:100%;height:280px;object-fit:cover"
+            style="display:block;width:100%;height:280px;object-fit:cover;border-bottom:1px solid var(--border)"
           />
           <div style="padding:var(--space-300) var(--space-300);display:flex;flex-direction:column;gap:6px">
             <h2 style="font-size:1.25rem">Joel James</h2>
-            <span style="font-size:var(--text-ui);color:var(--text-subtle)">Founder · Engineer · Trader</span>
-            <span style="font-size:var(--text-small);color:var(--text-subtle)">Kerala, India</span>
+            <span class="mono" style="font-size:var(--text-xs);color:var(--text-faint)">founder · engineer · trader — Kerala, India</span>
             <div style="display:flex;gap:var(--space-150);margin-top:var(--space-125)">
               {founderLinks.map((l) => (
                 <a
@@ -143,9 +150,10 @@ const principles = [
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={`Joel James on ${l.label}`}
-                  style="font-size:var(--text-small);font-weight:var(--fw-medium)"
+                  class="link-more"
+                  style="font-size:var(--text-small)"
                 >
-                  {l.label}
+                  {l.label} →
                 </a>
               ))}
             </div>
@@ -155,40 +163,46 @@ const principles = [
     </section>
 
     <!-- Two tracks -->
-    <Section>
-      <h2 style="margin-bottom:var(--space-125);font-size:var(--text-h2);letter-spacing:-0.6px">
-        One studio, two tracks
+    <Section variant="alt" rule="top">
+      <span class="eyebrow">Two tracks</span>
+      <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
+        One studio, pointed at two problems
       </h2>
-      <p style="margin:0 0 var(--space-500);font-size:var(--text-body);color:var(--text-subtle)">
-        The same standards, pointed at two different problems.
-      </p>
-      <div class="about-tracks">
+      <div class="grid-2">
         {tracks.map((track) => (
-          <div
-            class="card card--pad"
-            style={`gap:var(--space-200);border-top:4px solid ${track.color}`}
-          >
-            <div class="icon-tile" style={`background:color-mix(in srgb, ${track.color} 10%, transparent);color:${track.color}`}>
-              <Icon name={track.icon} size={24} aria-hidden="true" />
+          <div class="card card--pad card--hover" style="gap:var(--space-200)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-200)">
+              <span class="icon-tile tint" style={`--hue:${track.hue}`}>
+                <Icon name={track.icon} size={20} aria-hidden="true" />
+              </span>
+              <span class="kicker" style={`color:${track.hue}`}>{track.label}</span>
             </div>
-            <h3 style="font-size:var(--text-h3)">{track.label}</h3>
-            <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">{track.body}</p>
-            <div style="margin-top:auto;padding-top:var(--space-100)">
-              <a href={track.href} class="btn btn--sm btn--accent" style={`--btn-accent:${track.color}`}>
-                {track.cta}
-              </a>
-            </div>
+            <h3 style="font-size:var(--text-h3)">{track.title}</h3>
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">{track.body}</p>
+            <a href={track.href} class="link-more">{track.trail} →</a>
           </div>
         ))}
       </div>
     </Section>
 
     <!-- Principles -->
-    <Section variant="ink" size="sm">
-      <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
-        How I build
+    <Section rule="top">
+      <span class="eyebrow">How I build</span>
+      <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
+        Four rules, no exceptions
       </h2>
-      <PrincipleGrid items={principles} onInk />
+      <div class="grid-2">
+        {principles.map((p) => (
+          <div class="card card--pad" style="gap:var(--space-150)">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="step-chip tint" style={`--hue:${p.hue}`}>{p.n}</span>
+              <Icon name={p.icon} size={20} style={`color:${p.hue}`} aria-hidden="true" />
+            </div>
+            <h3 style="font-size:1.25rem">{p.title}</h3>
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55">{p.body}</p>
+          </div>
+        ))}
+      </div>
     </Section>
 
     <CtaBanner />
@@ -197,20 +211,19 @@ const principles = [
 </BaseLayout>
 
 <style>
+  .about-hero {
+    position: relative;
+    overflow: hidden;
+  }
   .about-top {
+    position: relative;
     display: grid;
     grid-template-columns: 1.5fr 1fr;
     gap: var(--space-800);
-  }
-  .about-tracks {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-300);
+    align-items: center;
+    padding-block: clamp(4rem, 8vw, 6rem);
   }
   @media (max-width: 960px) {
     .about-top { grid-template-columns: 1fr; gap: var(--space-500); }
-  }
-  @media (max-width: 720px) {
-    .about-tracks { grid-template-columns: 1fr; }
   }
 </style>

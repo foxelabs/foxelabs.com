@@ -6,7 +6,8 @@
 // the hue at the bottom left. No text beyond the slug, no gradients.
 //
 // Run: node scripts/make-covers.mjs
-// Writes 1600×900 PNGs into src/content/blog/covers/, overwriting in place.
+// Writes 1600×900 SVGs (displayed on the site) and PNGs (share cards) into
+// src/content/blog/covers/, overwriting in place.
 import { Resvg } from '@resvg/resvg-js';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -192,14 +193,21 @@ for (const c of COVERS) {
   ${PICTOGRAMS[c.art](hue, support)}
   <text x="64" y="836" font-family="Inconsolata" font-size="40" font-weight="500" fill="${hue}">${c.slug}</text>
 </svg>`;
-  const png = new Resvg(svg, {
+  const resvg = new Resvg(svg, {
     fitTo: { mode: 'width', value: W },
     font: {
       fontFiles: [path.join(fontDir, 'inconsolata-500.ttf'), path.join(fontDir, 'inconsolata-700.ttf')],
       loadSystemFonts: false,
       defaultFontFamily: 'Inconsolata',
     },
-  }).render().asPng();
+  });
+  // The SVG is what the site displays: vector, so it stays sharp at any
+  // size and DPR. resvg's toString() outlines the slug text into paths, so
+  // the file needs no font. The PNG stays for share cards, which need raster.
+  const vector = resvg.toString();
+  const png = resvg.render().asPng();
+  const svgFile = c.file.replace(/\.png$/, '.svg');
+  writeFileSync(path.join(outDir, svgFile), vector);
   writeFileSync(path.join(outDir, c.file), png);
-  console.log(`${c.file}  ${(png.length / 1024).toFixed(0)} KB  (${c.hue})`);
+  console.log(`${svgFile}  ${(vector.length / 1024).toFixed(1)} KB  ·  ${c.file}  ${(png.length / 1024).toFixed(0)} KB  (${c.hue})`);
 }

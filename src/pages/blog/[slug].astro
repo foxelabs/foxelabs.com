@@ -53,8 +53,12 @@ const pageTitle = data.seoTitle ?? data.title;
 const metaDescription = data.seoDescription ?? data.description;
 const postPath = `/blog/${post.id}`;
 // A real cover beats a generated card; posts without one fall through to the
-// card BaseLayout renders for this path.
-const shareImage = data.heroImage?.src;
+// card BaseLayout renders for this path. Covers display as SVG, but social
+// scrapers need raster, so share the PNG twin the cover script writes beside it.
+const pngCovers = import.meta.glob<{ default: ImageMetadata }>('../../content/blog/covers/*.png', { eager: true });
+const coverName = data.heroImage?.src.split('/').pop()?.split('?')[0].replace(/(\.[\w-]+)?\.svg$/, ''); // drops the build hash too
+const pngCover = Object.entries(pngCovers).find(([p]) => coverName && p.endsWith(`/${coverName}.png`))?.[1].default;
+const shareImage = data.heroImage?.format === 'svg' ? pngCover?.src : data.heroImage?.src;
 const publishedIso = data.pubDate.toISOString();
 const modifiedIso = (data.updatedDate ?? data.pubDate).toISOString();
 
