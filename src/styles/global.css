@@ -36,7 +36,6 @@
   /* ---- Ink ---- */
   --text:        #f4f5f6;   /* headings + primary copy */
   --text-strong: #ffffff;
-  --text-body:   #b0b6be;   /* body copy */
   --text-subtle: #b0b6be;
   --text-caps:   #9ea6b0;   /* uppercase micro-labels */
   --text-faint:  #8d949d;
@@ -169,7 +168,6 @@
 
   --text:        #17181a;
   --text-strong: #000000;
-  --text-body:   #50555a;
   --text-subtle: #50555a;
   --text-caps:   #5b6168;
   --text-faint:  #6a7076;
@@ -217,7 +215,7 @@
     margin: 0;
     padding: 0;
     background: var(--bg);
-    color: var(--text-body);
+    color: var(--text-subtle);
     font-family: var(--font-body);
     font-size: 15px;
     line-height: 1.55;
@@ -294,7 +292,7 @@
 .band--ink {
   background: var(--bg-subtle);
   border-top: 1px solid var(--border);
-  color: var(--text-body);
+  color: var(--text-subtle);
 }
 .band--ink h1, .band--ink h2, .band--ink h3,
 .band--ink h4, .band--ink h5, .band--ink h6 { color: var(--text); }
@@ -385,7 +383,7 @@
 .nav__link {
   padding: var(--space-100) var(--space-150);
   border-radius: var(--r-sm);
-  color: var(--text-body);
+  color: var(--text-subtle);
   font-size: var(--text-ui);
   font-weight: var(--fw-medium);
   transition: background-color 0.1s ease, color 0.1s ease;
@@ -466,7 +464,7 @@
   text-decoration: none;
 }
 .mega__name { font-size: 0.9375rem; font-weight: var(--fw-heading); }
-.mega__desc { font-size: var(--text-small); line-height: 1.45; color: var(--text-body); }
+.mega__desc { font-size: var(--text-small); line-height: 1.45; color: var(--text-subtle); }
 
 .mega__promo {
   align-self: stretch;
@@ -493,7 +491,7 @@
   line-height: 1.25;
   color: var(--text);
 }
-.mega__promo-body { font-size: var(--text-ui); line-height: 1.5; color: var(--text-body); }
+.mega__promo-body { font-size: var(--text-ui); line-height: 1.5; color: var(--text-subtle); }
 .mega__promo-cta { margin-top: auto; }
 
 /* ---- The same tree on a narrow screen ---------------------------------- */
@@ -542,7 +540,7 @@
   padding-left: var(--space-300);
   font-size: var(--text-body);
   font-weight: var(--fw-medium);
-  color: var(--text-body);
+  color: var(--text-subtle);
 }
 .nav-mobile__sub:hover { color: var(--text); text-decoration: none; }
 
@@ -657,13 +655,13 @@
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: var(--fw-medium);
-  color: var(--text-body);
+  color: var(--text-subtle);
   background: var(--bg-hover);
 }
 .chip--sm { padding: 4px 10px; font-size: 11px; }
 .chip--muted { color: var(--text-faint); background: transparent; }
 a.chip:hover { color: var(--text); border-color: var(--border-strong); text-decoration: none; }
-.band--ink .chip { border-color: var(--border); color: var(--text-body); }
+.band--ink .chip { border-color: var(--border); color: var(--text-subtle); }
 
 .badge {
   font-family: var(--font-mono);
@@ -674,7 +672,7 @@ a.chip:hover { color: var(--text); border-color: var(--border-strong); text-deco
   border-radius: var(--r-pill);
   padding: 3px var(--space-125);
   white-space: nowrap;
-  color: var(--text-body);
+  color: var(--text-subtle);
 }
 
 /* ---- Card grids ---- */
@@ -747,14 +745,14 @@ a.chip:hover { color: var(--text); border-color: var(--border-strong); text-deco
   border: 1px solid var(--border);
   border-radius: var(--r-lg);
   overflow: hidden;
-  color: var(--text-body);
+  color: var(--text-subtle);
   transition: border-color 0.2s ease;
 }
 .card--pad { padding: var(--space-400); }
 a.card:hover,
 .card--hover:hover {
   text-decoration: none;
-  color: var(--text-body);
+  color: var(--text-subtle);
   border-color: var(--border-strong);
 }
 .card__body {
@@ -874,7 +872,7 @@ a.card:hover,
   padding: 0 22px 20px;
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--text-body);
+  color: var(--text-subtle);
 }
 
 /* ---- Tabs -------------------------------------------------------------- */
@@ -883,7 +881,7 @@ a.card:hover,
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
   background: var(--bg-hover);
-  color: var(--text-body);
+  color: var(--text-subtle);
   font-family: var(--font-mono);
   font-size: var(--text-small);
   font-weight: var(--fw-medium);
@@ -899,7 +897,7 @@ a.card:hover,
 }
 a.tab:hover { text-decoration: none; }
 
-.band--ink .tab { border-color: var(--border); color: var(--text-body); }
+.band--ink .tab { border-color: var(--border); color: var(--text-subtle); }
 .band--ink .tab:hover { color: var(--text); }
 .band--ink .tab[aria-selected='true'],
 .band--ink .tab[aria-pressed='true'] {
@@ -977,7 +975,7 @@ textarea.field { resize: vertical; min-height: 120px; }
   height: 34px;
   border: 1px solid var(--border-strong);
   border-radius: var(--r-pill);
-  color: var(--text-body);
+  color: var(--text-subtle);
   transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
 }
 .social-btn:hover {
@@ -1025,7 +1023,7 @@ textarea.field { resize: vertical; min-height: 120px; }
   align-items: center;
   gap: var(--space-050);
   font-size: var(--text-ui);
-  color: var(--text-body);
+  color: var(--text-subtle);
 }
 .footer__link:hover { color: var(--text); }
 .footer__bar {
@@ -1163,7 +1161,7 @@ textarea.field { resize: vertical; min-height: 120px; }
    Prose — rendered Markdown (blog posts, product bodies, legal documents).
    =========================================================================== */
 .prose-foxe {
-  color: var(--text-body);
+  color: var(--text-subtle);
   font-size: 1rem;
   line-height: 1.7;
 }
@@ -1282,7 +1280,7 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe tbody td {
   padding: 0.7em 0.85em;
   border-bottom: 1px solid var(--border);
-  color: var(--text-body);
+  color: var(--text-subtle);
   text-align: left;
 }
 .prose-foxe tbody tr:nth-child(even) { background: none; }
@@ -1292,7 +1290,7 @@ textarea.field { resize: vertical; min-height: 120px; }
 }
 .prose-foxe tbody td:last-child {
   background: none;
-  color: var(--text-body);
+  color: var(--text-subtle);
   font-weight: var(--fw-body);
 }
 .prose-foxe tbody tr:last-child td { border-bottom: none; }
@@ -1341,5 +1339,5 @@ textarea.field { resize: vertical; min-height: 120px; }
   padding: 0 22px 20px;
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--text-body);
+  color: var(--text-subtle);
 }
