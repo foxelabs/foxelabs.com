@@ -26,12 +26,12 @@ const founderSocials = [
   { href: 'https://instagram.com/joeltalks', platform: 'Instagram', label: '@joeltalks', icon: 'mingcute:instagram-line' },
 ];
 
-// What people write about — one hue each, so the page has the home page's colour.
+// What people write about — a plain list; the colour lives elsewhere on the page.
 const topics = [
-  { icon: 'mingcute:plugin-2-line', title: 'Plugin support', body: 'Setup, bugs, or a feature request.', hue: 'var(--hue-blue)' },
-  { icon: 'mingcute:certificate-line', title: 'Licences & billing', body: 'Add-on keys, renewals, refunds.', hue: 'var(--hue-emerald)' },
-  { icon: 'mingcute:stock-line', title: 'Trading tools', body: 'Gold Scalpel, TickerLog, or an EA idea.', hue: 'var(--hue-amber)' },
-  { icon: 'mingcute:hammer-line', title: 'Custom builds', body: 'A plugin, library, or tool made to order.', hue: 'var(--hue-purple)' },
+  { title: 'Plugin support', body: 'setup, bugs, or a feature request' },
+  { title: 'Licences & billing', body: 'add-on keys, renewals, refunds' },
+  { title: 'Trading tools', body: 'Gold Scalpel, TickerLog, or an EA idea' },
+  { title: 'Custom builds', body: 'a plugin, library, or tool made to order' },
 ];
 ---
 <BaseLayout
@@ -72,15 +72,9 @@ const topics = [
             </span>
           </a>
 
-          <ul class="topic-grid">
+          <ul class="topic-list">
             {topics.map((t) => (
-              <li class="topic" style={`--hue:${t.hue}`}>
-                <span class="icon-tile icon-tile--sm tint" aria-hidden="true"><Icon name={t.icon} size={18} /></span>
-                <span>
-                  <strong>{t.title}</strong>
-                  <span>{t.body}</span>
-                </span>
-              </li>
+              <li><strong>{t.title}</strong> — {t.body}</li>
             ))}
           </ul>
 
@@ -90,9 +84,9 @@ const topics = [
             style="padding:var(--space-300) var(--space-300);gap:var(--space-250);margin-top:8px;width:100%"
           >
             <div>
-              <h2 class="kicker" style="color:var(--hue-red)">Where we are</h2>
+              <h2 class="kicker" style="color:var(--hue-cyan)">Where we are</h2>
               <div style="display:flex;align-items:center;gap:10px;font-size:var(--text-md);font-weight:var(--fw-medium);margin-top:6px">
-                <span class="icon-tile icon-tile--sm tint" style="--hue:var(--hue-red)"><Icon name="mingcute:location-line" size={18} aria-hidden="true" /></span>
+                <span class="icon-tile icon-tile--sm tint" style="--hue:var(--hue-cyan)"><Icon name="mingcute:location-line" size={18} aria-hidden="true" /></span>
                 Kerala, India — London &amp; New York sessions
               </div>
             </div>
@@ -200,28 +194,23 @@ const topics = [
     background: color-mix(in srgb, var(--hue-amber) 22%, transparent);
     z-index: -1;
   }
-  .topic-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-250) var(--space-200);
-    width: 100%;
-  }
-  .topic {
+  .topic-list {
     display: flex;
-    gap: var(--space-125);
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 1.1em;
+    list-style: disc;
+    font-size: var(--text-md);
+    line-height: 1.5;
+    color: var(--text-subtle);
   }
-  .topic > span:last-child { display: flex; flex-direction: column; gap: 2px; }
-  .topic strong { font-size: var(--text-md); color: var(--text); font-weight: var(--fw-heading); }
-  .topic > span:last-child > span { font-size: var(--text-small); color: var(--text-subtle); line-height: 1.4; }
+  .topic-list li::marker { color: var(--text-faint); }
+  .topic-list strong { color: var(--text); font-weight: var(--fw-medium); }
   .form-head {
     display: flex;
     align-items: center;
     gap: var(--space-150);
     padding: var(--space-300) var(--space-400) 0;
-  }
-  @media (max-width: 520px) {
-    .topic-grid { grid-template-columns: 1fr; }
   }
 
   .contact-grid {
