@@ -47,10 +47,6 @@ export const TOPICS = Object.keys(TOPIC_META) as Topic[];
 /** Archive URL for a topic label, e.g. 'Software' → '/blog/topic/software/'. */
 export const topicPath = (topic: Topic): string => `/blog/topic/${TOPIC_META[topic].slug}/`;
 
-/** Topic label for a URL slug, or undefined when the slug is not a topic. */
-export const topicFromSlug = (slug: string): Topic | undefined =>
-  TOPICS.find((t) => TOPIC_META[t].slug === slug);
-
 /** URL-safe form of a free-form tag, e.g. 'Expert Advisors' → 'expert-advisors'. */
 export const tagSlug = (tag: string): string =>
   tag

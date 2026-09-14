@@ -663,6 +663,8 @@
 a.chip:hover { color: var(--text); border-color: var(--border-strong); text-decoration: none; }
 
 /* ---- Card grids ---- */
+/* grid-4 is referenced dynamically (PrincipleGrid's `grid-${columns}`) —
+   a plain-text grep will not find it. */
 .grid-2, .grid-3, .grid-4 { display: grid; gap: var(--space-250); }
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
@@ -1381,38 +1383,3 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe .pros li::marker { color: var(--ok); }
 .prose-foxe .cons li::marker { color: var(--bad); }
 
-.prose-foxe .faq-list { display: flex; flex-direction: column; gap: var(--space-150); margin-top: 1.4em; }
-.prose-foxe .faq-item {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-}
-.prose-foxe .faq-item summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-200);
-  padding: 18px 22px;
-  font-size: var(--text-body);
-  font-weight: var(--fw-heading);
-  color: var(--text);
-  cursor: pointer;
-  list-style: none;
-}
-.prose-foxe .faq-item summary::-webkit-details-marker { display: none; }
-.prose-foxe .faq-item summary::after {
-  content: '+';
-  font-family: var(--font-mono);
-  font-size: 1.125rem;
-  color: var(--text-faint);
-  flex: none;
-}
-.prose-foxe .faq-item[open] summary::after { content: '−'; }
-.prose-foxe .faq-item__chevron { display: none; }
-.prose-foxe .faq-item > p {
-  margin: 0;
-  padding: 0 22px 20px;
-  font-size: 0.9375rem;
-  line-height: 1.6;
-  color: var(--text-subtle);
-}

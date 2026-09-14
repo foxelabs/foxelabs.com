@@ -28,15 +28,6 @@ export const ACCENTS: Accent[] = [
   { name: 'emerald',   color: 'var(--acc-4)', ink: 'var(--ink-band)' },
 ];
 
-/** Raw hex per hue, for contexts that cannot resolve a CSS variable —
-    the share-card renderer, which rasterises outside the browser. */
-export const ACCENT_HEX: Record<string, string> = {
-  blue:   '#4d6bfa',
-  purple: '#9a5cf5',
-  amber:  '#f5a30b',
-  emerald: '#10c877',
-};
-
 /** Fixed hue per category, shared by category pages and listings.
     Keyed on the slugs exported from tracks.ts — the compiler flags drift. */
 const CATEGORY_ACCENT: Record<CategorySlug, string> = {
@@ -66,21 +57,6 @@ export function categoryAccent(category: string): Accent {
 
 export function topicAccent(topic: string): Accent {
   return byName(TOPIC_ACCENT[topic] ?? 'emerald');
-}
-
-/** Hex for a hue, for the share-card renderer. */
-export function accentHex(accent: Accent): string {
-  return ACCENT_HEX[accent.name] ?? ACCENT_HEX.blue;
-}
-
-/** Canonical hex back to its theme token, so a colour stored in content
-    frontmatter still lightens on the dark theme. Unknown values pass through. */
-const HEX_TO_TOKEN: Record<string, string> = Object.fromEntries(
-  ACCENTS.map((a) => [ACCENT_HEX[a.name].toUpperCase(), a.color])
-);
-
-export function accentToken(hex: string): string {
-  return HEX_TO_TOKEN[hex.toUpperCase()] ?? hex;
 }
 
 /**
