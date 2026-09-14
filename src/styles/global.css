@@ -216,7 +216,7 @@
     background: var(--bg);
     color: var(--text-subtle);
     font-family: var(--font-body);
-    font-size: 15px;
+    font-size: 15.5px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -326,19 +326,6 @@
 }
 .brand-logo { display: block; }
 
-/* The quad mark drawn in CSS — four rounded squares in the chart hues. */
-.brand-quad {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 3px;
-  flex: none;
-}
-.brand-quad span { width: 9px; height: 9px; border-radius: 2px; }
-.brand-quad span:nth-child(1) { background: var(--acc-1); }
-.brand-quad span:nth-child(2) { background: var(--acc-4); }
-.brand-quad span:nth-child(3) { background: var(--acc-3); }
-.brand-quad span:nth-child(4) { background: var(--acc-2); }
-
 /* ---- Navigation -------------------------------------------------------- */
 .nav-shell {
   position: sticky;
@@ -363,19 +350,36 @@
   flex: 1;
 }
 .nav__link {
+  position: relative;
   padding: var(--space-100) var(--space-150);
   border-radius: var(--r-sm);
   color: var(--text-subtle);
   font-size: var(--text-ui);
   font-weight: var(--fw-medium);
-  transition: background-color 0.1s ease, color 0.1s ease;
+  transition: color 0.1s ease;
+}
+/* Section-hue underline: grows in on hover, stays put on the active page.
+   Each link carries its --hue (the same map the mega menu uses). */
+.nav__link::after {
+  content: '';
+  position: absolute;
+  left: var(--space-150);
+  right: var(--space-150);
+  bottom: 3px;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--hue, var(--text));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.18s ease;
 }
 .nav__link:hover {
-  background: var(--bg-hover);
   color: var(--text);
   text-decoration: none;
 }
-.nav__link[aria-current='page'] { background: var(--bg-hover); color: var(--text); }
+.nav__link[aria-current='page'] { color: var(--text); }
+.nav__link:hover::after,
+.nav__link[aria-current='page']::after { transform: scaleX(1); }
 
 .nav__link--menu {
   display: inline-flex;
@@ -1222,7 +1226,7 @@ textarea.field { resize: vertical; min-height: 120px; }
   color: var(--code-text);
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.65;
 }
 

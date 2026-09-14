@@ -99,16 +99,15 @@ const menus = [
 ];
 
 const plainLinks = [
-  { href: '/blog/', label: 'Blog' },
-  { href: '/about/', label: 'About' },
+  { href: '/blog/', label: 'Blog', hue: 'var(--hue-blue)' },
+  { href: '/about/', label: 'About', hue: 'var(--hue-purple)' },
 ];
 ---
 
 <div class="nav-shell" data-nav-shell>
   <header class="nav">
     <a href="/" class="brand" aria-label="Foxe Labs — home">
-      {/* The quad mark, drawn in CSS. Placeholder for the final logo. */}
-      <span class="brand-quad" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+      <img src="/foxe.svg" alt="" class="brand-logo" width="26" height="26" />
       <span class="brand__name">Foxe Labs</span>
     </a>
 
@@ -121,13 +120,14 @@ const plainLinks = [
           aria-expanded="false"
           aria-controls={`mega-${menu.id}`}
           data-mega-trigger={menu.id}
+          style={`--hue:${menu.promo.color}`}
         >
           {menu.label}
           <Icon name="mingcute:down-line" class="nav__chevron" size={12} aria-hidden="true" />
         </a>
       ))}
       {plainLinks.map((l) => (
-        <a href={l.href} class="nav__link" aria-current={isActive(l.href)} data-mega-trigger="">{l.label}</a>
+        <a href={l.href} class="nav__link" aria-current={isActive(l.href)} data-mega-trigger="" style={`--hue:${l.hue}`}>{l.label}</a>
       ))}
     </nav>
 
