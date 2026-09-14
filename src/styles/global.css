@@ -1097,6 +1097,46 @@ textarea.field { resize: vertical; min-height: 120px; }
   padding-block: clamp(3rem, 6vw, 4.5rem);
 }
 
+/* Resource rows (docs, support, source…) inside purchase and fact cards. */
+.resource-links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-100);
+}
+.resource-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-150);
+  padding: var(--space-100) var(--space-150) var(--space-100) var(--space-100);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  color: var(--text);
+  transition: border-color 0.12s ease, background-color 0.12s ease;
+}
+.resource-link:hover {
+  text-decoration: none;
+  border-color: color-mix(in srgb, var(--hue) 45%, var(--border));
+  background: color-mix(in srgb, var(--hue) 6%, var(--bg-card));
+}
+.resource-link__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  flex: none;
+}
+.resource-link__text { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
+.resource-link__label { font-size: var(--text-md); font-weight: var(--fw-medium); line-height: 1.3; }
+.resource-link__hint { font-size: var(--text-xs); color: var(--text-faint); font-family: var(--font-mono); }
+.resource-link__arrow { color: var(--text-faint); flex: none; transition: transform 0.12s ease, color 0.12s ease; }
+.resource-link:hover .resource-link__arrow { color: var(--hue); transform: translateX(2px); }
+@media (prefers-reduced-motion: reduce) {
+  .resource-link__arrow { transition: none; }
+}
+
 /* A tinted square holding an icon. */
 .icon-tile {
   width: 44px;

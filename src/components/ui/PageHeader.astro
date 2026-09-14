@@ -1,6 +1,6 @@
 ---
-import Eyebrow from './Eyebrow.astro';
-
+// Inner-page header in the home hero's language: dot grid, solid status chip,
+// large title, subtle lead.
 interface Props {
   eyebrow?: string;
   title: string;
@@ -11,23 +11,26 @@ interface Props {
   back?: { href: string; label: string };
 }
 
-const { eyebrow, title, lead, color = 'var(--acc-1)', back } = Astro.props;
+const { eyebrow, title, lead, color = 'var(--hue-blue)', back } = Astro.props;
 ---
-<section class="band band--sm band--bottom">
+<section class="page-hero">
+  <div class="cellgrid" aria-hidden="true"></div>
   <div class="container-x">
     <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start;max-width:760px">
-      {back && (
-        <a href={back.href} style="font-size:var(--text-small);font-weight:var(--fw-medium);color:var(--text-subtle)">
-          ← {back.label}
-        </a>
+      {back && <a href={back.href} class="link-more">← {back.label}</a>}
+      {eyebrow && (
+        <span class="chip chip--muted chip--solid">
+          <span class="dot dot--sm" style={`background:${color};border-radius:999px`} aria-hidden="true"></span>
+          {eyebrow}
+        </span>
       )}
-      {eyebrow && <Eyebrow chip color={color}>{eyebrow}</Eyebrow>}
-      <h1 style="font-size:var(--text-title);letter-spacing:-1.2px">{title}</h1>
+      <h1 style="font-size:var(--text-title);line-height:1.05">{title}</h1>
       {lead && (
-        <p style="margin:0;max-width:600px;font-size:1.125rem;line-height:1.5;color:var(--text-subtle)">
+        <p style="margin:0;max-width:600px;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
           {lead}
         </p>
       )}
+      <slot />
     </div>
   </div>
 </section>

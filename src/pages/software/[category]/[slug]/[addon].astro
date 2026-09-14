@@ -8,6 +8,7 @@ import Section from '../../../../components/ui/Section.astro';
 import PricingCard from '../../../../components/ui/PricingCard.astro';
 import Faq from '../../../../components/ui/Faq.astro';
 import Screenshots from '../../../../components/ui/Screenshots.astro';
+import ResourceLinks from '../../../../components/ui/ResourceLinks.astro';
 import { projectPath, categoryPath, categoryMeta, addonPath } from '../../../../config/tracks';
 import { breadcrumbLd, softwareApplicationLd, faqLd } from '../../../../config/seo';
 import { accentFor } from '../../../../config/accents';
@@ -139,16 +140,17 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
           hue={accent.color}
         >
           {data.url && (
-            <a href={data.url} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+            <a href={data.url} class="btn btn--primary" style="justify-content:center" target="_blank" rel="noopener noreferrer">
               Get {data.name}
             </a>
           )}
-          <div style="display:flex;flex-direction:column;gap:var(--space-125);padding-top:var(--space-150);border-top:1px solid var(--border)">
-            <a href={docsUrl} target="_blank" rel="noopener noreferrer" class="link-more">
-              Documentation →
-            </a>
-            <a href="/contact/" class="link-more">Get support →</a>
-          </div>
+          <ResourceLinks
+            links={[
+              { href: docsUrl, label: 'Documentation', hint: 'docs.foxelabs.com' },
+              { href: parentUrl, label: `${parent.data.name} core plugin`, icon: 'mingcute:plugin-2-line', hint: 'Free · required' },
+              { href: '/contact/', label: 'Get support', hint: 'Straight to the team' },
+            ]}
+          />
           <p style="margin:0;font-size:var(--text-small);color:var(--text-subtle)">
             Requires the free <a href={parentUrl}>{parent.data.name}</a> plugin to be installed and active.
           </p>

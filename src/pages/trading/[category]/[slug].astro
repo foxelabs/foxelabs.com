@@ -8,9 +8,10 @@ import EmailForm from '../../../components/EmailForm.astro';
 import PricingCard from '../../../components/ui/PricingCard.astro';
 import Section from '../../../components/ui/Section.astro';
 import Faq from '../../../components/ui/Faq.astro';
+import ResourceLinks from '../../../components/ui/ResourceLinks.astro';
 import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
-import { accentFor } from '../../../config/accents';
+import { accentFor, HUES } from '../../../config/accents';
 import { Icon } from 'astro-icon/components';
 
 export async function getStaticPaths() {
@@ -69,12 +70,32 @@ const structuredData = [
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
 
+// Hero fact tiles — each its own hue so the essentials read at a glance.
+const heroFacts = [
+  { icon: 'mingcute:copper-coin-line', label: 'Market', value: data.market, hue: 'var(--hue-amber)' },
+  { icon: 'mingcute:chart-bar-line', label: 'Platform', value: data.platform, hue: 'var(--hue-blue)' },
+  data.version && { icon: 'mingcute:git-merge-line', label: 'Version', value: data.version, hue: 'var(--hue-purple)' },
+  data.price && { icon: 'mingcute:wallet-4-line', label: 'Price', value: data.price.split('·')[0].trim(), hue: 'var(--hue-emerald)' },
+].filter(Boolean) as { icon: string; label: string; value: string; hue: string }[];
+
+// Spec rows get an icon by label; unknown labels fall back to a plain dot.
+const specIcon: Record<string, string> = {
+  symbol: 'mingcute:copper-coin-line',
+  platform: 'mingcute:chart-bar-line',
+  timeframe: 'mingcute:time-line',
+  'account type': 'mingcute:wallet-4-line',
+  recommended: 'mingcute:safety-certificate-line',
+  'min. balance': 'mingcute:currency-dollar-line',
+  activations: 'mingcute:device-line',
+  license: 'mingcute:certificate-line',
+};
+
 const resourceLinks = [
-  data.demoUrl && { href: data.demoUrl, label: data.demoLabel ?? 'Download free demo' },
-  data.docsUrl && { href: data.docsUrl, label: 'Documentation' },
+  data.demoUrl && { href: data.demoUrl, label: data.demoLabel ?? 'Download free demo', hint: 'MT5 Strategy Tester' },
+  data.docsUrl && { href: data.docsUrl, label: 'Documentation', hint: 'docs.foxelabs.com' },
   data.signalUrl && { href: data.signalUrl, label: 'View live signal' },
-  { href: data.supportUrl ?? '/contact/', label: 'Get support' },
-].filter(Boolean) as { href: string; label: string }[];
+  { href: data.supportUrl ?? '/contact/', label: 'Get support', hint: 'Straight to the team' },
+].filter(Boolean) as { href: string; label: string; hint?: string }[];
 ---
 <BaseLayout
   title={pageTitle}
@@ -98,9 +119,7 @@ const resourceLinks = [
               <span class="sync-dot" aria-hidden="true"></span>
               {statusLabel[data.status] ?? data.status}
             </span>
-            <span class="chip chip--sm chip--muted">{data.market}</span>
-            <span class="chip chip--sm chip--muted">{data.platform}</span>
-            {data.version && <span class="chip chip--sm chip--muted">{data.version}</span>}
+            <span class="chip chip--sm chip--muted">{cat?.label ?? 'Trading'}</span>
           </div>
 
           <h1 style="font-size:var(--text-title);line-height:1.05">{data.name}</h1>
@@ -108,11 +127,27 @@ const resourceLinks = [
             {data.tagline}
           </p>
 
+          {heroFacts.length > 0 && (
+            <dl class="fact-tiles">
+              {heroFacts.map((f) => (
+                <div class="fact-tile" style={`--hue:${f.hue}`}>
+                  <span class="fact-tile__icon tint" aria-hidden="true"><Icon name={f.icon} size={18} /></span>
+                  <div>
+                    <dt class="kicker">{f.label}</dt>
+                    <dd>{f.value}</dd>
+                  </div>
+                </div>
+              ))}
+            </dl>
+          )}
+
           {data.features.length > 0 && (
-            <ul class="dot-list" style={`--dot-hue:${accent.color};margin-top:var(--space-150);font-size:var(--text-md);line-height:1.5`}>
-              {data.features.map((f) => (
-                <li>
-                  <Icon name="mingcute:check-line" size={16} style="color:var(--dot-hue);flex:none" aria-hidden="true" />
+            <ul class="feature-list">
+              {data.features.map((f, i) => (
+                <li style={`--hue:${HUES[i % HUES.length]}`}>
+                  <span class="feature-list__tick tint" aria-hidden="true">
+                    <Icon name="mingcute:check-line" size={14} />
+                  </span>
                   <span>{f}</span>
                 </li>
               ))}
@@ -135,14 +170,10 @@ const resourceLinks = [
 
           {data.status === 'live' && data.ctaUrl ? (
             <>
-              <a href={data.ctaUrl} class="btn btn--primary" target="_blank" rel="noopener noreferrer">
+              <a href={data.ctaUrl} class="btn btn--primary" style="justify-content:center" target="_blank" rel="noopener noreferrer">
                 {data.ctaLabel ?? 'Get it now'}
               </a>
-              <div style="display:flex;flex-direction:column;gap:var(--space-125);padding-top:var(--space-150);border-top:1px solid var(--border)">
-                {resourceLinks.map((l) => (
-                  <a href={l.href} class="link-more">{l.label} →</a>
-                ))}
-              </div>
+              <ResourceLinks links={resourceLinks} />
             </>
           ) : (
             <EmailForm id={`product-form-${product.id}`} buttonLabel="Notify me" />
@@ -158,8 +189,11 @@ const resourceLinks = [
         <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">Why traders run it</h2>
         <div class="grid-3">
           {data.highlights.map((h, i) => (
-            <div class="card card--pad" style="gap:var(--space-150)">
-              <span class="step-chip tint" style={`--hue:${accent.color};align-self:flex-start`}>{String(i + 1).padStart(2, '0')}</span>
+            <div class="card card--pad" style={`gap:var(--space-150);--hue:${HUES[i % HUES.length]}`}>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span class="icon-tile tint"><Icon name={h.icon} size={22} aria-hidden="true" /></span>
+                <span class="mono" style="font-size:var(--text-xs);color:var(--hue)">{String(i + 1).padStart(2, '0')}</span>
+              </div>
               <h3 style="font-size:1.25rem">{h.title}</h3>
               <p style="margin:0;font-size:var(--text-md);line-height:1.55">{h.body}</p>
             </div>
@@ -186,9 +220,12 @@ const resourceLinks = [
               Specifications
             </h2>
             <dl class="spec-grid">
-              {data.specs.map((s) => (
+              {data.specs.map((s, i) => (
                 <div class="spec-grid__row">
-                  <dt>{s.label}</dt>
+                  <dt>
+                    <Icon name={specIcon[s.label.toLowerCase()] ?? 'mingcute:information-line'} size={16} style={`color:${HUES[i % HUES.length]}`} aria-hidden="true" />
+                    {s.label}
+                  </dt>
                   <dd>{s.value}</dd>
                 </div>
               ))}
@@ -229,10 +266,56 @@ const resourceLinks = [
     font-size: var(--text-ui);
     border-bottom: 1px solid var(--border);
   }
-  .spec-grid dt { color: var(--text-subtle); }
+  .spec-grid dt { color: var(--text-subtle); display: flex; align-items: center; gap: 8px; }
   .spec-grid dd { margin: 0; text-align: right; font-weight: var(--fw-medium); }
   @media (max-width: 620px) {
     .spec-grid { grid-template-columns: 1fr; }
+  }
+
+  .fact-tiles {
+    margin: var(--space-100) 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-125);
+    width: 100%;
+  }
+  .fact-tile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-125);
+    padding: var(--space-125) var(--space-150);
+    border: 1px solid color-mix(in srgb, var(--hue) 28%, var(--border));
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--hue) 5%, var(--bg-card));
+  }
+  .fact-tile__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-sm);
+    flex: none;
+  }
+  .fact-tile dd { margin: 2px 0 0; font-size: var(--text-md); font-weight: var(--fw-heading); color: var(--text); }
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-125);
+    margin-top: var(--space-100);
+    font-size: var(--text-md);
+    line-height: 1.5;
+  }
+  .feature-list li { display: flex; align-items: flex-start; gap: var(--space-125); }
+  .feature-list__tick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border-radius: 999px;
+    flex: none;
   }
 
   .product-hero {
@@ -247,6 +330,52 @@ const resourceLinks = [
     margin-inline: auto;
   }
   @media (max-width: 960px) {
-    .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
+    .fact-tiles {
+    margin: var(--space-100) 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-125);
+    width: 100%;
+  }
+  .fact-tile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-125);
+    padding: var(--space-125) var(--space-150);
+    border: 1px solid color-mix(in srgb, var(--hue) 28%, var(--border));
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--hue) 5%, var(--bg-card));
+  }
+  .fact-tile__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-sm);
+    flex: none;
+  }
+  .fact-tile dd { margin: 2px 0 0; font-size: var(--text-md); font-weight: var(--fw-heading); color: var(--text); }
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-125);
+    margin-top: var(--space-100);
+    font-size: var(--text-md);
+    line-height: 1.5;
+  }
+  .feature-list li { display: flex; align-items: flex-start; gap: var(--space-125); }
+  .feature-list__tick {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+    border-radius: 999px;
+    flex: none;
+  }
+
+  .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
   }
 </style>

@@ -8,6 +8,7 @@ import CtaBanner from '../../../components/CtaBanner.astro';
 import Section from '../../../components/ui/Section.astro';
 import Faq from '../../../components/ui/Faq.astro';
 import Screenshots from '../../../components/ui/Screenshots.astro';
+import ResourceLinks from '../../../components/ui/ResourceLinks.astro';
 import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
 import { accentFor } from '../../../config/accents';
@@ -110,6 +111,14 @@ const structuredData = [
   }),
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
+
+const resources = [
+  registryLink && { href: registryLink.href, label: registryLink.label, hint: data.registry },
+  data.repo && { href: data.repo, label: 'Source on GitHub', icon: 'mingcute:github-line', hint: 'github.com' },
+  !data.acquired && { href: docsUrl, label: 'Documentation', hint: 'docs.foxelabs.com' },
+  !data.acquired && { href: changelogUrl, label: 'Changelog' },
+  { href: supportUrl, label: 'Get support', hint: data.acquired ? 'New owner' : 'Straight to the team' },
+].filter(Boolean) as { href: string; label: string; icon?: string; hint?: string }[];
 
 const facts = [
   data.license && { label: 'License', value: data.license },
@@ -217,28 +226,8 @@ const facts = [
                 ))}
               </dl>
             )}
-            <div style="border-top:1px solid var(--border);padding:var(--space-200) var(--space-300);display:flex;flex-direction:column;gap:var(--space-125)">
-              {registryLink && (
-                <a href={registryLink.href} target="_blank" rel="noopener noreferrer" class="link-more">
-                  {registryLink.label} →
-                </a>
-              )}
-              {data.repo && (
-                <a href={data.repo} target="_blank" rel="noopener noreferrer" class="link-more">
-                  View source on GitHub →
-                </a>
-              )}
-              {!data.acquired && (
-                <>
-                  <a href={docsUrl} target="_blank" rel="noopener noreferrer" class="link-more">
-                    Documentation →
-                  </a>
-                  <a href={changelogUrl} target="_blank" rel="noopener noreferrer" class="link-more">
-                    Changelog →
-                  </a>
-                </>
-              )}
-              <a href={supportUrl} class="link-more">Get support →</a>
+            <div style="border-top:1px solid var(--border);padding:var(--space-250)">
+              <ResourceLinks links={resources} />
             </div>
           </div>
 

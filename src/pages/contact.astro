@@ -3,7 +3,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import ContactForm from '../components/ContactForm.astro';
-import Eyebrow from '../components/ui/Eyebrow.astro';
 import { Icon } from 'astro-icon/components';
 import { abs, breadcrumbLd, SITE, SOCIALS } from '../config/seo';
 
@@ -26,6 +25,14 @@ const founderSocials = [
   { href: 'https://github.com/joel-james', platform: 'GitHub', label: '@joel-james', icon: 'mingcute:github-line' },
   { href: 'https://instagram.com/joeltalks', platform: 'Instagram', label: '@joeltalks', icon: 'mingcute:instagram-line' },
 ];
+
+// What people write about — one hue each, so the page has the home page's colour.
+const topics = [
+  { icon: 'mingcute:plugin-2-line', title: 'Plugin support', body: 'Setup, bugs, or a feature request.', hue: 'var(--hue-blue)' },
+  { icon: 'mingcute:certificate-line', title: 'Licences & billing', body: 'Add-on keys, renewals, refunds.', hue: 'var(--hue-emerald)' },
+  { icon: 'mingcute:stock-line', title: 'Trading tools', body: 'Gold Scalpel, TickerLog, or an EA idea.', hue: 'var(--hue-amber)' },
+  { icon: 'mingcute:hammer-line', title: 'Custom builds', body: 'A plugin, library, or tool made to order.', hue: 'var(--hue-purple)' },
+];
 ---
 <BaseLayout
   title="Contact Foxe Labs — Support & Licensing"
@@ -40,12 +47,18 @@ const founderSocials = [
 >
   <Nav />
   <main id="main">
-    <section class="band band--sm">
+    <section class="page-hero">
+      <div class="cellgrid" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--amber" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--emerald" aria-hidden="true"></div>
       <div class="container-x contact-grid">
         <div style="display:flex;flex-direction:column;gap:var(--space-300);align-items:flex-start">
-          <Eyebrow chip color="var(--acc-3)">Contact</Eyebrow>
-          <h1 style="font-size:var(--text-title);line-height:1.06;letter-spacing:-1.3px">Say hello.</h1>
-          <p style="margin:0;font-size:var(--text-body-lg);line-height:1.6;color:var(--text-subtle)">
+          <span class="chip chip--muted chip--solid">
+            <span class="sync-dot" aria-hidden="true"></span>
+            Replies within a working day
+          </span>
+          <h1 style="font-size:var(--text-hero);line-height:1.05">Say <span class="contact-mark">hello.</span></h1>
+          <p style="margin:0;font-size:var(--text-lead);line-height:1.55;color:var(--text-subtle)">
             A plugin question, an EA idea, licensing, or a custom build — send it over. No ticket
             queues, no tier one: your message lands in the inbox of the team that wrote the code.
           </p>
@@ -59,35 +72,47 @@ const founderSocials = [
             </span>
           </a>
 
+          <ul class="topic-grid">
+            {topics.map((t) => (
+              <li class="topic" style={`--hue:${t.hue}`}>
+                <span class="icon-tile icon-tile--sm tint" aria-hidden="true"><Icon name={t.icon} size={18} /></span>
+                <span>
+                  <strong>{t.title}</strong>
+                  <span>{t.body}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+
           <div
             id="support"
             class="card"
             style="padding:var(--space-300) var(--space-300);gap:var(--space-250);margin-top:8px;width:100%"
           >
             <div>
-              <h2 class="kicker">Where we are</h2>
-              <div style="display:flex;align-items:center;gap:8px;font-size:var(--text-md);font-weight:var(--fw-medium);margin-top:4px">
-                <Icon name="mingcute:location-line" size={18} aria-hidden="true" />
+              <h2 class="kicker" style="color:var(--hue-red)">Where we are</h2>
+              <div style="display:flex;align-items:center;gap:10px;font-size:var(--text-md);font-weight:var(--fw-medium);margin-top:6px">
+                <span class="icon-tile icon-tile--sm tint" style="--hue:var(--hue-red)"><Icon name="mingcute:location-line" size={18} aria-hidden="true" /></span>
                 Kerala, India — London &amp; New York sessions
               </div>
             </div>
             <div>
-              <h2 class="kicker">The studio</h2>
+              <h2 class="kicker" style="color:var(--hue-blue)">The studio</h2>
               <div class="social-row">
                 {SOCIALS.map((s) => (
-                  <a href={s.href} class="social-btn" aria-label={s.label} target="_blank" rel="noopener noreferrer">
+                  <a href={s.href} class="social-btn social-btn--tint" aria-label={s.label} target="_blank" rel="noopener noreferrer">
                     <Icon name={s.icon} width={16} height={16} aria-hidden="true" />
                   </a>
                 ))}
               </div>
             </div>
             <div>
-              <h2 class="kicker">The human behind it</h2>
+              <h2 class="kicker" style="color:var(--hue-purple)">The human behind it</h2>
               <div class="social-row">
                 {founderSocials.map((s) => (
                   <a
                     href={s.href}
-                    class="social-btn"
+                    class="social-btn social-btn--tint"
                     aria-label={`Joel James on ${s.platform} — ${s.label}`}
                     title={s.label}
                     target="_blank"
@@ -102,7 +127,13 @@ const founderSocials = [
         </div>
 
         <div class="card" style="align-self:start">
-          <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+          <div class="form-head">
+            <span class="icon-tile tint" style="--hue:var(--hue-emerald)"><Icon name="mingcute:mail-send-line" size={20} aria-hidden="true" /></span>
+            <div>
+              <h2 style="font-size:1.25rem">Send a message</h2>
+              <span class="mono" style="font-size:var(--text-xs);color:var(--text-faint)">// lands with the people who wrote the code</span>
+            </div>
+          </div>
           <ContactForm />
         </div>
       </div>
@@ -124,7 +155,7 @@ const founderSocials = [
     color: var(--text);
     transition: background-color 0.1s ease, border-color 0.1s ease;
   }
-  .mail-link:hover { background: var(--bg-subtle); text-decoration: none; }
+  .mail-link:hover { background: color-mix(in srgb, var(--hue-amber) 6%, var(--bg-card)); border-color: color-mix(in srgb, var(--hue-amber) 40%, var(--border)); text-decoration: none; }
   .mail-link__icon {
     display: flex;
     align-items: center;
@@ -132,8 +163,8 @@ const founderSocials = [
     width: 34px;
     height: 34px;
     border-radius: var(--r-pill);
-    background: var(--bg-hover);
-    color: var(--text-subtle);
+    background: color-mix(in srgb, var(--hue-amber) 14%, transparent);
+    color: var(--hue-amber);
     flex: none;
   }
   .mail-link__text {
@@ -153,7 +184,53 @@ const founderSocials = [
     font-weight: var(--fw-medium);
   }
 
+  .hero-glow { position: absolute; width: 720px; height: 560px; pointer-events: none; }
+  .hero-glow--amber {
+    top: -180px; right: -120px;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--hue-amber) 9%, transparent), transparent);
+  }
+  .hero-glow--emerald {
+    bottom: -220px; left: -140px;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--hue-emerald) 8%, transparent), transparent);
+  }
+  .contact-mark { position: relative; display: inline-block; }
+  .contact-mark::after {
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: 0.08em; height: 0.18em;
+    background: color-mix(in srgb, var(--hue-amber) 22%, transparent);
+    z-index: -1;
+  }
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-125);
+    width: 100%;
+  }
+  .topic {
+    display: flex;
+    gap: var(--space-125);
+    align-items: flex-start;
+    padding: var(--space-150);
+    border: 1px solid color-mix(in srgb, var(--hue) 26%, var(--border));
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--hue) 5%, var(--bg-card));
+  }
+  .topic > span:last-child { display: flex; flex-direction: column; gap: 2px; }
+  .topic strong { font-size: var(--text-md); color: var(--text); font-weight: var(--fw-heading); }
+  .topic > span:last-child > span { font-size: var(--text-small); color: var(--text-subtle); line-height: 1.4; }
+  .social-btn--tint:hover { color: var(--hue-amber); border-color: color-mix(in srgb, var(--hue-amber) 45%, var(--border)); }
+  .form-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-150);
+    padding: var(--space-300) var(--space-400) 0;
+  }
+  @media (max-width: 520px) {
+    .topic-grid { grid-template-columns: 1fr; }
+  }
+
   .contact-grid {
+    position: relative;
     display: grid;
     grid-template-columns: 1fr 1.2fr;
     gap: var(--space-800);

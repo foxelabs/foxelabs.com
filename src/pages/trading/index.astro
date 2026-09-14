@@ -6,7 +6,7 @@ import Footer from '../../components/Footer.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import EmailForm from '../../components/EmailForm.astro';
 import Section from '../../components/ui/Section.astro';
-import Eyebrow from '../../components/ui/Eyebrow.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
 import Faq from '../../components/ui/Faq.astro';
 import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
 import { Icon } from 'astro-icon/components';
@@ -53,25 +53,25 @@ const principles = [
   {
     title: 'Risk before returns',
     icon: 'mingcute:shield-line',
-    color: 'var(--acc-1)',
+    color: 'var(--hue-blue)',
     body: 'Percentage-based sizing, a lot ceiling, early breakeven, position caps and cooldowns — designed in before any entry logic.',
   },
   {
     title: 'Pre-tuned, not fiddly',
     icon: 'mingcute:settings-3-line',
-    color: 'var(--acc-2)',
+    color: 'var(--hue-purple)',
     body: 'A short list of settings that matter, shipped at values we actually trade. No 60-input panel to guess your way through.',
   },
   {
     title: 'Test it first',
     icon: 'mingcute:test-tube-line',
-    color: 'var(--acc-3)',
+    color: 'var(--hue-amber)',
     body: 'A free Strategy Tester demo means you backtest on your own broker feed and spreads before spending anything.',
   },
   {
     title: 'Traded in-house',
     icon: 'mingcute:home-3-line',
-    color: 'var(--acc-4)',
+    color: 'var(--hue-emerald)',
     body: 'Every tool runs on our own accounts. If it is not good enough for our capital, it does not ship.',
   },
 ];
@@ -128,31 +128,29 @@ const faq = [
   <Nav />
   <main id="main">
     <!-- Hero -->
-    <section class="band band--sm band--bottom">
-      <div class="container-x">
-        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start;max-width:760px">
-          <Eyebrow chip color="var(--acc-3)">Trading</Eyebrow>
-          <h1 style="font-size:var(--text-title);letter-spacing:-1.2px">
-            Engineered for the account, not the backtest.
-          </h1>
-          <p style="margin:0;max-width:560px;font-size:1.125rem;line-height:1.5;color:var(--text-subtle)">
-            Expert advisors, a universal trading journal, and precision utilities for MetaTrader 5 —
-            built risk-first, pre-tuned, and traded on our own capital first.
-          </p>
-          <div style="display:flex;gap:var(--space-150);flex-wrap:wrap">
-            <a href={categoryPath('trading', 'expert-advisors')} class="btn btn--primary">Expert Advisors</a>
-            <a href="#waitlist" class="btn btn--ghost">Join the waitlist</a>
-          </div>
-          <p style="margin:4px 0 0;font-size:var(--text-small);color:var(--text-subtle)">
-            Trading carries substantial risk. Nothing here is financial advice.
-          </p>
-        </div>
+    <PageHeader
+      eyebrow="Built by traders"
+      color="var(--hue-amber)"
+      title="Engineered for the account, not the backtest."
+      lead="Expert advisors, a universal trading journal, and precision utilities for MetaTrader 5 — built risk-first, pre-tuned, and traded on our own capital first."
+    >
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <a href={categoryPath('trading', 'expert-advisors')} class="btn btn--primary">
+          <Icon name="mingcute:stock-line" size={16} aria-hidden="true" />
+          Expert Advisors
+        </a>
+        <a href="#waitlist" class="btn btn--ghost">
+          <Icon name="mingcute:mail-line" size={16} aria-hidden="true" />
+          Join the waitlist
+        </a>
       </div>
-    </section>
+      <span class="mono" style="font-size:var(--text-xs);color:var(--text-faint)">// trading carries substantial risk · not financial advice</span>
+    </PageHeader>
 
     <!-- Categories -->
-    <Section>
-      <h2 style="margin-bottom:var(--space-150);font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+    <Section variant="alt" rule="top">
+      <span class="eyebrow">Categories</span>
+      <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">
         Two kinds of tool.
       </h2>
       <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
@@ -160,24 +158,16 @@ const faq = [
       </p>
       <div class="grid-2">
         {categoryBoxes.map((box) => (
-          <a
-            href={box.href}
-            class="card card--pad"
-            style={`gap:var(--space-150);padding:var(--space-400);border-top:4px solid ${box.accent.color}`}
-          >
-            <div class="icon-tile" style={`background:color-mix(in srgb, ${box.accent.color} 10%, transparent);color:${box.accent.color}`}>
-              <Icon name={box.icon} size={24} aria-hidden="true" />
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-              <h3 style="font-size:var(--text-h3)">{box.title}</h3>
-              <span class="badge">
-                {box.badge}
+          <a href={box.href} class="card card--pad card--hover" style="gap:var(--space-200)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-200)">
+              <span class="icon-tile tint" style={`--hue:${box.accent.color}`}>
+                <Icon name={box.icon} size={20} aria-hidden="true" />
               </span>
+              <span class="kicker" style={`color:${box.accent.color}`}>{box.badge}</span>
             </div>
-            <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
-              {box.description}
-            </p>
-            <span class="link-more" style="margin-top:auto">Explore →</span>
+            <h3 style="font-size:var(--text-h3)">{box.title}</h3>
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">{box.description}</p>
+            <span class="link-more">Explore {box.title.toLowerCase()} →</span>
           </a>
         ))}
       </div>
@@ -185,32 +175,31 @@ const faq = [
 
     <!-- Every product -->
     {products.length > 0 && (
-      <Section variant="alt" rule="top">
-        <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
-          What we ship
-        </h2>
+      <Section rule="top">
+        <span class="eyebrow">Products</span>
+        <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">What we ship</h2>
         <div class="grid-3">
           {products.map((p) => (
             <a
               href={projectPath('trading', p.data.category, p.id)}
-              class="card card--pad"
-              style={`gap:var(--space-150);padding:var(--space-300);border-top:4px solid ${accentFor(productIds, p.id).color}`}
+              class="card card--pad card--hover" style={`gap:var(--space-150);--hue:${accentFor(productIds, p.id).color}`}
             >
-              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                <span class="kicker">{p.data.platform}</span>
-                <span class="badge">
-                  {statusLabel[p.data.status] ?? p.data.status}
-                </span>
+              <div class="icon-tile tint">
+                <Icon name={p.data.icon ?? 'mingcute:chart-line-line'} size={22} aria-hidden="true" />
               </div>
-              <h3 style="font-size:var(--text-h3);font-weight:var(--fw-heading)">{p.data.name}</h3>
-              <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">
+              <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                <span class="kicker" style="color:var(--hue)">{p.data.platform}</span>
+                <span class="chip chip--sm chip--muted">{statusLabel[p.data.status] ?? p.data.status}</span>
+              </div>
+              <h3 style="font-size:var(--text-h3)">{p.data.name}</h3>
+              <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">
                 {p.data.summary}
               </p>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
                 <span class="chip chip--sm chip--muted">{p.data.market}</span>
                 {p.data.price && <span class="chip chip--sm chip--muted">{p.data.price}</span>}
               </div>
-              <span class="link-more" style="margin-top:auto">View details →</span>
+              <span class="link-more">View details →</span>
             </a>
           ))}
         </div>
@@ -218,19 +207,20 @@ const faq = [
     )}
 
     <!-- Principles -->
-    <Section variant="ink" size="sm">
-      <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
+    <Section variant="alt" rule="top">
+      <span class="eyebrow">Principles</span>
+      <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
         How these are built
       </h2>
-      <PrincipleGrid items={principles} onInk />
+      <PrincipleGrid items={principles} />
     </Section>
 
     <!-- Waitlist -->
-    <Section id="waitlist">
+    <Section id="waitlist" rule="top">
       <div class="card" style="max-width:var(--measure);margin-inline:auto">
-        <span class="accent-rule" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
         <div style="padding:var(--space-500);display:flex;flex-direction:column;gap:var(--space-250)">
-          <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Get the next release first.</h2>
+          <span class="icon-tile tint" style="--hue:var(--hue-amber)"><Icon name="mingcute:mail-send-line" size={20} aria-hidden="true" /></span>
+          <h2 style="font-size:var(--text-h2)">Get the next release first.</h2>
           <p style="margin:0;font-size:var(--text-body);line-height:1.55;color:var(--text-subtle)">
             One email when a tool ships or a waitlist opens. Nothing else.
           </p>

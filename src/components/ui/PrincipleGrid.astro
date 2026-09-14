@@ -1,41 +1,28 @@
 ---
-// The "how we build" 4-up: an accent-tinted icon (or a plain mark), a short
-// title, one line of copy. One component for the four pages that render it,
-// so the block cannot drift.
+// The "how we build" cards, in the home page's principle style: a numbered
+// tinted chip, the icon in the same hue, a title and one line of copy.
 import { Icon } from 'astro-icon/components';
 
 interface Item {
   title: string;
   color: string;
   body: string;
-  /** Iconify name, e.g. 'mingcute:shield-line'. Falls back to the dot. */
   icon?: string;
 }
 interface Props {
   items: Item[];
-  /** On the ink band the copy uses the band's own subtle colour. */
-  onInk?: boolean;
 }
-const { items, onInk = false } = Astro.props;
-const bodyColor = onInk ? 'var(--ink-band-subtle)' : 'var(--text-subtle)';
+const { items } = Astro.props;
 ---
 <div class="grid-4">
-  {items.map((p) => (
-    <div style="display:flex;flex-direction:column;gap:var(--space-125)">
-      {p.icon ? (
-        <span
-          class="icon-tile icon-tile--sm"
-          style={`background:color-mix(in srgb, ${p.color} 14%, transparent);color:${p.color}`}
-        >
-          <Icon name={p.icon} size={20} aria-hidden="true" />
-        </span>
-      ) : (
-        <span class="dot dot--lg" style={`background:${p.color}`} aria-hidden="true"></span>
-      )}
-      <h3 style="font-size:var(--text-body-lg);font-weight:var(--fw-heading)">{p.title}</h3>
-      <p style={`margin:0;font-size:var(--text-ui);line-height:1.55;color:${bodyColor}`}>
-        {p.body}
-      </p>
+  {items.map((p, i) => (
+    <div class="card card--pad" style="gap:var(--space-150)">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span class="step-chip tint" style={`--hue:${p.color}`}>{String(i + 1).padStart(2, '0')}</span>
+        {p.icon && <Icon name={p.icon} size={20} style={`color:${p.color}`} aria-hidden="true" />}
+      </div>
+      <h3 style="font-size:1.125rem">{p.title}</h3>
+      <p style="margin:0;font-size:var(--text-md);line-height:1.55">{p.body}</p>
     </div>
   ))}
 </div>

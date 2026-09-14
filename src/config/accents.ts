@@ -90,3 +90,14 @@ export function accentFor(ids: string[], id: string): Accent {
   const i = ids.indexOf(id);
   return ACCENTS[(i < 0 ? 0 : i) % ACCENTS.length];
 }
+
+/** The kit's chart hues, in the order the home page spends them. Used where a
+    run of items should each read as its own thing (resource rows, highlights). */
+export const HUES = [
+  'var(--hue-blue)',
+  'var(--hue-emerald)',
+  'var(--hue-amber)',
+  'var(--hue-purple)',
+  'var(--hue-cyan)',
+  'var(--hue-red)',
+];

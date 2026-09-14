@@ -5,12 +5,12 @@ import Nav from '../../components/Nav.astro';
 import Footer from '../../components/Footer.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import Section from '../../components/ui/Section.astro';
-import Eyebrow from '../../components/ui/Eyebrow.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
 import Faq from '../../components/ui/Faq.astro';
 import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryPath, projectPath } from '../../config/tracks';
-import { ACCENTS, categoryAccent } from '../../config/accents';
+import { categoryAccent } from '../../config/accents';
 import { breadcrumbLd, collectionPageLd, faqLd } from '../../config/seo';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
@@ -46,7 +46,7 @@ const categoryBoxes = [
     badge: 'Coming soon',
     href: '/contact/',
     // Not a real category yet, so it takes the next free hue in the quad.
-    accent: ACCENTS[3],
+    accent: { name: 'emerald', color: 'var(--hue-emerald)', ink: '' },
     icon: 'mingcute:rocket-line',
   },
 ];
@@ -55,25 +55,25 @@ const principles = [
   {
     title: 'Battle-tested',
     icon: 'mingcute:safety-certificate-line',
-    color: 'var(--acc-1)',
+    color: 'var(--hue-blue)',
     body: 'Running on 100,000+ active sites. Not a demo — code that holds up in the real world.',
   },
   {
     title: 'Open source, always',
     icon: 'mingcute:code-line',
-    color: 'var(--acc-2)',
+    color: 'var(--hue-purple)',
     body: 'GPL-licensed and public on WordPress.org and Packagist. Read it, fork it, trust it.',
   },
   {
     title: 'Documented & supported',
     icon: 'mingcute:book-2-line',
-    color: 'var(--acc-3)',
+    color: 'var(--hue-amber)',
     body: 'Clear docs and changelogs. Your question reaches the person who wrote the code.',
   },
   {
     title: 'Free core, paid power',
     icon: 'mingcute:plugin-2-line',
-    color: 'var(--acc-4)',
+    color: 'var(--hue-emerald)',
     body: 'Every plugin is free and complete. Optional add-ons extend it — still GPL-licensed.',
   },
 ];
@@ -132,33 +132,26 @@ const faq = [
   <Nav />
   <main id="main">
     <!-- Hero -->
-    <section class="band band--sm band--bottom">
-      <div class="container-x">
-        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start;max-width:760px">
-          <Eyebrow chip color="var(--acc-1)">Software</Eyebrow>
-          <h1 style="font-size:var(--text-title);letter-spacing:-1.2px">
-            Tools we've shipped and kept shipping.
-          </h1>
-          <p style="margin:0;max-width:560px;font-size:1.125rem;line-height:1.5;color:var(--text-subtle)">
-            Open-source WordPress plugins and PHP libraries — GPL-licensed, documented, and
-            maintained in public. The same engineering that goes into everything we build.
-          </p>
-          {GITHUB_URL && (
-            <a href={GITHUB_URL} class="btn btn--ghost" target="_blank" rel="noopener noreferrer">
-              <Icon name="mingcute:github-line" size={18} aria-hidden="true" />
-              View on GitHub
-            </a>
-          )}
-        </div>
-      </div>
-    </section>
+    <PageHeader
+      eyebrow="Open source since 2014"
+      color="var(--hue-emerald)"
+      title="Tools we've shipped and kept shipping."
+      lead="Open-source WordPress plugins and PHP libraries — GPL-licensed, documented, and maintained in public. The same engineering that goes into everything we build."
+    >
+      {GITHUB_URL && (
+        <a href={GITHUB_URL} class="btn btn--ghost" target="_blank" rel="noopener noreferrer">
+          <Icon name="mingcute:github-line" size={16} aria-hidden="true" />
+          View on GitHub
+        </a>
+      )}
+    </PageHeader>
 
     <!-- Proof -->
-    <section class="band--subtle band--bottom">
+    <section class="band--bottom">
       <div class="container-x">
         <div class="stat-row">
           {stats.map((s) => (
-            <div style="padding:var(--space-350) var(--space-300);text-align:center">
+            <div style="padding:var(--space-350) var(--space-300)">
               <div class="stat__value">{s.value}</div>
               <div class="stat__label">{s.label}</div>
             </div>
@@ -168,8 +161,9 @@ const faq = [
     </section>
 
     <!-- Categories -->
-    <Section>
-      <h2 style="margin-bottom:var(--space-150);font-size:var(--text-h2-lg);letter-spacing:-0.8px">
+    <Section variant="alt" rule="top">
+      <span class="eyebrow">Categories</span>
+      <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">
         Three shelves, one standard.
       </h2>
       <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
@@ -178,35 +172,28 @@ const faq = [
       </p>
       <div class="grid-3">
         {categoryBoxes.map((box) => (
-          <a
-            href={box.href}
-            class="card card--pad"
-            style={`gap:var(--space-150);padding:var(--space-400);border-top:4px solid ${box.accent.color}`}
-          >
-            <div class="icon-tile" style={`background:color-mix(in srgb, ${box.accent.color} 10%, transparent);color:${box.accent.color}`}>
-              <Icon name={box.icon} size={24} aria-hidden="true" />
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-              <h3 style="font-size:var(--text-h3)">{box.title}</h3>
-              <span class="badge">
-                {box.badge}
+          <a href={box.href} class="card card--pad card--hover" style="gap:var(--space-200)">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-200)">
+              <span class="icon-tile tint" style={`--hue:${box.accent.color}`}>
+                <Icon name={box.icon} size={20} aria-hidden="true" />
               </span>
+              <span class="kicker" style={`color:${box.accent.color}`}>{box.badge}</span>
             </div>
-            <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
-              {box.description}
-            </p>
-            <span class="link-more" style="margin-top:auto">Explore →</span>
+            <h3 style="font-size:var(--text-h3)">{box.title}</h3>
+            <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">{box.description}</p>
+            <span class="link-more">Explore {box.title.toLowerCase()} →</span>
           </a>
         ))}
       </div>
     </Section>
 
     <!-- Principles -->
-    <Section variant="ink" size="sm">
-      <h2 style="margin-bottom:var(--space-500);font-size:var(--text-h2);letter-spacing:-0.6px">
+    <Section rule="top">
+      <span class="eyebrow">Principles</span>
+      <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
         Why these are worth installing
       </h2>
-      <PrincipleGrid items={principles} onInk />
+      <PrincipleGrid items={principles} />
     </Section>
 
     <Section variant="alt" rule="top">

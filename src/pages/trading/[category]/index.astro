@@ -76,27 +76,24 @@ const statusLabel: Record<string, string> = {
           {products.map((p) => (
             <a
               href={projectPath('trading', p.data.category, p.id)}
-              class="card card--pad"
-              style={`gap:var(--space-150);padding:var(--space-300);border-top:4px solid ${accentFor(productIds, p.id).color}`}
+              class="card card--pad card--hover" style={`gap:var(--space-150);--hue:${accentFor(productIds, p.id).color}`}
             >
-              <div class="icon-tile" style={`background:color-mix(in srgb, ${accentFor(productIds, p.id).color} 10%, transparent);color:${accentFor(productIds, p.id).color}`}>
+              <div class="icon-tile tint">
                 <Icon name={p.data.icon ?? tileIcon} size={24} aria-hidden="true" />
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-                <span class="kicker">{p.data.platform}</span>
-                <span class="badge">
-                  {statusLabel[p.data.status] ?? p.data.status}
-                </span>
+                <span class="kicker" style="color:var(--hue)">{p.data.platform}</span>
+                <span class="chip chip--sm chip--muted">{statusLabel[p.data.status] ?? p.data.status}</span>
               </div>
-              <h2 style="font-size:var(--text-h3);font-weight:var(--fw-heading)">{p.data.name}</h2>
-              <p style="margin:0;font-size:var(--text-ui);line-height:1.55;color:var(--text-subtle)">
+              <h2 style="font-size:var(--text-h3)">{p.data.name}</h2>
+              <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">
                 {p.data.summary}
               </p>
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
                 <span class="chip chip--sm chip--muted">{p.data.market}</span>
                 {p.data.price && <span class="chip chip--sm chip--muted">{p.data.price}</span>}
               </div>
-              <span class="link-more" style="margin-top:auto">View details →</span>
+              <span class="link-more">View details →</span>
             </a>
           ))}
         </div>

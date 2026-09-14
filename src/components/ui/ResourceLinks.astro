@@ -1,0 +1,62 @@
+---
+// Resource rows for purchase and fact cards: a tinted icon tile per link, the
+// label, and an arrow that nudges on hover. Each row takes the next hue so the
+// list reads at a glance instead of as a column of grey text links.
+import { Icon } from 'astro-icon/components';
+import { HUES } from '../../config/accents';
+
+export interface ResourceLink {
+  href: string;
+  label: string;
+  /** Iconify name; guessed from the label when omitted. */
+  icon?: string;
+  /** Small grey line under the label, e.g. the destination. */
+  hint?: string;
+}
+
+interface Props {
+  links: ResourceLink[];
+}
+
+const { links } = Astro.props;
+
+const guessIcon = (label: string) => {
+  const l = label.toLowerCase();
+  if (l.includes('doc')) return 'mingcute:book-2-line';
+  if (l.includes('changelog')) return 'mingcute:history-line';
+  if (l.includes('support')) return 'mingcute:chat-3-line';
+  if (l.includes('github') || l.includes('source')) return 'mingcute:github-line';
+  if (l.includes('demo') || l.includes('download')) return 'mingcute:download-2-line';
+  if (l.includes('signal')) return 'mingcute:heartbeat-line';
+  if (l.includes('wordpress')) return 'mingcute:world-2-line';
+  if (l.includes('packagist')) return 'mingcute:box-2-line';
+  return 'mingcute:link-line';
+};
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+---
+<ul class="resource-links">
+  {links.map((l, i) => (
+    <li>
+      <a
+        href={l.href}
+        class="resource-link"
+        style={`--hue:${HUES[i % HUES.length]}`}
+        {...(isExternal(l.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      >
+        <span class="resource-link__icon tint" aria-hidden="true">
+          <Icon name={l.icon ?? guessIcon(l.label)} size={18} />
+        </span>
+        <span class="resource-link__text">
+          <span class="resource-link__label">{l.label}</span>
+          {l.hint && <span class="resource-link__hint">{l.hint}</span>}
+        </span>
+        <Icon
+          name={isExternal(l.href) ? 'mingcute:arrow-right-up-line' : 'mingcute:arrow-right-line'}
+          size={16}
+          class="resource-link__arrow"
+          aria-hidden="true"
+        />
+      </a>
+    </li>
+  ))}
+</ul>
