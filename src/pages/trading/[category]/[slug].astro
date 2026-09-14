@@ -107,7 +107,7 @@ const resourceLinks = [
     <!-- Hero -->
     <section class="page-hero">
       <div class="cellgrid" aria-hidden="true"></div>
-      <div class="container-x product-hero">
+      <div class="container-x split-hero" style="position:relative">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
           <a href={categoryPath('trading', data.category)} class="link-more">
             ← All {cat?.label ?? 'trading tools'}
@@ -255,18 +255,10 @@ const resourceLinks = [
     .spec-grid { grid-template-columns: 1fr; }
   }
 
-  .product-hero {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: var(--space-700);
-  }
   /* One measured column at the compact reading scale — the bodies here are
      short sections, not articles, so they get less air than blog prose. */
   .what {
     max-width: 720px;
     margin-inline: auto;
-  }
-  @media (max-width: 960px) {
-    .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
   }
 </style>

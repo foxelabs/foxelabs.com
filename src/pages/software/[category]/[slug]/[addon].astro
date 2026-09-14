@@ -100,7 +100,7 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
     <!-- Hero -->
     <section class="page-hero">
       <div class="cellgrid" aria-hidden="true"></div>
-      <div class="container-x addon-hero">
+      <div class="container-x split-hero" style="position:relative">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
           <a href={parentUrl} class="link-more">
             ← All {parent.data.name} add-ons
@@ -179,13 +179,3 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
   <Footer />
 </BaseLayout>
 
-<style>
-  .addon-hero {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: var(--space-700);
-  }
-  @media (max-width: 960px) {
-    .addon-hero { grid-template-columns: 1fr; gap: var(--space-500); }
-  }
-</style>

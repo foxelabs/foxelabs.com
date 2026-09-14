@@ -1,0 +1,41 @@
+---
+// The "door" card: tinted icon tile, hue kicker, title, one paragraph, and a
+// trailing link. Used for the home/about track doors and the hub category
+// boxes — the whole card is the link when `linkCard` is set, otherwise the
+// trail line is.
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  title: string;
+  body: string;
+  /** CSS colour for the tile tint and kicker — a var() from the quad. */
+  hue: string;
+  icon: string;
+  /** Uppercase micro-label beside the tile (e.g. "Open source · GPL"). */
+  kicker: string;
+  /** Text of the trailing link; an arrow is appended. */
+  trail: string;
+  href: string;
+  /** Make the whole card the anchor (category boxes) instead of the trail. */
+  linkCard?: boolean;
+  id?: string;
+}
+
+const { title, body, hue, icon, kicker, trail, href, linkCard = false, id } = Astro.props;
+const Tag = linkCard ? 'a' : 'div';
+---
+<Tag class="card card--pad card--hover" id={id} href={linkCard ? href : undefined} style="gap:var(--space-200)">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-200)">
+    <span class="icon-tile tint" style={`--hue:${hue}`}>
+      <Icon name={icon} size={20} aria-hidden="true" />
+    </span>
+    <span class="kicker" style={`color:${hue}`}>{kicker}</span>
+  </div>
+  <h3 style="font-size:var(--text-h3)">{title}</h3>
+  <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">{body}</p>
+  {linkCard ? (
+    <span class="link-more">{trail} →</span>
+  ) : (
+    <a href={href} class="link-more">{trail} →</a>
+  )}
+</Tag>

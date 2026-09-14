@@ -30,7 +30,9 @@ const {
     <div class="faq">
       {items.map((item, i) => (
         <details class="faq__item" open={openFirst && i === 0}>
-          <summary class="faq__q">{item.q}</summary>
+          {/* Inline h3 so screen-reader users can jump between questions by
+              heading; font:inherit keeps the summary's own type. */}
+          <summary class="faq__q"><h3 style="display:inline;margin:0;font:inherit;letter-spacing:inherit;color:inherit">{item.q}</h3></summary>
           <p class="faq__a">{item.a}</p>
         </details>
       ))}

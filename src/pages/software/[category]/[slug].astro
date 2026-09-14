@@ -141,7 +141,7 @@ const facts = [
     <!-- Hero -->
     <section class="page-hero">
       <div class="cellgrid" aria-hidden="true"></div>
-      <div class="container-x product-hero">
+      <div class="container-x split-hero" style="position:relative">
         <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
           <a href={categoryPath('oss', data.category)} class="link-more">
             ← All {cat?.label ?? 'software'}
@@ -306,19 +306,11 @@ const facts = [
 </BaseLayout>
 
 <style>
-  .product-hero {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr;
-    gap: var(--space-700);
-  }
   .fact-grid {
     margin: 0;
     padding: var(--space-300);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-250) var(--space-200);
-  }
-  @media (max-width: 960px) {
-    .product-hero { grid-template-columns: 1fr; gap: var(--space-500); }
   }
 </style>

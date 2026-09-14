@@ -11,10 +11,12 @@ interface Item {
 }
 interface Props {
   items: Item[];
+  /** Cards per row on wide screens (defaults to 4). */
+  columns?: 2 | 3 | 4;
 }
-const { items } = Astro.props;
+const { items, columns = 4 } = Astro.props;
 ---
-<div class="grid-4">
+<div class={`grid-${columns}`}>
   {items.map((p, i) => (
     <div class="card card--pad" style="gap:var(--space-150)">
       <div style="display:flex;align-items:center;justify-content:space-between">

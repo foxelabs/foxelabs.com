@@ -9,6 +9,7 @@ import Section from '../../components/ui/Section.astro';
 import PageHeader from '../../components/ui/PageHeader.astro';
 import Faq from '../../components/ui/Faq.astro';
 import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
+import TrackCard from '../../components/ui/TrackCard.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryPath, projectPath } from '../../config/tracks';
 import { accentFor, categoryAccent } from '../../config/accents';
@@ -158,17 +159,16 @@ const faq = [
       </p>
       <div class="grid-2">
         {categoryBoxes.map((box) => (
-          <a href={box.href} class="card card--pad card--hover" style="gap:var(--space-200)">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-200)">
-              <span class="icon-tile tint" style={`--hue:${box.accent.color}`}>
-                <Icon name={box.icon} size={20} aria-hidden="true" />
-              </span>
-              <span class="kicker" style={`color:${box.accent.color}`}>{box.badge}</span>
-            </div>
-            <h3 style="font-size:var(--text-h3)">{box.title}</h3>
-            <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">{box.description}</p>
-            <span class="link-more">Explore {box.title.toLowerCase()} →</span>
-          </a>
+          <TrackCard
+            linkCard
+            title={box.title}
+            body={box.description}
+            hue={box.accent.color}
+            icon={box.icon}
+            kicker={box.badge}
+            trail={`Explore ${box.title.toLowerCase()}`}
+            href={box.href}
+          />
         ))}
       </div>
     </Section>

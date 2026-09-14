@@ -1095,6 +1095,17 @@ textarea.field { resize: vertical; min-height: 120px; }
   opacity: 0.5;
 }
 
+/* Two-column hero split: copy on the left, a card (pricing, portrait) on the
+   right. Pages that need a different ratio or gap override those two lines. */
+.split-hero {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: var(--space-700);
+}
+@media (max-width: 960px) {
+  .split-hero { grid-template-columns: 1fr; gap: var(--space-500); }
+}
+
 /* Inner-page hero: the home hero's dot grid and air, without the constellation. */
 .page-hero {
   position: relative;

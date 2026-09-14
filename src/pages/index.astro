@@ -7,6 +7,8 @@ import Footer from '../components/Footer.astro';
 import CtaBanner from '../components/CtaBanner.astro';
 import Section from '../components/ui/Section.astro';
 import Faq from '../components/ui/Faq.astro';
+import TrackCard from '../components/ui/TrackCard.astro';
+import PrincipleGrid from '../components/ui/PrincipleGrid.astro';
 import { Image } from 'astro:assets';
 import { faqLd } from '../config/seo';
 import { topicOf } from '../config/tracks';
@@ -201,19 +203,16 @@ const faq = [
       </h2>
       <div class="grid-2">
         {tracks.map((track) => (
-          <div class="card card--pad card--hover" id={track.id} style="gap:var(--space-200)">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-200)">
-              <span class="icon-tile tint" style={`--hue:${track.hue}`}>
-                <Icon name={track.icon} size={20} aria-hidden="true" />
-              </span>
-              <span class="kicker" style={`color:${track.hue}`}>{track.label}</span>
-            </div>
-            <h3 style="font-size:var(--text-h3)">{track.title}</h3>
-            <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">
-              {track.body}
-            </p>
-            <a href={track.href} class="link-more">{track.trail} →</a>
-          </div>
+          <TrackCard
+            id={track.id}
+            title={track.title}
+            body={track.body}
+            hue={track.hue}
+            icon={track.icon}
+            kicker={track.label}
+            trail={track.trail}
+            href={track.href}
+          />
         ))}
       </div>
     </Section>
@@ -224,18 +223,7 @@ const faq = [
       <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
         The discipline is the product
       </h2>
-      <div class="grid-3">
-        {principles.map((p) => (
-          <div class="card card--pad" style="gap:var(--space-150)">
-            <div style="display:flex;align-items:center;justify-content:space-between">
-              <span class="step-chip tint" style={`--hue:${p.hue}`}>{p.n}</span>
-              <Icon name={p.icon} size={20} style={`color:${p.hue}`} aria-hidden="true" />
-            </div>
-            <h3 style="font-size:1.25rem">{p.title}</h3>
-            <p style="margin:0;font-size:var(--text-md);line-height:1.55">{p.body}</p>
-          </div>
-        ))}
-      </div>
+      <PrincipleGrid columns={3} items={principles.map((p) => ({ title: p.title, color: p.hue, icon: p.icon, body: p.body }))} />
     </Section>
 
     <!-- Latest writing -->
