@@ -70,14 +70,6 @@ const structuredData = [
   ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
 ];
 
-// Hero fact tiles — each its own hue so the essentials read at a glance.
-const heroFacts = [
-  { icon: 'mingcute:copper-coin-line', label: 'Market', value: data.market, hue: 'var(--hue-amber)' },
-  { icon: 'mingcute:chart-bar-line', label: 'Platform', value: data.platform, hue: 'var(--hue-blue)' },
-  data.version && { icon: 'mingcute:git-merge-line', label: 'Version', value: data.version, hue: 'var(--hue-purple)' },
-  data.price && { icon: 'mingcute:wallet-4-line', label: 'Price', value: data.price.split('·')[0].trim(), hue: 'var(--hue-emerald)' },
-].filter(Boolean) as { icon: string; label: string; value: string; hue: string }[];
-
 // Spec rows get an icon by label; unknown labels fall back to a plain dot.
 const specIcon: Record<string, string> = {
   symbol: 'mingcute:copper-coin-line',
@@ -127,27 +119,11 @@ const resourceLinks = [
             {data.tagline}
           </p>
 
-          {heroFacts.length > 0 && (
-            <dl class="fact-tiles">
-              {heroFacts.map((f) => (
-                <div class="fact-tile" style={`--hue:${f.hue}`}>
-                  <span class="fact-tile__icon tint" aria-hidden="true"><Icon name={f.icon} size={18} /></span>
-                  <div>
-                    <dt class="kicker">{f.label}</dt>
-                    <dd>{f.value}</dd>
-                  </div>
-                </div>
-              ))}
-            </dl>
-          )}
-
           {data.features.length > 0 && (
-            <ul class="feature-list">
-              {data.features.map((f, i) => (
-                <li style={`--hue:${HUES[i % HUES.length]}`}>
-                  <span class="feature-list__tick tint" aria-hidden="true">
-                    <Icon name="mingcute:check-line" size={14} />
-                  </span>
+            <ul class="dot-list" style={`--dot-hue:${accent.color};margin-top:var(--space-150);font-size:var(--text-md);line-height:1.5`}>
+              {data.features.map((f) => (
+                <li>
+                  <Icon name="mingcute:check-line" size={16} style="color:var(--text-faint);flex:none" aria-hidden="true" />
                   <span>{f}</span>
                 </li>
               ))}
@@ -270,52 +246,6 @@ const resourceLinks = [
   .spec-grid dd { margin: 0; text-align: right; font-weight: var(--fw-medium); }
   @media (max-width: 620px) {
     .spec-grid { grid-template-columns: 1fr; }
-  }
-
-  .fact-tiles {
-    margin: var(--space-100) 0 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: var(--space-125);
-    width: 100%;
-  }
-  .fact-tile {
-    display: flex;
-    align-items: center;
-    gap: var(--space-125);
-    padding: var(--space-125) var(--space-150);
-    border: 1px solid color-mix(in srgb, var(--hue) 28%, var(--border));
-    border-radius: var(--r-md);
-    background: color-mix(in srgb, var(--hue) 5%, var(--bg-card));
-  }
-  .fact-tile__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: var(--r-sm);
-    flex: none;
-  }
-  .fact-tile dd { margin: 2px 0 0; font-size: var(--text-md); font-weight: var(--fw-heading); color: var(--text); }
-  .feature-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-125);
-    margin-top: var(--space-100);
-    font-size: var(--text-md);
-    line-height: 1.5;
-  }
-  .feature-list li { display: flex; align-items: flex-start; gap: var(--space-125); }
-  .feature-list__tick {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    margin-top: 1px;
-    border-radius: 999px;
-    flex: none;
   }
 
   .product-hero {

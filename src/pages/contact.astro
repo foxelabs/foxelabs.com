@@ -203,17 +203,13 @@ const topics = [
   .topic-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-125);
+    gap: var(--space-250) var(--space-200);
     width: 100%;
   }
   .topic {
     display: flex;
     gap: var(--space-125);
     align-items: flex-start;
-    padding: var(--space-150);
-    border: 1px solid color-mix(in srgb, var(--hue) 26%, var(--border));
-    border-radius: var(--r-md);
-    background: color-mix(in srgb, var(--hue) 5%, var(--bg-card));
   }
   .topic > span:last-child { display: flex; flex-direction: column; gap: 2px; }
   .topic strong { font-size: var(--text-md); color: var(--text); font-weight: var(--fw-heading); }
