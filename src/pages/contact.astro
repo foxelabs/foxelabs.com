@@ -57,7 +57,7 @@ const topics = [
             <span class="sync-dot" aria-hidden="true"></span>
             Replies within a working day
           </span>
-          <h1 style="font-size:var(--text-hero);line-height:1.05">Say <span class="contact-mark">hello.</span></h1>
+          <h1 style="font-size:var(--text-hero);line-height:1.05">Say <span class="mark-underline">hello.</span></h1>
           <p style="margin:0;font-size:var(--text-lead);line-height:1.55;color:var(--text-subtle)">
             A plugin question, an EA idea, licensing, or a custom build — send it over. No ticket
             queues, no tier one: your message lands in the inbox of the team that wrote the code.
@@ -94,7 +94,7 @@ const topics = [
               <h2 class="kicker" style="color:var(--hue-blue)">The studio</h2>
               <div class="social-row">
                 {SOCIALS.map((s) => (
-                  <a href={s.href} class="social-btn" aria-label={s.label} target="_blank" rel="noopener noreferrer">
+                  <a href={s.href} class="social-btn" aria-label={`${s.label} (opens in new tab)`} target="_blank" rel="noopener noreferrer">
                     <Icon name={s.icon} width={16} height={16} aria-hidden="true" />
                   </a>
                 ))}
@@ -107,7 +107,7 @@ const topics = [
                   <a
                     href={s.href}
                     class="social-btn"
-                    aria-label={`Joel James on ${s.platform} — ${s.label}`}
+                    aria-label={`Joel James on ${s.platform} — ${s.label} (opens in new tab)`}
                     title={s.label}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -178,22 +178,6 @@ const topics = [
     font-weight: var(--fw-medium);
   }
 
-  .hero-glow { position: absolute; width: 720px; height: 560px; pointer-events: none; }
-  .hero-glow--amber {
-    top: -180px; right: -120px;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--hue-amber) 9%, transparent), transparent);
-  }
-  .hero-glow--emerald {
-    bottom: -220px; left: -140px;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--hue-emerald) 8%, transparent), transparent);
-  }
-  .contact-mark { position: relative; display: inline-block; }
-  .contact-mark::after {
-    content: '';
-    position: absolute; left: 0; right: 0; bottom: 0.08em; height: 0.18em;
-    background: color-mix(in srgb, var(--hue-amber) 22%, transparent);
-    z-index: -1;
-  }
   .topic-list {
     display: flex;
     flex-direction: column;

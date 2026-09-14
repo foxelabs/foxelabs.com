@@ -3,19 +3,24 @@ interface Props {
   id?: string;
   buttonLabel?: string;
 }
-const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
+// Each instance needs its own id, or two forms on one page cross-wire their
+// aria-describedby error references.
+const uid = crypto.randomUUID().slice(0, 8);
+const { id = `email-form-${uid}`, buttonLabel = 'Get early access' } = Astro.props;
 ---
 <form data-email-form id={id} novalidate style="width:100%">
   <!-- Honeypot: humans never see it; bots that fill it get a fake 200. -->
   <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="display:none" />
 
+  <label class="field-label" for={`${id}-email`} style="margin-bottom:6px">Email address</label>
   <div data-fields class="email-row">
     <input
+      id={`${id}-email`}
       type="email"
       name="email"
       required
+      autocomplete="email"
       placeholder="you@domain.com"
-      aria-label="Email address"
       aria-describedby={`${id}-error`}
       class="field"
       style="flex:1"
@@ -75,8 +80,10 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
       var defaultError = errorEl.textContent;
 
       function setLoading(loading) {
-        button.disabled = loading;
-        input.disabled = loading;
+        // aria-disabled + readOnly instead of disabled: a disabled control
+        // drops keyboard focus to <body> mid-request; a read-only one keeps it.
+        button.setAttribute('aria-disabled', String(loading));
+        input.readOnly = loading;
         labelText.textContent = loading ? 'Sending…' : idleLabel;
       }
 
@@ -105,7 +112,18 @@ const { id = 'email-form', buttonLabel = 'Get early access' } = Astro.props;
               website: form.querySelector('input[name="website"]').value,
             }),
           });
-          if (!res.ok) throw new Error('request failed');
+          if (!res.ok) {
+            var detail = null;
+            try { detail = (await res.json()).error; } catch (_) {}
+            errorEl.textContent =
+              res.status === 429
+                ? 'Too many requests — wait a minute and try again.'
+                : detail || defaultError;
+            errorEl.hidden = false;
+            setLoading(false);
+            form.dataset.submitting = '0';
+            return;
+          }
           fields.hidden = true;
           success.hidden = false;
           success.focus();

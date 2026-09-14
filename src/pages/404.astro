@@ -21,14 +21,14 @@ const shortcuts = [
         <span class="fourohfour__digit">4</span>
         <span class="quad-block">
           <span style="background:var(--acc-1)"></span>
-          <span style="background:var(--acc-2)"></span>
           <span style="background:var(--acc-4)"></span>
           <span style="background:var(--acc-3)"></span>
+          <span style="background:var(--acc-2)"></span>
         </span>
         <span class="fourohfour__digit">4</span>
       </div>
 
-      <h1 style="font-size:2.125rem;letter-spacing:-0.7px">This page doesn't exist.</h1>
+      <h1 style="font-size:2.125rem;letter-spacing:-0.015em">This page doesn't exist.</h1>
       <p style="margin:0;font-size:var(--text-body-lg);line-height:1.6;color:var(--text-subtle)">
         The link is broken, moved, or never was. We've spent a decade redirecting sites past dead
         ends like this one. Consider yourself redirected.
@@ -42,7 +42,7 @@ const shortcuts = [
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:var(--space-150)">
         {shortcuts.map((s) => (
           <a href={s.href} class="chip">
-            <span class="dot" style={`background:${s.color}`} aria-hidden="true"></span>
+            <span class="dot dot--round" style={`background:${s.color}`} aria-hidden="true"></span>
             {s.label}
           </a>
         ))}

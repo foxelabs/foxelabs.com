@@ -245,9 +245,9 @@ If you've made it this far, the through-line is obvious: WordPress has every pie
 of information you need in the database, but no UI to look at it. The fastest way to
 close that gap is to add the missing UI.
 
-The free [Loggedin plugin](/software/plugins/loggedin) already adds a
+The free [Loggedin plugin](/software/plugins/loggedin/) already adds a
 concurrent-login limit and a Force Logout panel to the **Users → Loggedin** screen.
-Its [Active Sessions add-on](/software/plugins/loggedin/active-sessions) extends
+Its [Active Sessions add-on](/software/plugins/loggedin/active-sessions/) extends
 that screen with a dedicated **Sessions** tab showing every user with at least one
 live session, in one sortable, searchable list:
 
@@ -298,10 +298,10 @@ ships the API; you just have to call it.
 - **All sessions for a user, in code:** `WP_Session_Tokens::get_instance( $user_id )->destroy_all();`
 - **All sessions for a user, in WP-CLI:** `wp user session destroy <user>`
 - **All sessions for a user, in the admin:** the core
-  [Loggedin plugin](/software/plugins/loggedin)'s Force Logout panel (free) accepts
+  [Loggedin plugin](/software/plugins/loggedin/)'s Force Logout panel (free) accepts
   a user ID, email, or username and clears them in one click.
 - **Per-device sign-out in the admin:** the
-  [Active Sessions add-on](/software/plugins/loggedin/active-sessions)'s per-user
+  [Active Sessions add-on](/software/plugins/loggedin/active-sessions/)'s per-user
   modal — the only built-in option here that lets you revoke a single device
   without disturbing the others.
 
@@ -309,7 +309,7 @@ A signed-out user won't be notified, but the next page they try to load (or the 
 AJAX request from an already-open tab) will redirect them to `wp-login`. If you want
 that to happen the moment you click — without waiting for the user's next click —
 pair Loggedin with its
-[Real-time Logout add-on](/software/plugins/loggedin/realtime-logout), which reloads
+[Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/), which reloads
 the user's open tabs the moment their session ends.
 
 ## Wrapping up

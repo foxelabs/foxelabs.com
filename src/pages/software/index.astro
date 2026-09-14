@@ -10,7 +10,7 @@ import Faq from '../../components/ui/Faq.astro';
 import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
 import { Icon } from 'astro-icon/components';
 import { categoryPath, projectPath } from '../../config/tracks';
-import { categoryAccent } from '../../config/accents';
+import { accentNamed, categoryAccent } from '../../config/accents';
 import { breadcrumbLd, collectionPageLd, faqLd } from '../../config/seo';
 
 // GitHub org where the source lives (libraries here today; plugins moving over).
@@ -46,7 +46,7 @@ const categoryBoxes = [
     badge: 'Coming soon',
     href: '/contact/',
     // Not a real category yet, so it takes the next free hue in the quad.
-    accent: { name: 'emerald', color: 'var(--hue-emerald)', ink: '' },
+    accent: accentNamed('emerald'),
     icon: 'mingcute:rocket-line',
   },
 ];

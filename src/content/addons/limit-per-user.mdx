@@ -81,7 +81,7 @@ deletes the row rather than leaving dead data in `usermeta`.
 
 When several limit add-ons are active, per-user always wins:
 
-**per-user → [per-role](/software/plugins/loggedin/limit-per-role) → global.**
+**per-user → [per-role](/software/plugins/loggedin/limit-per-role/) → global.**
 
 An account with a per-user override uses that value regardless of any role
 limit. Only the number changes — your chosen login logic (block the new
@@ -95,6 +95,6 @@ protected by a nonce and the `edit_user` capability, so nobody can raise
 their own limit through a crafted request.
 
 Managing caps for whole groups rather than individuals? Use
-[Limit Per Role](/software/plugins/loggedin/limit-per-role) for the bulk of
+[Limit Per Role](/software/plugins/loggedin/limit-per-role/) for the bulk of
 your site and keep this add-on for the handful of accounts that are genuine
 exceptions.

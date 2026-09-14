@@ -71,7 +71,7 @@ const { id, shots, heading, lead, hue = 'var(--hue-blue)' } = Astro.props;
       <div class="tour-panel__copy">
         {shot.crumb && (
           <span class="chip chip--sm chip--muted mono" style="align-self:flex-start">
-            <span class="dot dot--sm" style={`background:${hue};border-radius:999px`} aria-hidden="true"></span>
+            <span class="dot dot--sm dot--round" style={`background:${hue}`} aria-hidden="true"></span>
             {shot.crumb}
           </span>
         )}

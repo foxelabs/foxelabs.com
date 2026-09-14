@@ -83,7 +83,7 @@ rules conflict the loose value is the safe one — nobody should be locked out
 of their account because a sibling role was configured more tightly.
 
 Worth knowing if you also run
-[Auto Logout](/software/plugins/loggedin/auto-logout): its per-role idle
+[Auto Logout](/software/plugins/loggedin/auto-logout/): its per-role idle
 timeouts resolve the opposite way, shortest wins, because an idle timeout
 only ends a session nobody is using. A user's extra role can *raise* their
 session limit and *lower* their idle timeout.
@@ -95,6 +95,6 @@ new login, log out the oldest session, or log out all of them. Limit Per
 Role changes how many sessions a user is allowed, not what happens when they
 exceed it.
 
-Running [Limit Per User](/software/plugins/loggedin/limit-per-user) too?
+Running [Limit Per User](/software/plugins/loggedin/limit-per-user/) too?
 Per-user overrides take precedence over these role limits:
 **per-user → per-role → global.**

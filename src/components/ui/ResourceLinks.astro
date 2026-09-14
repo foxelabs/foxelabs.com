@@ -50,6 +50,7 @@ const isExternal = (href: string) => /^https?:\/\//.test(href);
           <span class="resource-link__label">{l.label}</span>
           {l.hint && <span class="resource-link__hint">{l.hint}</span>}
         </span>
+        {isExternal(l.href) && <span class="sr-only">(opens in new tab)</span>}
         <Icon
           name={isExternal(l.href) ? 'mingcute:arrow-right-up-line' : 'mingcute:arrow-right-line'}
           size={16}

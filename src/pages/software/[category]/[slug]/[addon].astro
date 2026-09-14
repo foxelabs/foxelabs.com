@@ -64,9 +64,6 @@ const metaDescription = data.seoDescription ?? data.summary;
 
 const catLabel = categoryMeta('oss', parent.data.category)?.label ?? 'Software';
 const shotUrls = data.screenshots.map((s) => s.src.src);
-const priceMatch = data.price?.match(/([\d.]+)/);
-// "From $X" is tiered pricing — a flat Offer price would misstate it.
-const isFromPrice = /^from/i.test(data.price ?? '');
 const structuredData = [
   breadcrumbLd([
     { name: 'Home', path: '/' },
@@ -83,8 +80,9 @@ const structuredData = [
     // freeform 'WordPress Plugin' string is not a recognised category.
     applicationCategory: 'DeveloperApplication',
     operatingSystem: 'WordPress',
-    offerPrice: isFromPrice ? undefined : priceMatch?.[1],
-    offerLowPrice: isFromPrice ? priceMatch?.[1] : undefined,
+    // No Offer node while tier/price/purchase URLs are placeholders — answer
+    // engines quote machine-readable prices verbatim. Restore offerPrice /
+    // offerLowPrice once pricing is final.
     sameAs: data.url ? [data.url] : undefined,
     screenshot: shotUrls,
   }),
@@ -110,7 +108,7 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <span class="chip chip--sm chip--muted chip--solid">
-              <span class="dot dot--sm" style={`background:${accent.color};border-radius:999px`} aria-hidden="true"></span>
+              <span class="dot dot--sm dot--round" style={`background:${accent.color}`} aria-hidden="true"></span>
               {parent.data.name} add-on
             </span>
             {data.location && <span class="chip chip--sm chip--muted">{data.location}</span>}

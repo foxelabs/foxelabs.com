@@ -8,6 +8,7 @@
         Name
         <input
           id="c-name" type="text" name="name" required maxlength="120" placeholder="Your name"
+          autocomplete="name"
           class="field"
         />
       </label>
@@ -15,6 +16,7 @@
         Email
         <input
           id="c-email" type="email" name="email" required placeholder="you@example.com"
+          autocomplete="email"
           class="field"
         />
       </label>
@@ -152,7 +154,18 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
-        if (!res.ok) throw new Error('request failed');
+        if (!res.ok) {
+          var detail = null;
+          try { detail = (await res.json()).error; } catch (_) {}
+          errorEl.textContent =
+            res.status === 429
+              ? 'Too many requests — wait a minute and try again.'
+              : (detail || 'Something went wrong.') + ' Or email support@foxelabs.com.';
+          errorEl.hidden = false;
+          setLoading(false);
+          form.dataset.submitting = '0';
+          return;
+        }
         fields.hidden = true;
         success.hidden = false;
         success.focus();

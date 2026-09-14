@@ -9,9 +9,9 @@ import PostCard from '../../components/PostCard.astro';
 import Faq from '../../components/ui/Faq.astro';
 import { Icon } from 'astro-icon/components';
 import { articleLd, breadcrumbLd, faqLd, SITE } from '../../config/seo';
-import { topicAccent } from '../../config/accents';
+import { accentFor, topicAccent } from '../../config/accents';
 import { topicOf } from '../../config/tracks';
-import { tagLabel, tagPath, topicPath } from '../../config/blog';
+import { tagIndex, tagLabel, tagPath, tagSlug, topicPath } from '../../config/blog';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
@@ -40,6 +40,10 @@ const related = [
 ].slice(0, 3);
 
 const shareUrl = `${SITE.url}/blog/${post.id}/`;
+
+// Tag hue is positional within the full tag list — the same scheme the tag
+// archive headers use — so a tag keeps one colour wherever it appears.
+const tagOrder = tagIndex(allPosts).map((t) => t.slug);
 
 // "Published in <Topic>" points at the topic's blog archive, not the product
 // track — a reader following it wants more posts, not a product listing.
@@ -104,8 +108,8 @@ const shares = [
   ogType="article"
   image={shareImage}
   imageAlt={data.heroImageAlt ?? data.title}
-  imageWidth={data.heroImage?.width ?? 1200}
-  imageHeight={data.heroImage?.height ?? 630}
+  imageWidth={data.heroImage?.format === 'svg' ? (pngCover?.width ?? 1200) : (data.heroImage?.width ?? 1200)}
+  imageHeight={data.heroImage?.format === 'svg' ? (pngCover?.height ?? 630) : (data.heroImage?.height ?? 630)}
   publishedTime={publishedIso}
   modifiedTime={modifiedIso}
   author={data.author === SITE.name ? SITE.name : data.author}
@@ -115,13 +119,13 @@ const shares = [
   <main id="main">
     <!-- Article header -->
     <section class="band band--sm band--bottom">
-      <div class="measure" style="display:flex;flex-direction:column;gap:var(--space-250)">
+      <div class="post-col" style="display:flex;flex-direction:column;gap:var(--space-250)">
         <a href="/blog/" class="link-more">← Back to all posts</a>
-        <h1 style="font-size:var(--text-h1);line-height:1.12;letter-spacing:-1px">{data.title}</h1>
+        <h1 style="font-size:var(--text-h1);line-height:1.12;letter-spacing:-0.02em">{data.title}</h1>
 
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <a href={topicHref} class="chip chip--sm">
-            <span class="dot" style={`background:${accent.color}`} aria-hidden="true"></span>
+            <span class="dot dot--round" style={`background:${accent.color}`} aria-hidden="true"></span>
             {topic}
           </a>
           <span class="chip chip--sm chip--muted">{fmt(data.pubDate)}</span>
@@ -147,7 +151,7 @@ const shares = [
 
     <!-- Body -->
     <article class="band band--sm">
-      <div class="measure">
+      <div class="post-col">
         <div class="prose-foxe">
           <Content />
         </div>
@@ -160,11 +164,11 @@ const shares = [
 
         {data.tags.length > 0 && (
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:var(--space-600);padding-top:var(--space-300);border-top:1px solid var(--border)">
-            {data.tags.map((t, i) => (
+            {data.tags.map((t) => (
               <a href={tagPath(t)} class="chip chip--sm">
                 <span
-                  class="dot"
-                  style={`background:var(--acc-${(i % 4) + 1})`}
+                  class="dot dot--round"
+                  style={`background:${accentFor(tagOrder, tagSlug(t)).color}`}
                   aria-hidden="true"
                 ></span>
                 #{tagLabel(t)}
@@ -182,7 +186,7 @@ const shares = [
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={s.label}
+                  aria-label={`${s.label} (opens in new tab)`}
                   style="color:var(--text-subtle);display:inline-flex"
                 >
                   <Icon name={s.icon} width={20} height={20} aria-hidden="true" />
@@ -197,7 +201,7 @@ const shares = [
     {related.length > 0 && (
       <section class="band band--sm band--subtle band--top">
         <div class="container-x">
-          <h2 style="margin-bottom:var(--space-400);font-size:var(--text-h2);letter-spacing:-0.6px">
+          <h2 style="margin-bottom:var(--space-400);font-size:var(--text-h2);letter-spacing:-0.015em">
             Related content
           </h2>
           <div class="grid-3">
@@ -214,8 +218,9 @@ const shares = [
 
 <style>
   /* The post column runs to the same width as every other page's container,
-     rather than the narrower reading measure the legal docs use. */
-  .measure {
+     rather than the narrower reading measure the legal docs use — hence not
+     named after the --measure token. */
+  .post-col {
     max-width: var(--container);
     margin-inline: auto;
     padding-inline: var(--container-pad);

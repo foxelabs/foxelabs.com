@@ -73,10 +73,10 @@ const tags = tagIndex(posts);
               </div>
               <div class="lead-card__body">
                 <span class="chip chip--sm" style="align-self:flex-start">
-                  <span class="dot dot--sm" style={`background:${leadAccent.color};border-radius:999px`} aria-hidden="true"></span>
+                  <span class="dot dot--sm dot--round" style={`background:${leadAccent.color}`} aria-hidden="true"></span>
                   {leadTopic} · Featured
                 </span>
-                <h2 style="font-size:1.625rem;line-height:1.2;letter-spacing:-0.5px">{lead.data.title}</h2>
+                <h2 style="font-size:1.625rem;line-height:1.2;letter-spacing:-0.015em">{lead.data.title}</h2>
                 <p style="margin:0;font-size:var(--text-md);line-height:1.55;color:var(--text-subtle)">
                   {lead.data.description}
                 </p>
@@ -90,7 +90,7 @@ const tags = tagIndex(posts);
         <section class="band">
           <div class="container-x">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:var(--space-250);margin-bottom:var(--space-400);flex-wrap:wrap">
-              <h2 style="font-size:var(--text-h2);letter-spacing:-0.6px">Latest by topic</h2>
+              <h2 style="font-size:var(--text-h2);letter-spacing:-0.015em">Latest by topic</h2>
               <div role="group" aria-label="Filter posts by topic" style="display:flex;gap:8px;flex-wrap:wrap" data-topic-filter>
                 {filters.map((label) => (
                   <button
@@ -116,7 +116,7 @@ const tags = tagIndex(posts);
               <div style="display:flex;gap:8px;flex-wrap:wrap">
                 {topics.map((topic) => (
                   <a href={topicPath(topic)} class="chip chip--sm">
-                    <span class="dot" style={`background:${topicAccent(topic).color}`} aria-hidden="true"></span>
+                    <span class="dot dot--round" style={`background:${topicAccent(topic).color}`} aria-hidden="true"></span>
                     {topic}
                   </a>
                 ))}

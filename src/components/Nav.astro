@@ -136,7 +136,7 @@ const plainLinks = [
     <button
       class="nav__toggle"
       type="button"
-      aria-label="Open menu"
+      aria-label="Menu"
       aria-expanded="false"
       aria-controls="nav-mobile"
       data-nav-toggle
@@ -251,9 +251,11 @@ const plainLinks = [
         if (wide.matches) openMega(id || null);
       });
       // Keyboard: the trigger is a link to the hub page, so opening the panel
-      // is bound to focus rather than to activating it.
+      // is bound to focus rather than to activating it. Focus on a plain link
+      // must NOT close the open panel, or Tab can never reach the panel items
+      // — closing on focus-leave is handled by the shell's focusout below.
       trigger.addEventListener('focus', function () {
-        if (wide.matches) openMega(id || null);
+        if (wide.matches && id) openMega(id);
       });
       // Touch has no hover: the first tap opens the panel instead of
       // navigating, the second follows the link.
@@ -291,7 +293,6 @@ const plainLinks = [
       if (!toggle || !sheet) return;
       sheet.hidden = true;
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Open menu');
       sheet.querySelectorAll('[data-accordion]').forEach(function (row) {
         row.setAttribute('aria-expanded', 'false');
         var panel = panelFor(row);
@@ -321,7 +322,6 @@ const plainLinks = [
       if (sheet.hidden) {
         sheet.hidden = false;
         toggle.setAttribute('aria-expanded', 'true');
-        toggle.setAttribute('aria-label', 'Close menu');
       } else {
         closeSheet();
       }

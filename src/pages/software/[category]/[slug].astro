@@ -149,7 +149,7 @@ const facts = [
 
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <span class="chip chip--sm chip--muted chip--solid">
-              <span class="dot dot--sm" style={`background:${accent.color};border-radius:999px`} aria-hidden="true"></span>
+              <span class="dot dot--sm dot--round" style={`background:${accent.color}`} aria-hidden="true"></span>
               {data.kind}
             </span>
             <span class="chip chip--sm chip--muted">Open source · {data.license}</span>
@@ -221,7 +221,7 @@ const facts = [
                 {facts.map((f) => (
                   <div>
                     <dt class="kicker">{f.label}</dt>
-                    <dd style="margin:3px 0 0;font-size:0.96875rem;font-weight:var(--fw-heading)">{f.value}</dd>
+                    <dd style="margin:3px 0 0;font-size:var(--text-md);font-weight:var(--fw-heading)">{f.value}</dd>
                   </div>
                 ))}
               </dl>

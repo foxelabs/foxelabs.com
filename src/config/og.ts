@@ -61,7 +61,7 @@ const STATIC_CARDS: OgEntry[] = [
   {
     slug: 'about',
     eyebrow: 'About',
-    accent: 'lime',
+    accent: 'emerald',
     title: 'A small studio that ships and keeps shipping',
     subtitle: 'Foxe Labs builds open-source tools and trading software, and runs on both.',
   },

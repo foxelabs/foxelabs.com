@@ -10,6 +10,7 @@ import Faq from '../components/ui/Faq.astro';
 import { Image } from 'astro:assets';
 import { faqLd } from '../config/seo';
 import { topicOf } from '../config/tracks';
+import { topicAccent } from '../config/accents';
 
 // Latest writing — real published posts, newest first. No fabricated releases.
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
@@ -24,7 +25,9 @@ const postMeta = (post: (typeof posts)[number]) => {
   const mins = Math.max(1, Math.round((post.body ?? '').trim().split(/\s+/).length / 200));
   return {
     topic,
-    hue: post.data.heroColor ?? 'var(--acc-4)',
+    // Topic-keyed, same as PostCard — the same post must not change kicker
+    // colour between the home page and /blog.
+    hue: topicAccent(topic).color,
     date: post.data.pubDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
     mins,
   };
@@ -125,8 +128,8 @@ const faq = [
     <!-- Hero -->
     <section class="hero">
       <div class="cellgrid" aria-hidden="true"></div>
-      <div class="hero__glow hero__glow--amber" aria-hidden="true"></div>
-      <div class="hero__glow hero__glow--emerald" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--amber" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--emerald" aria-hidden="true"></div>
       <div class="container-x hero__inner">
         <div class="hero__copy">
           <span class="chip chip--muted chip--solid" style="align-self:flex-start">
@@ -134,7 +137,7 @@ const faq = [
             Shipping since 2014
           </span>
           <h1 style="font-size:var(--text-hero);line-height:1.05">
-            Traders who build<br />like <span class="hero__mark">engineers.</span>
+            Traders who build<br />like <span class="mark-underline">engineers.</span>
           </h1>
           <p style="margin:0;font-size:var(--text-lead);color:var(--text-subtle);max-width:540px">
             Foxe Labs is a small software studio. For a decade we have shipped open-source
@@ -154,7 +157,10 @@ const faq = [
           <span class="mono" style="font-size:var(--text-xs);color:var(--text-faint)">// lines of code · lines on the chart</span>
         </div>
 
-        <!-- Quad Mark constellation -->
+        <!-- Quad Mark constellation. Only the drawing is decorative — the
+             stats beneath it are real content and stay visible (and audible)
+             on every viewport. -->
+        <div class="hero__side">
         <div class="constellation" aria-hidden="true">
           <svg class="constellation__lines" viewBox="0 0 560 400" preserveAspectRatio="none">
             <line x1="225" y1="150" x2="110" y2="75" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4" />
@@ -170,18 +176,19 @@ const faq = [
           </div>
           {orbit.map((o) => (
             <span class={`constellation__chip constellation__chip--${o.pos} mono`}>
-              <span class="dot dot--sm" style={`background:${o.hue};border-radius:999px`}></span>
+              <span class="dot dot--sm dot--round" style={`background:${o.hue}`}></span>
               {o.name}
             </span>
           ))}
-          <div class="constellation__stats">
-            {stats.map((s) => (
-              <div>
-                <div class="stat__value">{s.value}</div>
-                <div class="stat__label">{s.label}</div>
-              </div>
-            ))}
-          </div>
+        </div>
+        <div class="constellation__stats">
+          {stats.map((s) => (
+            <div>
+              <div class="stat__value">{s.value}</div>
+              <div class="stat__label">{s.label}</div>
+            </div>
+          ))}
+        </div>
         </div>
       </div>
     </section>
@@ -262,7 +269,7 @@ const faq = [
                     <span class="kicker" style={`color:${m.hue}`}>{m.topic}</span>
                     <span class="mono studio-meta">{m.date} · {m.mins} min read</span>
                   </div>
-                  <h3 style="font-size:1.375rem;line-height:1.25">{lead.data.title}</h3>
+                  <h3 style="font-size:var(--text-h3);line-height:1.25">{lead.data.title}</h3>
                   <span class="link-more">Read the post →</span>
                 </div>
               </a>
@@ -313,22 +320,6 @@ const faq = [
     position: relative;
     overflow: hidden;
   }
-  .hero__glow {
-    position: absolute;
-    width: 720px;
-    height: 560px;
-    pointer-events: none;
-  }
-  .hero__glow--amber {
-    top: -180px;
-    right: -120px;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--hue-amber) 7%, transparent), transparent);
-  }
-  .hero__glow--emerald {
-    bottom: -220px;
-    left: -140px;
-    background: radial-gradient(closest-side, color-mix(in srgb, var(--hue-emerald) 6%, transparent), transparent);
-  }
   .hero__inner {
     position: relative;
     display: grid;
@@ -342,32 +333,20 @@ const faq = [
     flex-direction: column;
     gap: var(--space-300);
   }
-  /* Amber marker-highlight under the last word. */
-  .hero__mark {
-    position: relative;
-    display: inline-block;
-  }
-  .hero__mark::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0.08em;
-    height: 0.18em;
-    background: color-mix(in srgb, var(--hue-amber) 22%, transparent);
-    z-index: -1;
-  }
-
   /* ---- Constellation ---- */
+  .hero__side {
+    display: flex;
+    flex-direction: column;
+  }
   .constellation {
     position: relative;
-    height: 480px;
+    height: 400px;
   }
   .constellation__lines {
     position: absolute;
-    inset: 0 0 80px 0;
+    inset: 0;
     width: 100%;
-    height: calc(100% - 80px);
+    height: 100%;
   }
   .constellation__quad {
     position: absolute;
@@ -405,22 +384,21 @@ const faq = [
   .constellation__chip--bl { left: 0; top: 300px; }
   .constellation__chip--br { right: 0; top: 300px; }
   .constellation__stats {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: var(--space-150);
     border-top: 1px solid var(--border);
     padding-top: var(--space-250);
+    margin-top: var(--space-250);
   }
 
   @media (max-width: 960px) {
     .hero__inner { grid-template-columns: 1fr; }
-    .constellation { height: 440px; max-width: 560px; }
+    .hero__side { max-width: 560px; }
+    .constellation { height: 360px; }
   }
   @media (max-width: 560px) {
+    /* Only the drawing goes — the stats stay. */
     .constellation { display: none; }
   }
 

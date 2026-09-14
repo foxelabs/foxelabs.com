@@ -20,7 +20,7 @@ const { eyebrow, title, lead, color = 'var(--hue-blue)', back } = Astro.props;
       {back && <a href={back.href} class="link-more">← {back.label}</a>}
       {eyebrow && (
         <span class="chip chip--muted chip--solid">
-          <span class="dot dot--sm" style={`background:${color};border-radius:999px`} aria-hidden="true"></span>
+          <span class="dot dot--sm dot--round" style={`background:${color}`} aria-hidden="true"></span>
           {eyebrow}
         </span>
       )}

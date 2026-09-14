@@ -1,3 +1,4 @@
+import { readdirSync, readFileSync } from 'node:fs';
 import { defineConfig } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import mdx from '@astrojs/mdx';
@@ -6,6 +7,31 @@ import icon from 'astro-icon';
 import rehypeExternalLinks from 'rehype-external-links';
 import { codeTheme, rehypeCodePanel } from './src/lib/codePanel.mjs';
 import minifyInlineScripts from './src/lib/minifyInline.mjs';
+
+// Tag archives with fewer than two posts are noindexed by the template, so
+// they must not be submitted in the sitemap either — "submitted URL marked
+// noindex" is a Search Console error. The counts come straight from the blog
+// frontmatter (same slugging as src/config/blog.ts tagSlug).
+const tagSlug = (tag) =>
+  tag.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const thinTagUrls = (() => {
+  const counts = new Map();
+  const dir = './src/content/blog';
+  for (const file of readdirSync(dir)) {
+    if (!file.endsWith('.mdx')) continue;
+    const source = readFileSync(`${dir}/${file}`, 'utf8');
+    if (/^draft:\s*true/m.test(source)) continue;
+    const block = source.match(/^tags:\n((?:\s+-\s+.+\n)+)/m);
+    if (!block) continue;
+    for (const line of block[1].trim().split('\n')) {
+      const slug = tagSlug(line.replace(/^\s*-\s*/, ''));
+      if (slug) counts.set(slug, (counts.get(slug) ?? 0) + 1);
+    }
+  }
+  return new Set(
+    [...counts].filter(([, n]) => n < 2).map(([slug]) => `https://foxelabs.com/blog/tag/${slug}/`)
+  );
+})();
 
 export default defineConfig({
   output: 'static',
@@ -25,6 +51,7 @@ export default defineConfig({
     // to ignore it.
     sitemap({
       changefreq: 'weekly',
+      filter: (url) => !thinTagUrls.has(url),
       serialize: (item) => ({
         ...item,
         priority: item.url === 'https://foxelabs.com/' ? 1.0

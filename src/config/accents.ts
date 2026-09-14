@@ -25,7 +25,7 @@ export const ACCENTS: Accent[] = [
   { name: 'blue',   color: 'var(--acc-1)', ink: '#FFFFFF' },
   { name: 'purple', color: 'var(--acc-2)', ink: '#FFFFFF' },
   { name: 'amber',  color: 'var(--acc-3)', ink: 'var(--ink-band)' },
-  { name: 'lime',   color: 'var(--acc-4)', ink: 'var(--ink-band)' },
+  { name: 'emerald',   color: 'var(--acc-4)', ink: 'var(--ink-band)' },
 ];
 
 /** Raw hex per hue, for contexts that cannot resolve a CSS variable —
@@ -34,7 +34,7 @@ export const ACCENT_HEX: Record<string, string> = {
   blue:   '#4d6bfa',
   purple: '#9a5cf5',
   amber:  '#f5a30b',
-  lime:   '#10c877',
+  emerald: '#10c877',
 };
 
 /** Fixed hue per category, shared by category pages and listings.
@@ -43,7 +43,7 @@ const CATEGORY_ACCENT: Record<CategorySlug, string> = {
   plugins: 'blue',
   libraries: 'purple',
   'expert-advisors': 'amber',
-  tools: 'lime',
+  tools: 'emerald',
 };
 
 /** Blog topics. Colour is keyed on the topic rather than the post, so a filter
@@ -56,12 +56,16 @@ const TOPIC_ACCENT: Record<string, string> = {
 
 const byName = (name: string) => ACCENTS.find((a) => a.name === name) ?? ACCENTS[0];
 
+/** A quad accent by name, for the rare spot that is not category- or
+    topic-keyed (e.g. a "coming soon" box with no real category yet). */
+export const accentNamed = (name: string): Accent => byName(name);
+
 export function categoryAccent(category: string): Accent {
   return byName(CATEGORY_ACCENT[category as CategorySlug] ?? 'blue');
 }
 
 export function topicAccent(topic: string): Accent {
-  return byName(TOPIC_ACCENT[topic] ?? 'lime');
+  return byName(TOPIC_ACCENT[topic] ?? 'emerald');
 }
 
 /** Hex for a hue, for the share-card renderer. */

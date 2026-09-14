@@ -21,7 +21,7 @@ const { items } = Astro.props;
         <span class="step-chip tint" style={`--hue:${p.color}`}>{String(i + 1).padStart(2, '0')}</span>
         {p.icon && <Icon name={p.icon} size={20} style={`color:${p.color}`} aria-hidden="true" />}
       </div>
-      <h3 style="font-size:1.125rem">{p.title}</h3>
+      <h3 style="font-size:var(--text-h4)">{p.title}</h3>
       <p style="margin:0;font-size:var(--text-md);line-height:1.55">{p.body}</p>
     </div>
   ))}
