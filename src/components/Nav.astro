@@ -17,6 +17,14 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft)).so
 /** The two projects each category leads with in the menu. The column header
     links to the category page, so the menu is a taste of the shelf rather than
     the shelf itself. A category missing here falls back to its first two by order. */
+/** Column icon per category; items use their own project icon. */
+const CATEGORY_ICON: Record<string, string> = {
+  plugins: 'mingcute:plugin-2-line',
+  libraries: 'mingcute:box-2-line',
+  'expert-advisors': 'mingcute:stock-line',
+  tools: 'mingcute:tool-line',
+};
+
 const MEGA_FEATURED: Record<string, string[]> = {
   plugins: ['loggedin', 'lazy-load-for-comments'],
   libraries: ['wp-review-notice', 'wp-queue-process'],
@@ -40,11 +48,14 @@ const columnsFor = (track: Track) => {
         title: meta.label,
         href: `${basePath}/${slug}/`,
         color: categoryAccent(slug).color,
+        icon: CATEGORY_ICON[slug] ?? 'mingcute:box-2-line',
+        count: items.length,
         items: shown.map((p) => ({
           name: p.data.name,
           tagline: p.data.tagline,
           href: `${basePath}/${slug}/${p.id}/`,
-          tint: `color-mix(in srgb, ${accentFor(ids, p.id).color} 12%, transparent)`,
+          hue: accentFor(ids, p.id).color,
+          icon: p.data.icon ?? CATEGORY_ICON[slug] ?? 'mingcute:box-2-line',
         })),
       };
     })
@@ -59,7 +70,9 @@ const menus = [
     columns: columnsFor('oss'),
     promo: {
       eyebrow: 'Open source',
-      color: 'var(--acc-4)',
+      color: 'var(--hue-emerald)',
+      icon: 'mingcute:code-line',
+      meta: '110,000+ installs · GPL',
       title: 'Every plugin and library in one place',
       body: 'GPL-licensed WordPress plugins and PHP packages, maintained in the open.',
       cta: 'Browse all software',
@@ -73,7 +86,9 @@ const menus = [
     columns: columnsFor('trading'),
     promo: {
       eyebrow: 'Risk-first',
-      color: 'var(--acc-2)',
+      color: 'var(--hue-amber)',
+      icon: 'mingcute:chart-line-line',
+      meta: 'MetaTrader 5 · traded in-house',
       title: 'Engineering discipline, pointed at the markets',
       body:
         'Every system is tested before it ships. Trading carries substantial risk — nothing here is financial advice.',
@@ -135,24 +150,37 @@ const plainLinks = [
       <div class="mega__inner">
         {menu.columns.map((column) => (
           <div class="mega__col">
-            <a href={column.href} class="mega__title" style={`--mega-hue:${column.color}`}>
+            <a href={column.href} class="mega__title" style={`--hue:${column.color}`}>
+              <Icon name={column.icon} size={14} aria-hidden="true" />
               {column.title}
-              <Icon name="mingcute:right-small-line" size={14} aria-hidden="true" />
+              <span class="mega__count">{column.count}</span>
+              <Icon name="mingcute:right-small-line" size={14} class="mega__title-arrow" aria-hidden="true" />
             </a>
             <div class="mega__items">
               {column.items.map((item) => (
-                <a href={item.href} class="mega__item" style={`--mega-tint:${item.tint}`}>
-                  <span class="mega__name">{item.name}</span>
-                  <span class="mega__desc">{item.tagline}</span>
+                <a href={item.href} class="mega__item" style={`--hue:${item.hue}`}>
+                  <span class="mega__icon tint" aria-hidden="true">
+                    <Icon name={item.icon} size={18} />
+                  </span>
+                  <span class="mega__text">
+                    <span class="mega__name">{item.name}</span>
+                    <span class="mega__desc">{item.tagline}</span>
+                  </span>
+                  <Icon name="mingcute:arrow-right-line" size={14} class="mega__arrow" aria-hidden="true" />
                 </a>
               ))}
             </div>
           </div>
         ))}
-        <div class="mega__promo">
-          <span class="mega__eyebrow" style={`color:${menu.promo.color}`}>{menu.promo.eyebrow}</span>
+        <div class="mega__promo" style={`--hue:${menu.promo.color}`}>
+          <div class="cellgrid" aria-hidden="true"></div>
+          <span class="mega__promo-head">
+            <span class="icon-tile icon-tile--sm tint" aria-hidden="true"><Icon name={menu.promo.icon} size={18} /></span>
+            <span class="mega__eyebrow">{menu.promo.eyebrow}</span>
+          </span>
           <span class="mega__promo-title">{menu.promo.title}</span>
           <span class="mega__promo-body">{menu.promo.body}</span>
+          <span class="mono mega__promo-meta">// {menu.promo.meta}</span>
           <a href={menu.promo.href} class="btn btn--primary btn--sm mega__promo-cta" style="align-self:flex-start">
             {menu.promo.cta}
           </a>
@@ -178,7 +206,10 @@ const plainLinks = [
         <div class="nav-mobile__panel" id={`nav-mobile-${menu.id}`} hidden>
           <a href={menu.href} class="nav-mobile__sub">All {menu.label.toLowerCase()}</a>
           {menu.columns.map((column) => (
-            <a href={column.href} class="nav-mobile__sub">{column.title}</a>
+            <a href={column.href} class="nav-mobile__sub">
+              <Icon name={column.icon} size={16} style={`color:${column.color}`} aria-hidden="true" />
+              {column.title}
+            </a>
           ))}
         </div>
       </>

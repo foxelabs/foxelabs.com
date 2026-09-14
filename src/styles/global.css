@@ -433,7 +433,7 @@
 .mega__title {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 6px;
   align-self: start;
   padding: 0;
   font-family: var(--font-mono);
@@ -441,32 +441,65 @@
   font-weight: var(--fw-medium);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--mega-hue, var(--text-caps));
+  color: var(--hue, var(--text-caps));
 }
-.mega__title:hover { color: var(--mega-hue, var(--text)); }
+.mega__title:hover { text-decoration: none; color: var(--hue, var(--text)); }
+.mega__count {
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--hue) 12%, transparent);
+  letter-spacing: 0;
+}
+.mega__title-arrow { transition: transform 0.12s ease; }
+.mega__title:hover .mega__title-arrow { transform: translateX(2px); }
 .mega__items {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   margin-inline: calc(var(--space-150) * -1);
 }
 .mega__item {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: flex-start;
+  gap: var(--space-150);
   padding: var(--space-150);
+  border: 1px solid transparent;
   border-radius: var(--r-md);
   color: var(--text);
+  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 .mega__item:hover {
-  background: var(--mega-tint, var(--bg-hover));
+  background: var(--bg-subtle);
+  border-color: var(--border);
   color: var(--text);
   text-decoration: none;
 }
+.mega__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-sm);
+  flex: none;
+}
+.mega__text { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; }
 .mega__name { font-size: 0.9375rem; font-weight: var(--fw-heading); }
 .mega__desc { font-size: var(--text-small); line-height: 1.45; color: var(--text-subtle); }
+.mega__arrow {
+  align-self: center;
+  flex: none;
+  color: var(--hue);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.mega__item:hover .mega__arrow,
+.mega__item:focus-visible .mega__arrow { opacity: 1; transform: none; }
 
 .mega__promo {
+  position: relative;
+  overflow: hidden;
   align-self: stretch;
   display: flex;
   flex-direction: column;
@@ -476,12 +509,15 @@
   background: var(--bg-sunken);
   border: 1px solid var(--border);
 }
+.mega__promo > :not(.cellgrid) { position: relative; }
+.mega__promo-head { display: flex; align-items: center; gap: 10px; }
 .mega__eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: var(--fw-medium);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  color: var(--hue);
 }
 .mega__promo-title {
   font-family: var(--font-display);
@@ -492,6 +528,7 @@
   color: var(--text);
 }
 .mega__promo-body { font-size: var(--text-ui); line-height: 1.5; color: var(--text-subtle); }
+.mega__promo-meta { font-size: var(--text-xs); color: var(--text-faint); }
 .mega__promo-cta { margin-top: auto; }
 
 /* ---- The same tree on a narrow screen ---------------------------------- */
@@ -536,6 +573,7 @@
 .nav-mobile__sub {
   display: flex;
   align-items: center;
+  gap: 10px;
   min-height: 44px;
   padding-left: var(--space-300);
   font-size: var(--text-body);
@@ -1144,7 +1182,7 @@ textarea.field { resize: vertical; min-height: 120px; }
 .resource-link__arrow { color: var(--text-faint); flex: none; transition: transform 0.12s ease, color 0.12s ease; }
 .resource-link:hover .resource-link__arrow { color: var(--hue); transform: translateX(2px); }
 @media (prefers-reduced-motion: reduce) {
-  .resource-link__arrow { transition: none; }
+  .resource-link__arrow, .mega__arrow, .mega__title-arrow { transition: none; }
 }
 
 /* A tinted square holding an icon. */
