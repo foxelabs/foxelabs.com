@@ -1,121 +1,122 @@
-@import '@fontsource-variable/bricolage-grotesque';
-@import '@fontsource-variable/public-sans';
-/* Latin subset only. The full import pulls cyrillic, greek and vietnamese too,
-   and the small ones get base64-inlined into this render-blocking stylesheet —
-   11 KB of code-block font on every page, most of it for scripts we never set. */
-@import '@fontsource/jetbrains-mono/latin-400.css';
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inconsolata';
 
-/* Metrics-adjusted local fallbacks: until the webfonts arrive, text renders in
-   Arial resized to their metrics, so the swap barely moves the layout. */
+/* Metrics-adjusted local fallback: until the webfont arrives, text renders in
+   Arial resized to Space Grotesk's metrics, so the swap barely moves layout. */
 @font-face {
-  font-family: 'Bricolage Fallback';
+  font-family: 'Space Grotesk Fallback';
   src: local('Arial');
-  size-adjust: 104%;
-  ascent-override: 94%;
-  descent-override: 24%;
-  line-gap-override: 0%;
-}
-@font-face {
-  font-family: 'Public Sans Fallback';
-  src: local('Arial');
-  size-adjust: 102%;
-  ascent-override: 98%;
+  size-adjust: 105%;
+  ascent-override: 93%;
   descent-override: 25%;
   line-gap-override: 0%;
 }
 
 /* ===========================================================================
-   Foxe Labs design system — single source of truth.
+   Foxe Labs design system — "Foxe Mono Kit" web theme.
 
-   The site runs on a neutral base (white / near-black) with a four-hue accent
-   quad used as DECORATION only: dots, card rules, illustration fields, the
-   bar above every CTA. No hue is a brand identity and no hue carries a track.
-   Emphasis is structural instead — ink fills for primary actions, a blue for
-   links, hairline borders for everything else.
+   Dark is the default. Space Grotesk carries the voice (headlines, prose,
+   nav); Inconsolata carries every figure, micro-label and slug. There is no
+   brand accent: the primary button is inverted, links are told apart by
+   weight, and colour is reserved for meaning — the chart-hue quad used only
+   as 12% fills / 38% borders (tints) and per-post cover hues.
 
-   Colour values here are ours. They were tuned against a reference palette but
-   every one of them was moved off it; nothing in this file is copied.
+   [data-theme='light'] on <html> is the only way to the light theme.
    =========================================================================== */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  /* ---- Surfaces + ink ---- */
-  --bg:          #FFFFFF;
-  --bg-subtle:   #F7F8FA;   /* alternating band, sunken strips */
-  --bg-hover:    #F0F2F4;   /* hovered rows, inline code, neutral pills */
-  --text:        #2A2B2F;   /* headings + primary copy */
-  --text-subtle: #515359;   /* secondary copy, captions, labels */
-  --text-faint:  #8B8E96;   /* placeholders and other not-yet-content text */
-  --border:      #DFE1E7;
+  /* ---- Surfaces: elevation is a lighter fill, not a shadow ---- */
+  --bg:          #0a0a0b;   /* page */
+  --bg-subtle:   #101113;   /* alternate band */
+  --bg-sunken:   #121315;   /* rail-grade panel, code ground */
+  --bg-card:     #17181b;   /* card */
+  --bg-hover:    #1f2124;   /* hovered rows, inline code, neutral pills */
 
-  /* ---- Bold: the emphatic pairing. Primary buttons and the dark bands. ---- */
-  --bold:        #1D1E20;
-  --bold-text:   #FFFFFF;
-  --bold-hover:  #000000;
+  /* ---- Ink ---- */
+  --text:        #f4f5f6;   /* headings + primary copy */
+  --text-strong: #ffffff;
+  --text-body:   #b0b6be;   /* body copy */
+  --text-subtle: #b0b6be;
+  --text-caps:   #9ea6b0;   /* uppercase micro-labels */
+  --text-faint:  #8d949d;
 
-  /* ---- Link blue ---- */
-  --link:        #1A6BD6;
-  --link-hover:  #0157CB;
-  --link-tint:   #F2F7FE;
+  /* ---- Borders ---- */
+  --border:        #26282d;
+  --border-strong: #34373d;
+  --border-dashed: #3a3d43;
 
-  /* ---- The accent quad. Decoration only — never a track, never body text. ---- */
-  --acc-1: #1A6BD6;   /* blue */
-  --acc-2: #9C46D6;   /* purple — dark enough for AA white text on a fill */
-  --acc-3: #F9A50B;   /* amber */
-  --acc-4: #97C94E;   /* lime */
+  /* ---- Bold: the inverted primary pairing ---- */
+  --bold:        #ececec;
+  --bold-text:   #131313;
+  --bold-hover:  #ffffff;
 
-  /* ---- Ink band. Fixed in both themes: it is a black band, not a dark-mode
-     surface, so it keeps its own ramp rather than following the theme. ---- */
-  --ink-band:        #1D1E20;
-  --ink-band-raised: #2B2C30;
-  --ink-band-text:   #FFFFFF;
-  --ink-band-subtle: #AAACB0;
-  --ink-band-faint:  #8A8D94;   /* ≥4.5:1 on the band — AA for small text */
-  --ink-band-border: #3C3E42;
+  /* ---- Links: ink and weight, never blue ---- */
+  --link:        #f4f5f6;
+  --link-hover:  #ffffff;
+  --link-tint:   #1f2124;
 
-  /* ---- Code blocks. Dark in both themes. Close to the ink band but not the
-     same ramp: these are the slab colours from the design, kept literal. ---- */
-  --code-bg:     #1E1F21;
-  --code-head:   #2C2D31;
-  --code-text:   #DEE0E4;
-  --code-key:    #C88FE8;
-  --code-str:    #A5CD6B;
-  --code-num:    #FFB84D;
-  --code-fn:     #79B8FF;
-  --code-com:    #8A8D94;
+  /* ---- The chart-hue quad. Theme-invariant; used only as tints. ---- */
+  --acc-1: #4d6bfa;   /* blue */
+  --acc-2: #9a5cf5;   /* purple */
+  --acc-3: #f5a30b;   /* amber */
+  --acc-4: #10c877;   /* emerald */
+  --hue-blue:    #4d6bfa;
+  --hue-emerald: #10c877;
+  --hue-purple:  #9a5cf5;
+  --hue-amber:   #f5a30b;
+  --hue-red:     #ef3f52;
+  --hue-cyan:    #0cb8c4;
+  --hue-sky:     #1da8ee;
 
-  /* ---- Semantic ---- */
-  --ok:   #1F8A5F;
-  --bad:  #C4362B;
+  /* ---- Ink band: fixed in both themes — a black band, not a surface. ---- */
+  --ink-band:        #101113;
+  --ink-band-raised: #17181b;
+  --ink-band-text:   #f4f5f6;
+  --ink-band-subtle: #b0b6be;
+  --ink-band-faint:  #8d949d;
+  --ink-band-border: #26282d;
+
+  /* ---- Code blocks. Dark in both themes. ---- */
+  --code-bg:     #121315;
+  --code-head:   #1f2124;
+  --code-text:   #dee0e4;
+  --code-key:    #c88fe8;
+  --code-str:    #6fd39b;
+  --code-num:    #ffb84d;
+  --code-fn:     #79b8ff;
+  --code-com:    #8d949d;
+
+  /* ---- Semantic (P&L greens/reds) ---- */
+  --ok:   #4ade80;
+  --bad:  #f0625d;
 
   /* ---- Type ---- */
-  /* Bricolage sets every heading and display number; Public Sans carries body,
-     UI and controls — neutral enough to stay quiet under a loud display face.
-     Both fall back to a metrics-matched Arial above. */
-  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Fallback',
+  --font-display: 'Space Grotesk Variable', 'Space Grotesk', 'Space Grotesk Fallback',
     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-body: 'Public Sans Variable', 'Public Sans', 'Public Sans Fallback',
-    -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-body: var(--font-display);
+  --font-mono: 'Inconsolata Variable', 'Inconsolata', ui-monospace, SFMono-Regular,
+    Menlo, monospace;
 
-  --text-hero:    clamp(2.25rem, 1.55rem + 3vw, 3.5rem);      /* 36 → 56 */
+  --text-hero:    clamp(2.4rem, 1.4rem + 4.2vw, 4rem);        /* 38 → 64 */
   --text-title:   clamp(2rem, 1.5rem + 2.2vw, 3.125rem);      /* 32 → 50 */
   --text-h1:      clamp(1.9rem, 1.45rem + 1.9vw, 2.625rem);   /* 30 → 42 */
   --text-h2:      clamp(1.6rem, 1.35rem + 1.1vw, 2rem);       /* 26 → 32 */
   --text-h2-lg:   clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem);    /* 28 → 36 */
   --text-h3:      1.375rem;   /* 22 */
   --text-h4:      1.125rem;   /* 18 */
-  --text-lead:    1.1875rem;  /* 19 */
+  --text-lead:    1.125rem;   /* 18 */
   --text-body:    1rem;
-  --text-body-lg: 1.0625rem;  /* 17 — card titles, principle heads */
-  --text-md:      0.9375rem;  /* 15 — card copy, dense body */
-  --text-ui:      0.875rem;   /* 14 */
-  --text-small:   0.8125rem;  /* 13 */
-  --text-xs:      0.75rem;    /* 12 */
+  --text-body-lg: 1.0625rem;
+  --text-md:      0.9375rem;
+  --text-ui:      0.875rem;
+  --text-small:   0.8125rem;
+  --text-xs:      0.75rem;
 
-  --fw-display: 800;
+  /* Space Grotesk tops out at 700 — anything heavier would be synthesised. */
+  --fw-display: 700;
   --fw-heading: 700;
-  --fw-medium:  600;
+  --fw-medium:  500;
   --fw-body:    400;
 
   /* ---- Space + shape ---- */
@@ -133,86 +134,74 @@
   --space-700: 56px;
   --space-800: 64px;
 
-  --band-pad:    clamp(3.5rem, 6vw, 5.5rem);   /* 56 → 88 */
-  --band-pad-sm: clamp(3rem, 5vw, 4.5rem);     /* 48 → 72 */
-  --container:     1080px;
-  --container-pad: clamp(1.25rem, 4vw, 2.5rem);  /* 20 → 40 */
-  --measure: 760px;   /* article + FAQ column */
+  --band-pad:    clamp(4rem, 7vw, 5.5rem);
+  --band-pad-sm: clamp(3rem, 5vw, 4.5rem);
+  --container:     1180px;
+  --container-pad: clamp(1.25rem, 4vw, 3rem);
+  --measure: 760px;
 
-  --r-sm:   4px;
-  --r-md:   8px;
-  --r-lg:   12px;
+  /* The kit's radius scale. */
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
   --r-pill: 999px;
 
-  --nav-h: 64px;
+  --nav-h: 72px;
 
-  --shadow-hover: 0 4px 12px rgba(10, 30, 66, 0.14);
-  --shadow-menu:  0 16px 32px rgb(30 31 33 / 0.10);
+  --shadow-hover: 0 12px 32px rgb(0 0 0 / 0.45);
+  --shadow-menu:  0 16px 32px rgb(0 0 0 / 0.55);
 
-  /* Accent buttons step their hue toward this on hover — toward black on a
-     light page, toward white on a dark one, so hover always gains emphasis. */
-  --accent-mix: #000000;
-
-  /* Text on an accent fill. White holds on the light theme's blue and purple;
-     amber and lime fills must override this to ink at the call site. */
-  --btn-accent-ink: #FFFFFF;
+  --accent-mix: #ffffff;
+  --btn-accent-ink: #131313;
 }
 
 /* ===========================================================================
-   Dark theme. Its own ramp, not an inversion — inverted light greys go muddy
-   and the light-theme blue loses contrast on a dark ground.
-   Applied by [data-theme='dark'] on <html>, set before first paint.
+   Light theme — the kit's own light ramp, not an inversion.
    =========================================================================== */
-[data-theme='dark'] {
-  color-scheme: dark;
+[data-theme='light'] {
+  color-scheme: light;
 
-  --bg:          #15191C;
-  --bg-subtle:   #1C2024;
-  --bg-hover:    #2B3238;
-  --text:        #DDE3E9;
-  --text-subtle: #9EACBA;
-  --text-faint:  #6C7A87;
-  --border:      #3C464E;
+  --bg:          #f4f4f5;
+  --bg-subtle:   #fafafa;
+  --bg-sunken:   #fafafa;
+  --bg-card:     #ffffff;
+  --bg-hover:    #ececee;
 
-  /* Bold inverts: on a dark page the emphatic fill is the light one. */
-  --bold:        #FFFFFF;
-  --bold-text:   #1D1E20;
-  --bold-hover:  #DDE3E9;
+  --text:        #17181a;
+  --text-strong: #000000;
+  --text-body:   #50555a;
+  --text-subtle: #50555a;
+  --text-caps:   #5b6168;
+  --text-faint:  #6a7076;
 
-  --link:        #589EFC;
-  --link-hover:  #86B9FD;
-  --link-tint:   #1B2A40;
+  --border:        #e4e4e7;
+  --border-strong: #d4d4d8;
+  --border-dashed: #d4d4d8;
 
-  /* The quad lightens just enough to hold up against a dark ground. */
-  --acc-1: #4C93EE;
-  --acc-2: #C084EE;
-  --acc-3: #FBBA47;
-  --acc-4: #A9D66A;
+  --bold:        #1a1b1e;
+  --bold-text:   #ffffff;
+  --bold-hover:  #000000;
 
-  --ok:   #4FC08A;
-  --bad:  #F0776D;
+  --link:        #17181a;
+  --link-hover:  #000000;
+  --link-tint:   #ececee;
 
-  --shadow-hover: 0 4px 12px rgba(3, 4, 4, 0.44);
-  --shadow-menu:  0 16px 32px rgba(0, 0, 0, 0.55);
+  --ok:   #15803d;
+  --bad:  #d31f1f;
 
-  --accent-mix: #FFFFFF;
+  --shadow-hover: 0 12px 32px rgb(20 20 25 / 0.12);
+  --shadow-menu:  0 16px 32px rgb(20 20 25 / 0.14);
 
-  /* The dark theme's lightened quad drops white text below AA on every hue —
-     accent fills carry ink instead. */
-  --btn-accent-ink: #1D1E20;
+  --accent-mix: #000000;
+  --btn-accent-ink: #ffffff;
 }
 
 /* ===========================================================================
-   Base — element defaults, layered so component rules below always win.
+   Base
    =========================================================================== */
 @layer base {
-  /* Reset. Small and explicit — the site owns its own defaults rather than
-     inheriting a framework's. Prose re-enables list markers and indents. */
   *, *::before, *::after { box-sizing: border-box; }
 
-  /* Component rules set display, which beats the user agent's [hidden] and
-     leaves anything toggled by script visible. Tailwind's preflight used to
-     cover this; now the reset does. */
   [hidden] { display: none !important; }
 
   p, figure, blockquote, dl, dd, pre, fieldset { margin: 0; }
@@ -228,15 +217,14 @@
     margin: 0;
     padding: 0;
     background: var(--bg);
-    color: var(--text);
+    color: var(--text-body);
     font-family: var(--font-body);
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Sticky footer on short pages. */
   body {
     min-height: 100dvh;
     display: flex;
@@ -250,23 +238,25 @@
     font-family: var(--font-display);
     font-weight: var(--fw-display);
     line-height: 1.15;
+    letter-spacing: -0.015em;
   }
-  h1 { font-size: var(--text-h1);  letter-spacing: -0.025em; line-height: 1.08; }
-  h2 { font-size: var(--text-h2);  letter-spacing: -0.02em; }
-  h3 { font-size: var(--text-h3);  letter-spacing: -0.01em; }
+  h1 { font-size: var(--text-h1); line-height: 1.06; }
+  h2 { font-size: var(--text-h2); }
+  h3 { font-size: var(--text-h3); }
   h4 { font-size: var(--text-h4); }
   h5, h6 { font-size: var(--text-body); }
 
   h1, h2, h3 { text-wrap: balance; }
   p { text-wrap: pretty; }
 
+  /* An inline link is ink and weight, never an underline by default. */
   a { color: var(--link); text-decoration: none; }
-  a:hover { color: var(--link-hover); text-decoration: underline; }
+  a:hover { color: var(--link-hover); }
 
   button { cursor: pointer; }
 
   :where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
-    outline: 2px solid var(--link);
+    outline: 2px solid var(--text);
     outline-offset: 2px;
     border-radius: var(--r-sm);
   }
@@ -299,16 +289,23 @@
 .band--top    { border-top: 1px solid var(--border); }
 .band--bottom { border-bottom: 1px solid var(--border); }
 
-/* The black band. Fixed ramp in both themes — it is a colour, not a surface. */
+/* The "ink band" is now simply the alternate band — separated by hairline,
+   told apart by fill, in both themes. */
 .band--ink {
-  background: var(--ink-band);
-  color: var(--ink-band-subtle);
+  background: var(--bg-subtle);
+  border-top: 1px solid var(--border);
+  color: var(--text-body);
 }
 .band--ink h1, .band--ink h2, .band--ink h3,
-.band--ink h4, .band--ink h5, .band--ink h6 { color: var(--ink-band-text); }
+.band--ink h4, .band--ink h5, .band--ink h6 { color: var(--text); }
+[data-theme='light'] .band--ink {
+  --ink-band-text:   #17181a;
+  --ink-band-subtle: #50555a;
+  --ink-band-faint:  #6a7076;
+  --ink-band-border: #e4e4e7;
+  background: #fafafa;
+}
 
-/* Screen-reader-only text: keeps the heading tree intact where the visual
-   design has no room for a heading. */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -321,14 +318,13 @@
   border: 0;
 }
 
-/* Skip link for keyboard users. */
 .skip-link {
   position: absolute;
   left: -9999px;
   top: 0;
   z-index: 100;
-  background: var(--bg);
-  color: var(--link);
+  background: var(--bg-card);
+  color: var(--text);
   padding: var(--space-100) var(--space-200);
   border-radius: var(--r-sm);
   font-weight: var(--fw-medium);
@@ -346,19 +342,24 @@
 .brand__name {
   font-size: 1.0625rem;
   font-weight: var(--fw-heading);
-  letter-spacing: -0.2px;
+  letter-spacing: -0.01em;
 }
+.brand-logo { display: block; }
 
-/* The fox badge. It carries its own colour, so one asset serves both themes —
-   the quadrants hold their own contrast on a light or a dark ground. Size is
-   set per use through the width/height attributes. */
-.brand-logo {
-  display: block;
+/* The quad mark drawn in CSS — four rounded squares in the chart hues. */
+.brand-quad {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+  flex: none;
 }
+.brand-quad span { width: 9px; height: 9px; border-radius: 2px; }
+.brand-quad span:nth-child(1) { background: var(--acc-1); }
+.brand-quad span:nth-child(2) { background: var(--acc-4); }
+.brand-quad span:nth-child(3) { background: var(--acc-3); }
+.brand-quad span:nth-child(4) { background: var(--acc-2); }
 
 /* ---- Navigation -------------------------------------------------------- */
-/* The header and its two menus travel together, so the sticky and the stacking
-   context sit on the shell rather than on the bar itself. */
 .nav-shell {
   position: sticky;
   top: 0;
@@ -384,27 +385,25 @@
 .nav__link {
   padding: var(--space-100) var(--space-150);
   border-radius: var(--r-sm);
-  color: var(--text);
+  color: var(--text-body);
   font-size: var(--text-ui);
   font-weight: var(--fw-medium);
-  transition: background-color 0.1s ease;
+  transition: background-color 0.1s ease, color 0.1s ease;
 }
 .nav__link:hover {
   background: var(--bg-hover);
   color: var(--text);
   text-decoration: none;
 }
-.nav__link[aria-current='page'] { background: var(--bg-hover); }
+.nav__link[aria-current='page'] { background: var(--bg-hover); color: var(--text); }
 
-/* A trigger keeps its hover ground for the chevron's sake but does not take the
-   pill highlight — the open panel below it is the state indicator. */
 .nav__link--menu {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 .nav__chevron {
-  color: var(--text-subtle);
+  color: var(--text-faint);
   transition: transform 0.25s ease;
 }
 [aria-expanded='true'] > .nav__chevron { transform: rotate(180deg); }
@@ -414,7 +413,7 @@
   position: absolute;
   inset-inline: 0;
   top: var(--nav-h);
-  background: var(--bg);
+  background: var(--bg-card);
   border-bottom: 1px solid var(--border);
   box-shadow: var(--shadow-menu);
 }
@@ -439,13 +438,14 @@
   gap: 2px;
   align-self: start;
   padding: 0;
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: var(--fw-heading);
-  letter-spacing: 1px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--mega-hue, var(--text-subtle));
+  color: var(--mega-hue, var(--text-caps));
 }
-.mega__title:hover { color: var(--mega-hue, var(--link)); text-decoration: underline; }
+.mega__title:hover { color: var(--mega-hue, var(--text)); }
 .mega__items {
   display: flex;
   flex-direction: column;
@@ -460,14 +460,13 @@
   border-radius: var(--r-md);
   color: var(--text);
 }
-/* Each row carries its own hue, set inline from the item's accent. */
 .mega__item:hover {
-  background: var(--mega-tint);
+  background: var(--mega-tint, var(--bg-hover));
   color: var(--text);
   text-decoration: none;
 }
 .mega__name { font-size: 0.9375rem; font-weight: var(--fw-heading); }
-.mega__desc { font-size: var(--text-small); line-height: 1.45; color: var(--text-subtle); }
+.mega__desc { font-size: var(--text-small); line-height: 1.45; color: var(--text-body); }
 
 .mega__promo {
   align-self: stretch;
@@ -476,22 +475,25 @@
   gap: 10px;
   padding: var(--space-300);
   border-radius: var(--r-md);
-  background: var(--bg-subtle);
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
 }
 .mega__eyebrow {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: var(--fw-heading);
-  letter-spacing: 1px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 .mega__promo-title {
   font-family: var(--font-display);
   font-size: 1.1875rem;
   font-weight: var(--fw-display);
-  letter-spacing: -0.3px;
+  letter-spacing: -0.01em;
   line-height: 1.25;
+  color: var(--text);
 }
-.mega__promo-body { font-size: var(--text-ui); line-height: 1.5; color: var(--text-subtle); }
+.mega__promo-body { font-size: var(--text-ui); line-height: 1.5; color: var(--text-body); }
 .mega__promo-cta { margin-top: auto; }
 
 /* ---- The same tree on a narrow screen ---------------------------------- */
@@ -529,12 +531,9 @@
 }
 .nav-mobile__row:hover { color: var(--text); text-decoration: none; }
 .nav-mobile__row--link { margin-top: var(--space-100); }
-.nav-mobile__row--cta { color: var(--link); }
-.nav-mobile__row--cta:hover { color: var(--link); }
-.nav-mobile__panel {
-  display: flex;
-  flex-direction: column;
-}
+.nav-mobile__row--cta { color: var(--text); }
+.nav-mobile__row--cta:hover { color: var(--text-strong); }
+.nav-mobile__panel { display: flex; flex-direction: column; }
 .nav-mobile__panel[hidden] { display: none; }
 .nav-mobile__sub {
   display: flex;
@@ -543,7 +542,7 @@
   padding-left: var(--space-300);
   font-size: var(--text-body);
   font-weight: var(--fw-medium);
-  color: var(--text-subtle);
+  color: var(--text-body);
 }
 .nav-mobile__sub:hover { color: var(--text); text-decoration: none; }
 
@@ -553,21 +552,18 @@
   justify-content: center;
   width: 36px;
   height: 36px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-sm);
   background: transparent;
   color: var(--text);
 }
 .nav__toggle:hover { background: var(--bg-hover); }
 
-/* Below this the row and its mega panels give way to the sheet. Keep it in
-   step with the media query the nav script matches on. */
 @media (max-width: 860px) {
   .nav { gap: var(--space-200); }
   .nav__links,
   .mega { display: none; }
   .nav__toggle { display: inline-flex; }
-  /* With the link row gone, the action and the toggle carry the right edge. */
   .nav__cta { margin-left: auto; }
 }
 @media (min-width: 861px) {
@@ -580,18 +576,21 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-100);
-  padding: 12px var(--space-300);
+  height: 42px;
+  padding: 0 var(--space-300);
   border: 1px solid transparent;
-  border-radius: var(--r-sm);
+  border-radius: var(--r-md);
   font-family: var(--font-body);
   font-size: 0.9375rem;
-  font-weight: var(--fw-medium);
-  line-height: 1.2;
+  font-weight: var(--fw-heading);
+  line-height: 1;
+  white-space: nowrap;
   text-align: center;
-  transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 .btn:hover { text-decoration: none; }
-.btn--sm { padding: 9px var(--space-200); font-size: var(--text-ui); }
+.btn:active { transform: translateY(1px); }
+.btn--sm { height: 36px; padding: 0 var(--space-250); font-size: var(--text-ui); }
 
 .btn--primary {
   background: var(--bold);
@@ -604,84 +603,85 @@
   color: var(--bold-text);
 }
 
-/* Carries a track's own accent. The caller sets --btn-accent; the hover state
-   is the same hue stepped down, so one property drives both. */
+/* Legacy accent buttons resolve to the inverted primary — no brand accent. */
 .btn--accent {
-  background: var(--btn-accent);
-  border-color: var(--btn-accent);
-  color: var(--btn-accent-ink);
+  background: var(--bold);
+  border-color: var(--bold);
+  color: var(--bold-text);
 }
 .btn--accent:hover {
-  background: color-mix(in srgb, var(--btn-accent) 86%, var(--accent-mix));
-  border-color: color-mix(in srgb, var(--btn-accent) 86%, var(--accent-mix));
-  color: var(--btn-accent-ink);
+  background: var(--bold-hover);
+  border-color: var(--bold-hover);
+  color: var(--bold-text);
 }
 
 .btn--ghost {
-  background: var(--bg);
+  background: transparent;
   color: var(--text);
-  border-color: var(--border);
+  border-color: var(--border-strong);
+  font-weight: var(--fw-medium);
 }
 .btn--ghost:hover { background: var(--bg-hover); color: var(--text); }
 
-/* On the ink band the ghost button borrows the band's own ramp. */
 .band--ink .btn--primary {
-  background: #FFFFFF;
-  border-color: #FFFFFF;
-  color: var(--ink-band);
+  background: var(--bold);
+  border-color: var(--bold);
+  color: var(--bold-text);
 }
-.band--ink .btn--primary:hover { background: var(--ink-band-subtle); border-color: var(--ink-band-subtle); }
+.band--ink .btn--primary:hover { background: var(--bold-hover); border-color: var(--bold-hover); }
 .band--ink .btn--ghost {
   background: transparent;
-  color: var(--ink-band-text);
-  border-color: var(--ink-band-border);
+  color: var(--text);
+  border-color: var(--border-strong);
 }
-.band--ink .btn--ghost:hover { background: rgba(255, 255, 255, 0.08); color: var(--ink-band-text); }
+.band--ink .btn--ghost:hover { background: var(--bg-hover); color: var(--text); }
 
-/* Plain text link with a trailing arrow — the quiet tertiary action. */
+/* Plain text link with a trailing arrow — mono, the kit's quiet action. */
 .link-more {
-  font-size: var(--text-ui);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
   font-weight: var(--fw-medium);
-  color: var(--link);
+  color: var(--text);
 }
+.link-more:hover { color: var(--text-strong); }
 
 /* ---- Chips ------------------------------------------------------------- */
-/* Over the hero mosaic a chip needs its own ground to stay legible. */
-.chip--solid { background: var(--bg); }
+.chip--solid { background: var(--bg-card); }
 .chip {
   display: inline-flex;
   align-items: center;
   gap: var(--space-100);
-  padding: 6px 14px;
+  padding: 5px 12px;
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
-  font-size: var(--text-small);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
   font-weight: var(--fw-medium);
-  color: var(--text);
-  background: transparent;
+  color: var(--text-body);
+  background: var(--bg-hover);
 }
-.chip--sm { padding: 5px 12px; font-size: var(--text-xs); }
-.chip--muted { color: var(--text-subtle); }
-a.chip:hover { background: var(--bg-hover); color: var(--text); text-decoration: none; }
-.band--ink .chip { border-color: var(--ink-band-border); color: var(--ink-band-subtle); }
+.chip--sm { padding: 4px 10px; font-size: 11px; }
+.chip--muted { color: var(--text-faint); background: transparent; }
+a.chip:hover { color: var(--text); border-color: var(--border-strong); text-decoration: none; }
+.band--ink .chip { border-color: var(--border); color: var(--text-body); }
 
-/* Status/count badge — the small filled pill beside a card title. */
 .badge {
+  font-family: var(--font-mono);
   font-size: var(--text-xs);
   font-weight: var(--fw-heading);
   background: var(--bg-hover);
+  border: 1px solid var(--border);
   border-radius: var(--r-pill);
-  padding: 4px var(--space-125);
+  padding: 3px var(--space-125);
   white-space: nowrap;
+  color: var(--text-body);
 }
 
 /* ---- Card grids ---- */
-/* The one responsive grid, at three densities. Every card listing on the site
-   collapses at the same two breakpoints so nothing drifts. */
-.grid-2, .grid-3, .grid-4 { display: grid; gap: var(--space-300); }
+.grid-2, .grid-3, .grid-4 { display: grid; gap: var(--space-250); }
 .grid-2 { grid-template-columns: repeat(2, 1fr); }
 .grid-3 { grid-template-columns: repeat(3, 1fr); }
-.grid-4 { grid-template-columns: repeat(4, 1fr); gap: var(--space-400); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); gap: var(--space-300); }
 @media (max-width: 960px) {
   .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
 }
@@ -689,8 +689,6 @@ a.chip:hover { background: var(--bg-hover); color: var(--text); text-decoration:
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
 }
 
-/* Feature/benefit list: an accent mark beside each line. The mark slot takes
-   either a small dot or an icon; the caller sets --dot-hue per list or item. */
 .dot-list {
   display: flex;
   flex-direction: column;
@@ -708,7 +706,6 @@ a.chip:hover { background: var(--bg-hover); color: var(--text); text-decoration:
   background: var(--dot-hue, var(--acc-1));
 }
 
-/* The accent dot. Small rounded square, not a circle. */
 .dot {
   display: inline-block;
   width: 9px;
@@ -721,23 +718,21 @@ a.chip:hover { background: var(--bg-hover); color: var(--text); text-decoration:
 .dot--lg { width: 14px; height: 14px; border-radius: 4px; }
 
 /* ---- Accent quad marks ------------------------------------------------- */
-/* The four-block rule above a CTA heading. */
 .accent-bar {
   display: flex;
-  gap: 0;
+  gap: 4px;
   align-self: center;
 }
-.accent-bar span { width: 20px; height: 8px; }
+.accent-bar span { width: 16px; height: 6px; border-radius: 2px; }
 .accent-bar span:nth-child(1) { background: var(--acc-1); }
 .accent-bar span:nth-child(2) { background: var(--acc-2); }
 .accent-bar span:nth-child(3) { background: var(--acc-3); }
 .accent-bar span:nth-child(4) { background: var(--acc-4); }
 
-/* The four-colour hairline across the top of a panel. */
 .accent-rule {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  height: 4px;
+  height: 3px;
 }
 .accent-rule span:nth-child(1) { background: var(--acc-1); }
 .accent-rule span:nth-child(2) { background: var(--acc-2); }
@@ -748,18 +743,19 @@ a.chip:hover { background: var(--bg-hover); color: var(--text); text-decoration:
 .card {
   display: flex;
   flex-direction: column;
-  background: var(--bg);
+  background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   overflow: hidden;
-  color: var(--text);
+  color: var(--text-body);
+  transition: border-color 0.2s ease;
 }
 .card--pad { padding: var(--space-400); }
 a.card:hover,
 .card--hover:hover {
   text-decoration: none;
-  color: var(--text);
-  box-shadow: var(--shadow-hover);
+  color: var(--text-body);
+  border-color: var(--border-strong);
 }
 .card__body {
   display: flex;
@@ -768,56 +764,86 @@ a.card:hover,
   padding: var(--space-250);
   flex: 1;
 }
-/* The solid-colour field standing in for a cover image. */
 .card__field {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-200);
+  padding: 0;
   text-align: center;
 }
 .card__field img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
-/* Category kicker over a card title. */
+/* Category kicker over a card title — the kit's label-caps. */
 .kicker {
-  font-size: var(--text-xs);
-  font-weight: var(--fw-heading);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  color: var(--text-subtle);
+  letter-spacing: 0.1em;
+  color: var(--text-caps);
 }
 .eyebrow {
-  font-size: var(--text-small);
-  font-weight: var(--fw-heading);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--text-subtle);
+  letter-spacing: 0.1em;
+  color: var(--text-caps);
 }
 
-/* ---- Stats ------------------------------------------------------------- */
+/* ---- Tinted chips: hue at 12% fill, 38% border, ink in the hue ---------- */
+.tint {
+  background: color-mix(in srgb, var(--hue, var(--acc-1)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--hue, var(--acc-1)) 38%, transparent);
+  color: var(--hue, var(--acc-1));
+}
+.step-chip {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---- Stats — figures are Inconsolata with tabular digits ---------------- */
 .stat__value {
-  font-family: var(--font-display);
-  font-size: 2rem;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.75rem;
   font-weight: var(--fw-display);
-  letter-spacing: -0.8px;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 .stat__label {
   margin-top: var(--space-050);
-  font-size: var(--text-small);
-  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-caps);
 }
 
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.mono { font-family: var(--font-mono); }
+
 /* ---- FAQ --------------------------------------------------------------- */
-/* <details>/<summary> so the answers exist in the DOM for search engines and
-   work with JavaScript off. The +/− is drawn by CSS, not scripted. */
 .faq {
   display: flex;
   flex-direction: column;
   gap: var(--space-150);
 }
 .faq__item {
-  background: var(--bg);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
 }
@@ -836,9 +862,10 @@ a.card:hover,
 .faq__q::-webkit-details-marker { display: none; }
 .faq__q::after {
   content: '+';
+  font-family: var(--font-mono);
   font-size: 1.125rem;
   font-weight: var(--fw-medium);
-  color: var(--text-subtle);
+  color: var(--text-faint);
   flex: none;
 }
 .faq__item[open] .faq__q::after { content: '−'; }
@@ -847,21 +874,22 @@ a.card:hover,
   padding: 0 22px 20px;
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--text-subtle);
+  color: var(--text-body);
 }
 
-/* ---- Tabs (product admin tour, filters) -------------------------------- */
+/* ---- Tabs -------------------------------------------------------------- */
 .tab {
-  padding: 9px var(--space-200);
+  padding: 8px var(--space-200);
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
-  background: transparent;
-  color: var(--text-subtle);
-  font-size: var(--text-ui);
+  background: var(--bg-hover);
+  color: var(--text-body);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
   font-weight: var(--fw-medium);
   transition: background-color 0.1s ease, color 0.1s ease, border-color 0.1s ease;
 }
-.tab:hover { color: var(--text); }
+.tab:hover { color: var(--text); border-color: var(--border-strong); }
 .tab[aria-selected='true'],
 .tab[aria-pressed='true'],
 .tab[aria-current='page'] {
@@ -871,19 +899,16 @@ a.card:hover,
 }
 a.tab:hover { text-decoration: none; }
 
-.band--ink .tab { border-color: var(--ink-band-border); color: var(--ink-band-subtle); }
-.band--ink .tab:hover { color: var(--ink-band-text); }
+.band--ink .tab { border-color: var(--border); color: var(--text-body); }
+.band--ink .tab:hover { color: var(--text); }
 .band--ink .tab[aria-selected='true'],
 .band--ink .tab[aria-pressed='true'] {
-  background: #FFFFFF;
-  border-color: #FFFFFF;
-  color: var(--ink-band);
+  background: var(--bold);
+  border-color: var(--bold);
+  color: var(--bold-text);
 }
 
 /* ---- Product tour ------------------------------------------------------ */
-/* Image left, copy right; stacked below 860px. Global rather than scoped to
-   the component: a scoped block is keyed to a per-build hash, and a stale dev
-   cache can leave the markup of one revision styled by the CSS of another. */
 .tour-panel {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
@@ -892,7 +917,7 @@ a.tab:hover { text-decoration: none; }
 }
 .tour-panel[hidden] { display: none; }
 .tour-panel__shot {
-  border: 1px solid var(--ink-band-border);
+  border: 1px solid var(--border);
   border-radius: var(--r-md);
   overflow: hidden;
 }
@@ -910,48 +935,49 @@ a.tab:hover { text-decoration: none; }
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: var(--text-small);
-  font-weight: var(--fw-heading);
-  color: var(--text-subtle);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-caps);
 }
 .field {
   width: 100%;
   box-sizing: border-box;
   padding: 11px 14px;
-  background: var(--bg);
+  background: var(--bg-card);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-sm);
   font-size: 0.9375rem;
-  font-family: inherit;
-  /* The reset gives form controls `font: inherit`, so without this a field
-     picks up the label's heading weight. */
+  font-family: var(--font-body);
   font-weight: var(--fw-body);
+  letter-spacing: normal;
+  text-transform: none;
   transition: border-color 0.1s ease;
 }
 .field::placeholder { color: var(--text-faint); font-weight: var(--fw-body); opacity: 1; }
 .field:focus,
 .field:focus-visible {
-  outline: 2px solid var(--link);
+  outline: 2px solid var(--text);
   outline-offset: -1px;
-  border-color: var(--link);
+  border-color: var(--text);
 }
 textarea.field { resize: vertical; min-height: 120px; }
 .field--mono { font-family: var(--font-mono); }
 .field[aria-invalid='true'] { border-color: var(--bad); }
 
 /* ---- Off-site links ----------------------------------------------------- */
-/* One round icon button for every social account, wherever it appears — the
-   footer's brand column and the contact page's card use the same control. */
 .social-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 34px;
   height: 34px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-pill);
-  color: var(--text-subtle);
+  color: var(--text-body);
   transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
 }
 .social-btn:hover {
@@ -982,8 +1008,6 @@ textarea.field { resize: vertical; min-height: 120px; }
   flex-direction: column;
   gap: 10px;
 }
-/* Off-site links under the brand blurb. Same round icon button as the theme
-   switch, so the two read as one family across the footer. */
 .footer__social {
   display: flex;
   flex-wrap: wrap;
@@ -1001,9 +1025,9 @@ textarea.field { resize: vertical; min-height: 120px; }
   align-items: center;
   gap: var(--space-050);
   font-size: var(--text-ui);
-  color: var(--text);
+  color: var(--text-body);
 }
-.footer__link:hover { color: var(--link); }
+.footer__link:hover { color: var(--text); }
 .footer__bar {
   display: flex;
   justify-content: space-between;
@@ -1014,10 +1038,10 @@ textarea.field { resize: vertical; min-height: 120px; }
   padding-top: var(--space-250);
   border-top: 1px solid var(--border);
   font-size: var(--text-small);
-  color: var(--text-subtle);
+  color: var(--text-faint);
 }
-.footer__bar a { color: var(--text-subtle); }
-/* Legal links and the theme switch travel together at the end of the bar. */
+.footer__bar a { color: var(--text-faint); }
+.footer__bar a:hover { color: var(--text); }
 .footer__legal {
   display: flex;
   align-items: center;
@@ -1028,10 +1052,6 @@ textarea.field { resize: vertical; min-height: 120px; }
   .footer__col:first-child { grid-column: 1 / -1; }
 }
 
-/* The theme switch. A round icon button: moon while light, sun while dark. The
-   border is transparent until hover — on its own in the bar, a permanent outline
-   reads heavier than the text links beside it. It keeps its width either way, so
-   nothing shifts. */
 .theme-toggle {
   display: inline-flex;
   align-items: center;
@@ -1042,72 +1062,69 @@ textarea.field { resize: vertical; min-height: 120px; }
   border: 1px solid transparent;
   border-radius: var(--r-pill);
   background: transparent;
-  color: var(--text-subtle);
+  color: var(--text-faint);
   cursor: pointer;
   transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
 }
 .theme-toggle:hover {
   background: var(--bg-hover);
-  border-color: var(--border);
+  border-color: var(--border-strong);
   color: var(--text);
 }
-.theme-toggle:focus-visible { border-color: var(--border); }
-.theme-toggle__dark { display: none; }
-[data-theme='dark'] .theme-toggle__dark  { display: block; }
-[data-theme='dark'] .theme-toggle__light { display: none; }
+.theme-toggle:focus-visible { border-color: var(--border-strong); }
+/* Dark is the default: show the sun (switch to light) unless light is active. */
+.theme-toggle__dark { display: block; }
+.theme-toggle__light { display: none; }
+[data-theme='light'] .theme-toggle__dark  { display: none; }
+[data-theme='light'] .theme-toggle__light { display: block; }
 
-/* ---- Hero cell grid ---------------------------------------------------- */
-/* A grid of empty cells behind the hero. Hovering one flashes its colour and
-   lets it fade back out. Decorative: it sits behind the content, is aria-hidden,
-   and the page is identical without it. */
+/* ---- Hero cell grid (decorative dot grid now) --------------------------- */
 .cellgrid {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
-  grid-auto-rows: 64px;
-  overflow: hidden;
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.5;
 }
-.cellgrid > i {
-  background: transparent;
-  transition: background-color 1.4s ease-out;
-}
-/* On a phone the copy runs the full width, so the grid drops to a finer weave:
-   the painted cells read as texture in the margins above and below the text
-   rather than as slabs behind it. Keep this breakpoint and the one the hero
-   script uses to pick its arrangement in step. */
-@media (max-width: 640px) {
-  .cellgrid {
-    grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
-    grid-auto-rows: 32px;
-  }
-}
-/* The painted clusters are part of the composition, so they stay; only the
-   hover fade goes. */
-@media (prefers-reduced-motion: reduce) {
-  .cellgrid > i { transition: none; }
-}
+.cellgrid > i { display: none; }
 
-/* A tinted square holding a track's icon, sized to the design's 48px tile. */
+/* A tinted square holding an icon. */
 .icon-tile {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--r-md);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-sm);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
-/* Smaller cut for the principle grid and add-on cards. */
 .icon-tile--sm {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
 }
 
+/* ---- Sync pulse --------------------------------------------------------- */
+.sync-dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: var(--r-pill);
+  background: var(--ok);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sync-dot { animation: syncPulse 2.2s ease-in-out infinite; }
+}
+@keyframes syncPulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 45%, transparent); }
+  50%      { box-shadow: 0 0 0 6px transparent; }
+}
+
+/* Dashed divider — only ever inside a card or a list. */
+.rule-dashed { border-top: 1px dashed var(--border-dashed); }
+
 /* ---- Code blocks ------------------------------------------------------- */
-/* A dark slab with a small chrome bar. Used by hand-written markup and by the
-   Shiki output in prose, which gets the same surface below. */
 .code {
+  border: 1px solid var(--border);
   border-radius: var(--r-md);
   overflow: hidden;
 }
@@ -1119,9 +1136,9 @@ textarea.field { resize: vertical; min-height: 120px; }
   background: var(--code-head);
   font-family: var(--font-mono);
   font-size: var(--text-xs);
-  font-weight: var(--fw-heading);
-  letter-spacing: 0.6px;
-  color: var(--ink-band-subtle);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.08em;
+  color: #8d949d;
 }
 .code__dots { display: flex; gap: var(--space-050); }
 .code__dots span { width: 8px; height: 8px; border-radius: 2px; }
@@ -1136,7 +1153,7 @@ textarea.field { resize: vertical; min-height: 120px; }
   color: var(--code-text);
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: 0.75rem;     /* 12px, fixed: not relative to the prose base */
+  font-size: 0.8125rem;
   line-height: 1.65;
 }
 
@@ -1144,41 +1161,41 @@ textarea.field { resize: vertical; min-height: 120px; }
 
 /* ===========================================================================
    Prose — rendered Markdown (blog posts, product bodies, legal documents).
-   Not layered: it styles descendant elements it does not name, and Tailwind
-   utilities are never applied inside it.
    =========================================================================== */
 .prose-foxe {
-  color: var(--text);
-  font-size: 1rem;         /* 16px */
+  color: var(--text-body);
+  font-size: 1rem;
   line-height: 1.7;
 }
 .prose-foxe > * + * { margin-top: 1.25em; }
 .prose-foxe h2 {
-  margin-top: 1.9em;
+  margin-top: 2.2em;
   margin-bottom: 0.55em;
-  font-size: 1.75rem;
+  padding-top: 1.2em;
+  border-top: 1px solid var(--border);
+  font-size: 1.5rem;
   font-weight: var(--fw-display);
-  letter-spacing: -0.5px;
+  letter-spacing: -0.015em;
   line-height: 1.2;
+  color: var(--text);
 }
 .prose-foxe h3 {
   margin-top: 1.6em;
   margin-bottom: 0.5em;
-  font-size: 1.3125rem;
+  font-size: 1.25rem;
   font-weight: var(--fw-display);
+  color: var(--text);
 }
 .prose-foxe h4 {
   margin-top: 1.4em;
   margin-bottom: 0.4em;
   font-size: var(--text-h4);
   font-weight: var(--fw-display);
+  color: var(--text);
 }
 .prose-foxe > h2:first-child,
-.prose-foxe > h3:first-child { margin-top: 0; }
+.prose-foxe > h3:first-child { margin-top: 0; border-top: none; padding-top: 0; }
 
-/* Product bodies are short — a handful of 40-to-500-word sections. The blog's
-   reading scale (16.5px at 1.7, 28px section heads, 1.9em above each) stretches
-   them into a long scroll for very little text, so they get a tighter one. */
 .prose-foxe--compact {
   font-size: var(--text-body);
   line-height: 1.6;
@@ -1187,6 +1204,8 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe--compact h2 {
   margin-top: 1.6em;
   margin-bottom: 0.4em;
+  padding-top: 0;
+  border-top: none;
   font-size: 1.25rem;
   font-weight: var(--fw-heading);
   letter-spacing: -0.01em;
@@ -1198,34 +1217,32 @@ textarea.field { resize: vertical; min-height: 120px; }
 }
 .prose-foxe--compact li { margin-top: 0.35em; }
 
-/* Legal documents are a run of numbered clauses, not a few chapter breaks —
-   the article's 28px section heads are far too loud across a dozen of them. */
-.prose-foxe--doc h2 { font-size: var(--text-h3); font-weight: var(--fw-heading); letter-spacing: -0.01em; }
+.prose-foxe--doc h2 { font-size: var(--text-h3); font-weight: var(--fw-heading); letter-spacing: -0.01em; padding-top: 0; border-top: none; }
 .prose-foxe--doc h3 { font-size: var(--text-h4); }
 
 .prose-foxe strong { color: var(--text); font-weight: var(--fw-heading); }
-.prose-foxe a { color: var(--link); text-decoration: underline; text-underline-offset: 2px; }
-.prose-foxe a:hover { color: var(--link-hover); }
+.prose-foxe a { color: var(--text); font-weight: var(--fw-medium); }
+.prose-foxe a:hover { color: var(--text-strong); }
 
 .prose-foxe ul, .prose-foxe ol { padding-left: 1.5em; }
 .prose-foxe ul { list-style: disc; }
 .prose-foxe ol { list-style: decimal; }
 .prose-foxe li { margin-top: 0.55em; }
-.prose-foxe li::marker { color: var(--text-subtle); }
+.prose-foxe li::marker { color: var(--text-faint); }
 
 .prose-foxe code {
   font-family: var(--font-mono);
-  font-size: 0.85em;
+  font-size: 0.92em;
   background: var(--bg-hover);
-  border-radius: var(--r-sm);
-  padding: 2px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
   color: var(--text);
 }
-/* Fenced blocks are wrapped in .code by the rehype plugin, so the slab itself
-   is styled there. Prose only has to space the panel from the text around it. */
 .prose-foxe .code { margin: 0 0 var(--space-250); }
 .prose-foxe pre code {
   background: none;
+  border: none;
   padding: 0;
   font-size: inherit;
   color: inherit;
@@ -1233,54 +1250,54 @@ textarea.field { resize: vertical; min-height: 120px; }
 
 .prose-foxe blockquote {
   margin-inline: 0;
-  border-left: 3px solid var(--acc-1);
+  border-left: 2px solid var(--border-strong);
   padding-left: 1em;
-  color: var(--text-subtle);
+  color: var(--text-faint);
 }
-.prose-foxe hr { border: none; border-top: 1px solid var(--border); }
+.prose-foxe hr { border: none; border-top: 1px dashed var(--border-dashed); }
+.prose-foxe img { border-radius: var(--r-lg); }
 
 .prose-foxe .table-wrap { overflow-x: auto; margin-block: 1.8em; }
 .prose-foxe table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
-  border: 1px solid var(--border);
-  border-radius: var(--r-md);
-  overflow: hidden;
+  font-size: 0.9375rem;
+  line-height: 1.45;
 }
 .prose-foxe thead th {
-  background: var(--ink-band);
-  color: var(--ink-band-text);
-  font-weight: var(--fw-heading);
-  padding: 12px;
-  text-align: center;
-  white-space: nowrap;
-}
-.prose-foxe thead th:first-child { text-align: left; padding-inline: var(--space-200); }
-/* The recommended column reads as the answer. */
-.prose-foxe thead th:last-child { background: var(--acc-1); }
-.prose-foxe tbody td {
-  padding: 12px;
-  border-top: 1px solid var(--border);
-  color: var(--text-subtle);
-  text-align: center;
-}
-.prose-foxe tbody tr:nth-child(even) { background: var(--bg-subtle); }
-.prose-foxe tbody td:first-child {
   text-align: left;
-  padding-inline: var(--space-200);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-caps);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8em 0.85em;
+  white-space: nowrap;
+  background: none;
+}
+.prose-foxe thead th:first-child { text-align: left; }
+.prose-foxe thead th:last-child { background: none; }
+.prose-foxe tbody td {
+  padding: 0.7em 0.85em;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-body);
+  text-align: left;
+}
+.prose-foxe tbody tr:nth-child(even) { background: none; }
+.prose-foxe tbody td:first-child {
   color: var(--text);
   font-weight: var(--fw-medium);
 }
 .prose-foxe tbody td:last-child {
-  background: var(--link-tint);
-  color: var(--link);
-  font-weight: var(--fw-heading);
+  background: none;
+  color: var(--text-body);
+  font-weight: var(--fw-body);
 }
+.prose-foxe tbody tr:last-child td { border-bottom: none; }
 
 @media (max-width: 620px) {
-  /* A comparison table cannot usefully reflow — let it scroll inside itself
-     instead of forcing the whole page sideways. */
   .prose-foxe table {
     display: block;
     overflow-x: auto;
@@ -1291,10 +1308,9 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe .pros li::marker { color: var(--ok); }
 .prose-foxe .cons li::marker { color: var(--bad); }
 
-/* In-prose FAQ — visible Q&A that also feeds the FAQPage schema. */
 .prose-foxe .faq-list { display: flex; flex-direction: column; gap: var(--space-150); margin-top: 1.4em; }
 .prose-foxe .faq-item {
-  background: var(--bg);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--r-md);
 }
@@ -1313,8 +1329,9 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe .faq-item summary::-webkit-details-marker { display: none; }
 .prose-foxe .faq-item summary::after {
   content: '+';
+  font-family: var(--font-mono);
   font-size: 1.125rem;
-  color: var(--text-subtle);
+  color: var(--text-faint);
   flex: none;
 }
 .prose-foxe .faq-item[open] summary::after { content: '−'; }
@@ -1324,9 +1341,5 @@ textarea.field { resize: vertical; min-height: 120px; }
   padding: 0 22px 20px;
   font-size: 0.9375rem;
   line-height: 1.6;
-  color: var(--text-subtle);
+  color: var(--text-body);
 }
-
-/* Shiki paints the slab and each token inline from the single dark theme in
-   astro.config.mjs, using the same colours as the --code-* properties. Nothing
-   to add here: an unlayered rule would beat .code in @layer components. */

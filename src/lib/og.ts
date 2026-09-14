@@ -16,10 +16,10 @@ export const OG_HEIGHT = 630;
 
 // Brand tokens, hard-coded because satori has no cascade to read them from.
 // Keep in step with src/styles/global.css.
-const INK = '#1D1E20';
-const WHITE = '#FFFFFF';
-const DIM = '#DDE3E9';
-const FAINT = '#777A81';
+const INK = '#0a0a0b';
+const WHITE = '#f4f5f6';
+const DIM = '#b0b6be';
+const FAINT = '#8d949d';
 
 /**
  * Card hues, keyed on the names in config/accents.ts so a card and the page it
@@ -30,10 +30,10 @@ const FAINT = '#777A81';
  * 'blue' is also the fallback for an unknown accent name.
  */
 export const OG_ACCENTS = {
-  blue: '#4C93EE',
-  purple: '#C084EE',
-  amber: '#FBBA47',
-  lime: '#A9D66A',
+  blue: '#4d6bfa',
+  purple: '#9a5cf5',
+  amber: '#f5a30b',
+  lime: '#10c877',
 } as const;
 
 export type OgAccent = keyof typeof OG_ACCENTS;
@@ -55,12 +55,13 @@ const dataUri = (path: string): string => {
   return uri;
 };
 
-// Static instances cut from the Bricolage Grotesque variable font at the two
-// weights the card uses. Satori cannot read woff2 (what fontsource ships) and
-// does not apply variable axes, so the site's webfont is no use here.
+// Static instances of the site's faces. Satori cannot read woff2 (what
+// fontsource ships) and does not apply variable axes, so these are the
+// gstatic static cuts.
 const fonts = [
-  { name: 'Bricolage', data: asset('src/assets/fonts/bricolage-400.ttf'), weight: 400 as const, style: 'normal' as const },
-  { name: 'Bricolage', data: asset('src/assets/fonts/bricolage-800.ttf'), weight: 800 as const, style: 'normal' as const },
+  { name: 'Space Grotesk', data: asset('src/assets/fonts/space-grotesk-400.ttf'), weight: 400 as const, style: 'normal' as const },
+  { name: 'Space Grotesk', data: asset('src/assets/fonts/space-grotesk-700.ttf'), weight: 700 as const, style: 'normal' as const },
+  { name: 'Inconsolata', data: asset('src/assets/fonts/inconsolata-500.ttf'), weight: 500 as const, style: 'normal' as const },
 ];
 
 // Rasterised from public/foxe.svg, which satori cannot read. A build input
@@ -118,7 +119,7 @@ function template({ eyebrow, title, subtitle, accent = 'blue', background }: OgC
         justifyContent: 'space-between',
         background: INK,
         padding: '68px 72px 76px',
-        fontFamily: 'Bricolage',
+        fontFamily: 'Space Grotesk',
       },
     },
     background
@@ -139,7 +140,7 @@ function template({ eyebrow, title, subtitle, accent = 'blue', background }: OgC
         {
           style: {
             fontSize: '21px',
-            fontWeight: 800,
+            fontWeight: 700,
             letterSpacing: '0.14em',
             color: WHITE,
           },
@@ -150,21 +151,23 @@ function template({ eyebrow, title, subtitle, accent = 'blue', background }: OgC
     el(
       'div',
       { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-start', maxWidth: column } },
-      // The lozenge is the only place a hue touches type, and it carries ink —
-      // the brand rule is that the accent is a fill, never a text colour.
+      // The eyebrow is a tinted chip — the kit's 12% fill / 38% border with
+      // ink in the hue, mono caps.
       el(
         'div',
         {
           style: {
             display: 'flex',
-            background: hue,
-            color: INK,
+            background: `${hue}21`,
+            border: `2px solid ${hue}61`,
+            color: hue,
+            fontFamily: 'Inconsolata',
             fontSize: '20px',
-            fontWeight: 800,
-            letterSpacing: '0.07em',
+            fontWeight: 500,
+            letterSpacing: '0.1em',
             textTransform: 'uppercase',
-            padding: '7px 14px',
-            borderRadius: '4px',
+            padding: '7px 16px',
+            borderRadius: '999px',
             marginBottom: '26px',
           },
         },
@@ -176,7 +179,7 @@ function template({ eyebrow, title, subtitle, accent = 'blue', background }: OgC
           style: {
             display: 'flex',
             fontSize: `${titleSize(title, Boolean(background))}px`,
-            fontWeight: 800,
+            fontWeight: 700,
             lineHeight: 1.06,
             letterSpacing: '-0.025em',
             color: WHITE,
@@ -203,7 +206,7 @@ function template({ eyebrow, title, subtitle, accent = 'blue', background }: OgC
     ),
     el(
       'div',
-      { style: { display: 'flex', fontSize: '22px', fontWeight: 400, color: FAINT } },
+      { style: { display: 'flex', fontFamily: 'Inconsolata', fontSize: '22px', fontWeight: 500, color: FAINT } },
       'foxelabs.com'
     ),
     // Full-bleed rule along the bottom edge — the site's ink band with its

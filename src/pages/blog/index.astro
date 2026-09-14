@@ -51,14 +51,15 @@ const tags = tagIndex(posts);
         <!-- Title + the lead story -->
         <section class="band band--sm band--bottom">
           <div class="container-x">
-            <h1 style="font-size:var(--text-title);letter-spacing:-1.2px;margin-bottom:var(--space-150)">From the studio</h1>
+            <span class="mono" style="display:block;font-size:var(--text-small);color:var(--text-faint);margin-bottom:var(--space-200)">// notes from both ledgers</span>
+            <h1 style="font-size:var(--text-title);margin-bottom:var(--space-150)">The workshop log</h1>
             <p style="margin:0 0 var(--space-500);font-size:1.125rem;line-height:1.5;color:var(--text-subtle);max-width:560px">
               Notes on how we build — open-source software, expert advisor design, risk, and the
               occasional release.
             </p>
 
-            <a href={`/blog/${lead.id}/`} class="card lead-card">
-              <div class="card__field" style={`background:${leadAccent.color};color:${leadAccent.ink};padding:0`}>
+            <a href={`/blog/${lead.id}/`} class="card card--hover lead-card">
+              <div class="card__field" style="padding:0">
                 {lead.data.heroImage && (
                   <Image
                     src={lead.data.heroImage}
@@ -72,7 +73,7 @@ const tags = tagIndex(posts);
               </div>
               <div class="lead-card__body">
                 <span class="chip chip--sm" style="align-self:flex-start">
-                  <span class="dot" style={`background:${leadAccent.color}`} aria-hidden="true"></span>
+                  <span class="dot dot--sm" style={`background:${leadAccent.color};border-radius:999px`} aria-hidden="true"></span>
                   {leadTopic} · Featured
                 </span>
                 <h2 style="font-size:1.625rem;line-height:1.2;letter-spacing:-0.5px">{lead.data.title}</h2>

@@ -1,9 +1,9 @@
 ---
 import '../styles/global.css';
 // Only the display face is preloaded. Headings are usually the LCP element and
-// their swap is the loud one; body text swaps in from a metrics-matched Arial,
-// which shifts nothing, so it does not need to compete for connection priority.
-import bricolageWoff2 from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
+// their swap is the loud one; body text shares the same face here, so one
+// preload covers both.
+import spaceGroteskWoff2 from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import Analytics from '../components/Analytics.astro';
 import { SITE, organizationLd, websiteLd } from '../config/seo';
 import { ogImageFor } from '../config/og';
@@ -65,7 +65,7 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <link rel="preload" href={bricolageWoff2} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={spaceGroteskWoff2} as="font" type="font/woff2" crossorigin />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     {/* One icon for every theme: the fox head knocked out of a rounded tile in
@@ -77,20 +77,18 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="Foxe Labs Blog" href="/rss.xml" />
-    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#15191C" media="(prefers-color-scheme: dark)" />
-    {/* Runs before the first paint so a dark-theme visitor never sees a white
-        flash. It is deliberately inline and un-bundled for that reason. */}
+    <meta name="theme-color" content="#0a0a0b" />
+    {/* Dark is the default, as in the products. A stored choice of light is the
+        only way to the light theme; the system preference is not consulted.
+        Runs before first paint so a returning light-theme visitor never sees a
+        dark flash. Deliberately inline and un-bundled for that reason. */}
     <script is:inline>
       (function () {
         try {
           const stored = localStorage.getItem('foxe-theme');
-          const theme =
-            stored ??
-            (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-          document.documentElement.dataset.theme = theme;
+          document.documentElement.dataset.theme = stored === 'light' ? 'light' : 'dark';
         } catch (e) {
-          document.documentElement.dataset.theme = 'light';
+          document.documentElement.dataset.theme = 'dark';
         }
       })();
     </script>
@@ -150,7 +148,7 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
           const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
           root.dataset.theme = next;
           labelToggles();
-          if (meta) meta.setAttribute('content', next === 'dark' ? '#15191C' : '#FFFFFF');
+          if (meta) meta.setAttribute('content', next === 'dark' ? '#0a0a0b' : '#f4f4f5');
           try {
             localStorage.setItem('foxe-theme', next);
           } catch (e) {

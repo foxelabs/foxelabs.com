@@ -34,7 +34,6 @@ const STATIC_CARDS: OgEntry[] = [
     // spend its one lozenge repeating itself.
     eyebrow: 'Software & Trading',
     accent: 'blue',
-    background: 'src/assets/og/home-bg.png',
     title: 'Open-source software and trading tools',
     subtitle: 'WordPress plugins, PHP libraries, and precision MetaTrader software — built and used in-house.',
   },

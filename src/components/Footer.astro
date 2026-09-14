@@ -58,9 +58,12 @@ const isExternal = (href: string) => href.startsWith('http');
       <div class="footer__cols">
         <div class="footer__col">
           <span class="brand">
-            <img class="brand-logo" src="/foxe.svg" width="24" height="24" alt="" aria-hidden="true" />
+            <span class="brand-quad" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
             <span class="brand__name" style="font-size:var(--text-md)">Foxe Labs</span>
           </span>
+          <p class="mono" style="margin:0;font-size:var(--text-xs);color:var(--text-faint)">
+            Lines of code, lines on the chart.
+          </p>
           <p style="margin:0;font-size:var(--text-small);line-height:1.5;color:var(--text-subtle);max-width:220px">
             Software provided as-is. Trading carries risk — not financial advice.
           </p>

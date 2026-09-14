@@ -26,11 +26,10 @@ const date = post.data.pubDate.toLocaleDateString('en-GB', {
   year: 'numeric',
 });
 ---
-<a href={`/blog/${post.id}/`} class="card" data-post-topic={topic}>
-  {/* The cover sits on a field in the topic's hue: a post without an image
-      still gets the same block of colour the grid is built around. */}
-  {/* color pins a readable foreground for any future overlay on the hue. */}
-  <div class="card__field" style={`${field};background:${accent.color};color:${accent.ink};padding:0`}>
+<a href={`/blog/${post.id}/`} class="card card--hover" data-post-topic={topic}>
+  {/* The tint-fill covers carry their own ground; a post without an image
+      falls back to a 12% tint of the topic hue. */}
+  <div class="card__field" style={`${field};background:color-mix(in srgb, ${accent.color} 12%, var(--bg-sunken));border-bottom:1px solid var(--border);padding:0`}>
     {post.data.heroImage && (
       <Image
         src={post.data.heroImage}
@@ -43,7 +42,7 @@ const date = post.data.pubDate.toLocaleDateString('en-GB', {
   </div>
   <div class="card__body">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-      <span class="kicker">{topic}</span>
+      <span class="kicker" style={`color:${accent.color}`}>{topic}</span>
       {showDate && <span style="font-size:var(--text-xs);color:var(--text-subtle)">{date}</span>}
     </div>
     <h3 style="font-size:var(--text-body-lg);font-weight:var(--fw-heading);line-height:1.35;letter-spacing:0">

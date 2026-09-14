@@ -31,10 +31,10 @@ export const ACCENTS: Accent[] = [
 /** Raw hex per hue, for contexts that cannot resolve a CSS variable —
     the share-card renderer, which rasterises outside the browser. */
 export const ACCENT_HEX: Record<string, string> = {
-  blue:   '#1A6BD6',
-  purple: '#9C46D6',
-  amber:  '#F9A50B',
-  lime:   '#97C94E',
+  blue:   '#4d6bfa',
+  purple: '#9a5cf5',
+  amber:  '#f5a30b',
+  lime:   '#10c877',
 };
 
 /** Fixed hue per category, shared by category pages and listings.
