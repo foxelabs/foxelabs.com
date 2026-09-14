@@ -979,10 +979,20 @@ textarea.field { resize: vertical; min-height: 120px; }
   transition: background-color 0.1s ease, border-color 0.1s ease, color 0.1s ease;
 }
 .social-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text);
+  color: var(--social, var(--text));
+  border-color: color-mix(in srgb, var(--social, var(--text)) 45%, var(--border));
+  background: color-mix(in srgb, var(--social, var(--text)) 8%, transparent);
   text-decoration: none;
 }
+/* Brand colour on hover, keyed on the destination so every social button on
+   the site picks it up without extra markup. X and GitHub are monochrome
+   brands, so they take the strongest text colour and follow the theme. */
+.social-btn[href*="x.com"],
+.social-btn[href*="github.com"]    { --social: var(--text-strong); }
+.social-btn[href*="youtube.com"]   { --social: #ff0033; }
+.social-btn[href*="instagram.com"] { --social: #e4405f; }
+.social-btn[href*="facebook.com"]  { --social: #0866ff; }
+.social-btn[href*="linkedin.com"]  { --social: #0a66c2; }
 .social-row {
   display: flex;
   flex-wrap: wrap;

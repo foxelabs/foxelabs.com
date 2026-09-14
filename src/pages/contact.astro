@@ -100,7 +100,7 @@ const topics = [
               <h2 class="kicker" style="color:var(--hue-blue)">The studio</h2>
               <div class="social-row">
                 {SOCIALS.map((s) => (
-                  <a href={s.href} class="social-btn social-btn--tint" aria-label={s.label} target="_blank" rel="noopener noreferrer">
+                  <a href={s.href} class="social-btn" aria-label={s.label} target="_blank" rel="noopener noreferrer">
                     <Icon name={s.icon} width={16} height={16} aria-hidden="true" />
                   </a>
                 ))}
@@ -112,7 +112,7 @@ const topics = [
                 {founderSocials.map((s) => (
                   <a
                     href={s.href}
-                    class="social-btn social-btn--tint"
+                    class="social-btn"
                     aria-label={`Joel James on ${s.platform} — ${s.label}`}
                     title={s.label}
                     target="_blank"
@@ -214,7 +214,6 @@ const topics = [
   .topic > span:last-child { display: flex; flex-direction: column; gap: 2px; }
   .topic strong { font-size: var(--text-md); color: var(--text); font-weight: var(--fw-heading); }
   .topic > span:last-child > span { font-size: var(--text-small); color: var(--text-subtle); line-height: 1.4; }
-  .social-btn--tint:hover { color: var(--hue-amber); border-color: color-mix(in srgb, var(--hue-amber) 45%, var(--border)); }
   .form-head {
     display: flex;
     align-items: center;
