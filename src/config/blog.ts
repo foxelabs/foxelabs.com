@@ -37,8 +37,8 @@ export const TOPIC_META: Record<Topic, TopicMeta> = {
   Writing: {
     slug: 'writing',
     description:
-      'Everything else — notes on the craft, the studio, and lessons picked up along the way.',
-    seoTitle: 'Notes from the Studio',
+      'Everything else — notes on the craft, the lab, and lessons picked up along the way.',
+    seoTitle: 'Notes from the Lab',
   },
 };
 

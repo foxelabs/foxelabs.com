@@ -28,7 +28,7 @@ export const GET: APIRoute = async () => {
   const sections = [
     `# ${SITE.name}`,
     '',
-    '> Foxe Labs (legally Foxe Labs LLP) is a small software studio based in Kerala, India. Two tracks: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5.',
+    '> Foxe Labs (legally Foxe Labs LLP) is a small software lab based in Kerala, India. Two tracks: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5.',
     '',
     'Everything on the software track is open source and free. Premium plugin add-ons are sold through Freemius with a 7-day money-back guarantee. On the trading track, Gold Scalpel is live on the MQL5 Market; the remaining trading products are in development and available by waitlist.',
     '',

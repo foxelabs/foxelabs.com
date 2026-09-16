@@ -54,7 +54,7 @@ export function organizationLd() {
       addressCountry: 'IN',
     },
     description:
-      'A small software studio building open-source WordPress tools and precision trading software.',
+      'A small software lab building open-source WordPress tools and precision trading software.',
     founder: { '@type': 'Person', name: SITE.founder },
     sameAs: SOCIALS.map((s) => s.href),
   };

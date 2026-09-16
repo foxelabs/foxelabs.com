@@ -62,7 +62,7 @@ const STATIC_CARDS: OgEntry[] = [
     slug: 'about',
     eyebrow: 'About',
     accent: 'emerald',
-    title: 'A small studio that ships and keeps shipping',
+    title: 'A small lab that ships and keeps shipping',
     subtitle: 'Foxe Labs builds open-source tools and trading software, and runs on both.',
   },
   {
@@ -70,7 +70,7 @@ const STATIC_CARDS: OgEntry[] = [
     eyebrow: 'Contact',
     accent: 'purple',
     title: 'Talk to the people who wrote it',
-    subtitle: 'Support, licensing, or a custom build — every message reaches the studio directly.',
+    subtitle: 'Support, licensing, or a custom build — every message reaches the lab directly.',
   },
   // The legal set stays on the brand hue: three near-identical cards in three
   // different colours would read as three different kinds of document.
