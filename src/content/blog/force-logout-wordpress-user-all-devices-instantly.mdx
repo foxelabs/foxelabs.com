@@ -45,6 +45,25 @@ Below are four ways to force log out a WordPress user, from the core
 button to a polling script that bounces their open tabs to the login screen
 within a minute, with honest pros and cons for each.
 
+## The quick answer
+
+The fastest way to sign a user out everywhere *and* have their open tabs
+actually show the login screen is the free
+[Loggedin plugin](/software/plugins/loggedin/) with its
+[Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/):
+
+1. Install and activate Loggedin, then the Real-time Logout add-on.
+2. Open **Users → Loggedin → Settings**, type the user's ID, email or
+   username into **Force Logout**, and click the button.
+3. Every session for that user ends on the server, and within the polling
+   interval (60 seconds by default) each tab they have open reloads to
+   wp-login.
+
+To sign out just one device, or many users at once, add
+[Active Sessions](/software/plugins/loggedin/active-sessions/). If you'd
+rather do it with core tools or code, the methods below cover each option,
+and [the comparison](#how-the-methods-compare) shows what each one gives up.
+
 ## First, what "logged in" actually means
 
 When a user signs in, WordPress creates a random **session token**, stores

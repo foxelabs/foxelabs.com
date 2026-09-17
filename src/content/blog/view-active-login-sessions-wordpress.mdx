@@ -43,6 +43,21 @@ If any of those sound familiar, this guide is for you. Below are four ways to vi
 currently active login sessions on a WordPress website — from a raw database query
 through to a one-click admin tool — with honest pros and cons for each.
 
+## The quick answer
+
+WordPress has no built-in screen for this. The fastest way to see who's
+signed in right now is the free [Loggedin plugin](/software/plugins/loggedin/)
+with its [Active Sessions add-on](/software/plugins/loggedin/active-sessions/):
+
+1. Install and activate Loggedin, then the Active Sessions add-on.
+2. Open **Users → Loggedin → Sessions**.
+3. Every user with a live session is listed. Click a row to see each device's
+   IP, browser and expiry, and sign out one device or all of them.
+
+No SQL, no code, no SSH. If you'd rather do it by hand, the manual methods
+below read the same data, and [the comparison](#why-this-is-the-practical-answer)
+shows what each one gives up.
+
 ## First, what's a "session" in WordPress?
 
 A WordPress session is created the moment a user successfully logs in. Internally

@@ -50,6 +50,22 @@ This guide covers four ways to automatically log out inactive users on a
 WordPress website — from a one-line filter to a complete idle-timeout setup with
 a warning countdown — with honest pros and cons for each.
 
+## The quick answer
+
+WordPress has no idle timeout. The fastest way to add one is the free
+[Loggedin plugin](/software/plugins/loggedin/) with its
+[Auto Logout add-on](/software/plugins/loggedin/auto-logout/):
+
+1. Install and activate Loggedin, then the Auto Logout add-on.
+2. Open **Users → Loggedin → Settings**.
+3. Set the idle timeout in minutes, optionally per role, turn on the warning
+   countdown, and save.
+
+Idle users are signed out on the server, with a "Stay signed in" prompt
+first. If you'd rather build it yourself, the code methods below cover each
+piece, and [the comparison](#how-the-methods-compare) shows what each one
+gives up.
+
 ## First, how WordPress decides you're still logged in
 
 When a user signs in, WordPress generates a *session token*, stores it in the

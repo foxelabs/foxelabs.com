@@ -53,6 +53,23 @@ Two of them are code you can paste today. One is a common piece of bad
 advice. The last one is the plugin I've maintained for this exact job
 since 2016.
 
+## The quick answer
+
+WordPress has no login limit. The fastest way to add one is the free
+[Loggedin plugin](/software/plugins/loggedin/):
+
+1. Install and activate Loggedin from WordPress.org.
+2. Open **Users → Loggedin → Settings**.
+3. Set **Active Logins Limit** (1 stops sharing outright, 2 or 3 allows a
+   phone and a laptop), pick **Logout Oldest**, **Logout All** or
+   **Block New**, and save.
+
+That's the whole setup, and it's free. For different limits per role or per
+user, add [Limit Per Role](/software/plugins/loggedin/limit-per-role/) or
+[Limit Per User](/software/plugins/loggedin/limit-per-user/). If you'd rather
+write it yourself, the snippets below show how, and
+[the comparison](#how-the-methods-compare) shows what each one gives up.
+
 ## First, what does "logged in" mean in WordPress?
 
 When a user signs in, WordPress generates a random **session token**, stores
