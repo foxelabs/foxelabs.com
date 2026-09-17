@@ -240,85 +240,50 @@ browser and change it. Something in the browser has to ask.
 
 ## Method 4 — Poll the server and reload the tab (recommended)
 
-The fix is small: a script on every authenticated page that asks the server
-"is my session still valid?" on an interval, and reloads the page the moment
-the answer is no. The reload hits WordPress with a dead cookie, and
-WordPress redirects to wp-login. From the user's side, the tab they were
-looking at simply turns into the login screen.
+The fix for job two has to live in the browser: something on every
+authenticated page that asks the server "is my session still valid?" on an
+interval, and reloads the page the moment the answer is no. The reload hits
+WordPress with a dead cookie, WordPress redirects to wp-login, and from the
+user's side the tab they were looking at simply turns into the login screen.
 
-Here's the whole mechanism in a companion plugin, so you can see there's
-no magic in it:
+The idea is simple. Getting it right on a live site is where the work is:
 
-```php
-// 1. One tiny endpoint that answers "is this request from a logged-in user?"
-add_action( 'wp_ajax_session_check', 'my_session_check' );
-add_action( 'wp_ajax_nopriv_session_check', 'my_session_check' );
-function my_session_check() {
-    wp_send_json_success( array( 'active' => is_user_logged_in() ) );
-}
+- **The interval is a load decision.** Every open tab makes one request per
+  interval. Sixty seconds is a sensible floor. A five-second interval on a
+  site with hundreds of concurrent members is tens of thousands of requests
+  a minute.
+- **The check has to bypass page caching.** A cached "yes, you're logged in"
+  answer defeats the whole point, and so does a reload that serves the
+  browser's cached copy of the members' page.
+- **It must only load for logged-in users.** Anonymous visitors, usually most
+  of your traffic, should get nothing extra, so cached public pages stay
+  untouched.
+- **It can't keep idle sessions alive.** If you also run an idle timeout, the
+  polling requests must never count as activity, or a tab left open on an
+  unattended screen never times out.
+- **It has to fail quietly.** A flaky connection shouldn't reload the page or
+  fill the console with errors.
 
-// 2. A poller, loaded only for logged-in users, on the front end and in wp-admin.
-add_action( 'wp_enqueue_scripts', 'my_session_poller' );
-add_action( 'admin_enqueue_scripts', 'my_session_poller' );
-function my_session_poller() {
-    if ( ! is_user_logged_in() ) {
-        return; // Anonymous visitors get nothing — nothing to poll for.
-    }
-
-    wp_register_script( 'my-session-poller', false, array(), null, true );
-    wp_enqueue_script( 'my-session-poller' );
-    wp_add_inline_script( 'my-session-poller', sprintf(
-        "setInterval(function(){
-            fetch(%s,{method:'POST',credentials:'same-origin',
-                headers:{'Content-Type':'application/x-www-form-urlencoded'},
-                body:'action=session_check'})
-            .then(function(r){return r.ok?r.json():null;})
-            .then(function(j){if(j&&j.data&&j.data.active===false){window.location.reload();}})
-            .catch(function(){});
-        },60000);",
-        wp_json_encode( admin_url( 'admin-ajax.php' ) )
-    ) );
-}
-```
-
-A dead cookie makes WordPress treat the request as anonymous, so
-`is_user_logged_in()` returns false, the script reloads, and the redirect to
-wp-login happens on its own. Sixty seconds is a deliberate default: each
-open tab makes one small request per interval, so a five-second interval on
-a site with hundreds of concurrent members is tens of thousands of requests
-a minute. `admin-ajax.php` is exempt from every page cache I know of, which
-is why it's the endpoint here.
-
-<div class="pros">
-
-**Pros**
-
-- Actually does job two. The user's tab reloads to the login screen without them touching anything, in wp-admin *and* on the front end.
-- Catches every way a session can end: an admin's force logout, a logout on another device, a hit concurrent-session limit, an idle timeout.
-- Plain polling. Works on every WordPress host with no WebSockets, no Node sidecar, no third-party realtime service, no firewall changes.
-
-</div>
-
-<div class="cons">
-
-**Cons**
-
-- It's a companion plugin you're now maintaining, with the interval hard-coded.
-- No settings screen, so changing the interval means editing code.
-- Nothing prevents someone from setting the interval to one second and paying for it in server load.
-
-</div>
-
-That snippet is, give or take a settings panel, the
+You can build that yourself, and then maintain it through every WordPress
+and caching-plugin update. Or you can use the
 [Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/) for
-the free [Loggedin plugin](/software/plugins/loggedin/). The add-on puts
-the interval on the **Users → Loggedin → Settings** screen, defaults it to
-60 seconds, loads the poller only for logged-in users, and forces a hard
-reload past the browser cache so a freshly cached members' page can't
-linger after the session is gone. It also plays correctly with the
-[Auto Logout add-on](/software/plugins/loggedin/auto-logout/): the poll
-requests are checked for validity but never count as user activity, so a
-tab left open on an unattended screen still times out on schedule.
+the free [Loggedin plugin](/software/plugins/loggedin/), which handles all of
+the above:
+
+- **One setting.** The refresh interval sits on the
+  **Users → Loggedin → Settings** screen, 60 seconds by default.
+- **Front end and wp-admin.** Open tabs reload to wp-login within the
+  interval, including members' areas and course pages where core's Heartbeat
+  doesn't run.
+- **Catches every way a session ends.** An admin's force logout, a logout on
+  another device, a hit concurrent-session limit, or an idle timeout from the
+  [Auto Logout add-on](/software/plugins/loggedin/auto-logout/).
+- **Loads only for logged-in users**, and forces a hard reload past the
+  browser cache so a cached page can't linger after the session is gone.
+- **Plays correctly with Auto Logout.** Poll requests are checked but never
+  count as activity.
+- **Works on every host.** It's plain polling, with no WebSockets, no Node
+  process, no third-party realtime service and no firewall changes.
 
 ### Putting job one and job two together
 
@@ -364,10 +329,11 @@ the user already has open. On the front end, that tab stays rendered until
 they click.
 
 Closing that gap takes a script in the browser that asks the server
-whether the session is still alive and reloads when it isn't. You've now
-seen the whole thing in forty lines, and the
+whether the session is still alive and reloads when it isn't, without
+hammering the server, fighting the page cache, or keeping idle sessions
+alive. The
 [Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/)
-packages it with a settings panel on top of the free
+does exactly that from one setting on top of the free
 [Loggedin plugin](/software/plugins/loggedin/), whose Force Logout panel and
 [Active Sessions add-on](/software/plugins/loggedin/active-sessions/)
 handle the first job from the same screen. If what you actually need is
