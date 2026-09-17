@@ -66,10 +66,12 @@ export function websiteLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${SITE.url}/#website`,
-    // `name` is the site name Google may show above the SERP title.
+    // `name` is the site name Google shows above the SERP title. Keep the
+    // domain out of alternateName (it invites Google to show the domain) and
+    // make `url` match the homepage canonical exactly, trailing slash included.
     name: SITE.name,
-    alternateName: ['FoxeLabs', 'foxelabs.com'],
-    url: SITE.url,
+    alternateName: 'FoxeLabs',
+    url: `${SITE.url}/`,
     publisher: { '@id': `${SITE.url}/#organization` },
     inLanguage: 'en',
   };
