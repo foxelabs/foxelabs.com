@@ -1,0 +1,359 @@
+---
+title: "How to force log out a WordPress user from every device, instantly"
+description: Ending a WordPress session on the server is easy — the user's open tabs just don't notice until they click something. Here are four ways to force a user out of every device, from the button hidden in core to a polling script that bounces their tabs to the login screen within a minute, with honest pros and cons for each.
+seoTitle: How to force log out a WordPress user from all devices instantly
+seoDescription: Four ways to force logout a WordPress user on every device — the core Log Out Everywhere button, a password reset, WP-CLI and destroy_all(), or a polling script that reloads their open tabs — and why the user still looks signed in until you add the last one.
+pubDate: 2026-09-17
+author: Joel James
+track: oss
+heroImage: covers/cover-force-logout-wordpress-realtime.svg
+heroImageAlt: Minimal sky-blue line-art of a browser window with a highlighted exit arrow on a dark blue-tinted ground
+tags:
+  - wordpress
+  - security
+  - loggedin
+faq:
+  - q: How do I force log out a WordPress user?
+    a: "Open the user under Users → All Users → Edit and click Log Out Everywhere in the Sessions row. In code, call WP_Session_Tokens::get_instance( $user_id )->destroy_all(). From the terminal, run wp user session destroy <user> --all. The free Loggedin plugin adds a Force Logout panel that does the same from a user ID, email or username."
+  - q: How do I log out a WordPress user from all devices?
+    a: Destroy every session token the user holds. WordPress keeps one token per browser and device in the wp_usermeta table, and destroy_all() removes them all at once, so every device is signed out on its next request. The Log Out Everywhere button on the Edit User screen and the Loggedin Force Logout panel both call that method.
+  - q: Why does a user still appear logged in after I destroyed their session?
+    a: WordPress only checks the login cookie when the browser makes a request. A page that was already open keeps rendering as signed in until the user clicks something, and on the front end nothing makes a request on its own. To bounce open tabs immediately you need a script that polls the server, which is what the Real-time Logout add-on for Loggedin does.
+  - q: Does changing a user's password log them out everywhere?
+    a: Yes. The WordPress authentication cookie is signed with a fragment of the password hash, so once the password changes every existing cookie fails validation and each device is treated as logged out on its next request. It is effective but heavy-handed, because the user now has to reset their password too.
+  - q: How do I log out all WordPress users at once?
+    a: Change the security keys and salts in wp-config.php. Every authentication cookie is signed with those values, so rotating them invalidates every session on the site immediately, including your own. The Loggedin plugin's Active Sessions add-on offers a gentler option, a bulk sign-out for selected users from one list.
+  - q: Is WordPress real-time logout possible without WebSockets?
+    a: Yes. A small script on each authenticated page can ask admin-ajax.php every 60 seconds whether the session is still valid and reload the page when it is not. That is plain polling, it works on every host without a Node process or a third-party service, and at a one-minute interval the load is one small request per open tab per minute.
+---
+
+Someone hands in their notice and you need their WordPress access gone
+before they leave the building. A customer's laptop is stolen with the
+site still open. A refund goes through and the member should stop reading
+the paid content now, not when their cookie expires in two weeks. Every
+one of those is the same request: **force this user out of every device,
+right now.**
+
+WordPress can do the first half. Ending a session on the server is a
+one-line API call, and there's even a button for it buried in core. The
+second half is where people get caught out: the user's open tab has no
+idea it's been signed out, and keeps showing the dashboard, the course, or
+the members' area until they click something. On a front-end page that can
+be a long time.
+
+Below are four ways to force log out a WordPress user, from the core
+button to a polling script that bounces their open tabs to the login screen
+within a minute, with honest pros and cons for each.
+
+## First, what "logged in" actually means
+
+When a user signs in, WordPress creates a random **session token**, stores
+it in the `wp_usermeta` table under the meta key `session_tokens`, and puts
+the same token in the browser's authentication cookie. One token per
+browser, per device. A phone and a laptop are two sessions; two Chrome
+profiles are two more.
+
+The part that matters for this guide: **WordPress only looks at that cookie
+when the browser sends a request.** There is no live connection between
+the server and the page. A tab that finished loading at 9:00 is just HTML
+sitting in a browser; if you destroy the session at 9:01, the tab looks
+identical at 9:02. Only the next request, a click, a form submit, an AJAX
+call, gets bounced to wp-login.
+
+So "force logout" is really two jobs:
+
+1. **Invalidate the sessions on the server**, so the next request from any
+   device fails.
+2. **Make the open tabs notice**, so the user is actually looking at a
+   login screen instead of yesterday's page.
+
+Methods 1 through 3 do the first job. Only Method 4 does the second.
+
+## Method 1 — The "Log Out Everywhere" button in core
+
+WordPress has had this since 4.1, and almost nobody knows it's there. Open
+**Users → All Users**, click **Edit** on the user, and scroll to the
+**Sessions** row. If the user has any active sessions you'll see a
+**Log Out Everywhere** button. Click it and every session token for that
+user is destroyed.
+
+On your own profile the same row reads **Log Out Everywhere Else**, which
+keeps your current session and ends the rest, handy after using a shared
+computer.
+
+<div class="pros">
+
+**Pros**
+
+- Already installed. No plugin, no code.
+- Uses the official `WP_Session_Tokens::destroy_all()` API, so it works with any session storage backend.
+- Takes effect on the server immediately.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- Hidden four clicks deep on a screen most admins never scroll to the bottom of.
+- One user at a time. There's no way to sign out ten refunded members in one go.
+- All or nothing. You can't sign out just the stolen laptop and leave their phone alone.
+- The user's open tabs don't notice. They stay rendered as signed-in until the next click.
+
+</div>
+
+For a single leaver, this is genuinely enough for job one. Bookmark the
+screen.
+
+## Method 2 — Reset their password
+
+The blunt instrument. WordPress signs every authentication cookie with a
+four-character fragment of the user's password hash. Change the password,
+with **Generate Password** on the Edit User screen or a reset link, and every
+existing cookie fails validation on its next request, on every device.
+
+<div class="pros">
+
+**Pros**
+
+- Guaranteed. No cookie signed against the old hash can ever be used again.
+- The right move when the *credential* is the problem: a leaked password, an account you suspect is compromised.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- Heavy-handed for anything else. The user now has to reset a password they didn't ask to lose.
+- The stale session tokens stay in the database until the user logs in again, so a "who's logged in" report still lists them.
+- Doesn't help when the account is fine and you just want a specific device gone.
+- Same tab problem as Method 1. The page they had open stays on screen.
+
+</div>
+
+Related nuclear option: change the **security keys and salts** in
+`wp-config.php`. Every cookie on the site is signed with them, so rotating
+them logs out *everyone* at once, you included. Right after a breach, that's
+exactly what you want. On a Tuesday afternoon because one member was
+refunded, it isn't.
+
+## Method 3 — Code and WP-CLI
+
+For anything scripted, the API is `WP_Session_Tokens`. It's the same class
+the core button calls:
+
+```php
+// End every session for a user.
+WP_Session_Tokens::get_instance( $user_id )->destroy_all();
+
+// End every session except the one making this request.
+WP_Session_Tokens::get_instance( $user_id )->destroy_others( wp_get_session_token() );
+
+// End one specific session by its verifier (the key in the session_tokens meta).
+WP_Session_Tokens::get_instance( $user_id )->destroy( $verifier );
+```
+
+A practical use: sign a member out the moment their subscription is
+cancelled, so a refund and a logout are one event.
+
+```php
+// WooCommerce Subscriptions: cancelled → signed out everywhere.
+add_action( 'woocommerce_subscription_status_cancelled', function ( $subscription ) {
+    $user_id = $subscription->get_user_id();
+    if ( $user_id ) {
+        WP_Session_Tokens::get_instance( $user_id )->destroy_all();
+    }
+} );
+```
+
+From a terminal, WP-CLI ships the same thing:
+
+```bash
+# List the user's sessions, then end all of them.
+wp user session list jdoe
+wp user session destroy jdoe --all
+```
+
+If the free [Loggedin plugin](/software/plugins/loggedin/) is installed you
+also get `wp loggedin sessions list <user>` with a readable
+login-time / expiry / IP / user-agent table, and
+`wp loggedin sessions destroy <user> --token=<hash>` to end one device
+instead of all of them. Both accept a user ID, email, or username.
+
+<div class="pros">
+
+**Pros**
+
+- Scriptable. Hook it to a cancellation, a role change, an offboarding checklist.
+- Bulk operations are a `foreach` away.
+- `destroy()` on a single verifier is the only core route to "just that one device".
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- You need SSH or a deploy pipeline. Not something to hand a site owner.
+- Finding the verifier for "the stolen laptop" means reading the raw `session_tokens` meta and matching an IP or user-agent by eye.
+- And still, the tabs don't notice. The next request fails; the current page doesn't.
+
+</div>
+
+## Why the user still looks signed in
+
+At this point every method has done job one. The server no longer honours
+the session. And yet the user, sitting at the tab they had open, sees
+nothing change. This is the support ticket that follows every force
+logout: "I signed them out but they said they were still in."
+
+In **wp-admin**, the gap is short. The Heartbeat API pings the server every
+15 to 60 seconds, and when the session is gone WordPress shows its
+"Session expired, please log in again" overlay. That's core doing job two
+for you, but only inside the admin.
+
+On the **front end**, there is no Heartbeat. A members' area, a course
+lesson, a client dashboard built with a page builder: none of those make a
+request on their own. The page sits there, fully rendered, as long as the
+user leaves the tab open. Nothing on the server can reach into that
+browser and change it. Something in the browser has to ask.
+
+## Method 4 — Poll the server and reload the tab (recommended)
+
+The fix is small: a script on every authenticated page that asks the server
+"is my session still valid?" on an interval, and reloads the page the moment
+the answer is no. The reload hits WordPress with a dead cookie, and
+WordPress redirects to wp-login. From the user's side, the tab they were
+looking at simply turns into the login screen.
+
+Here's the whole mechanism in a companion plugin, so you can see there's
+no magic in it:
+
+```php
+// 1. One tiny endpoint that answers "is this request from a logged-in user?"
+add_action( 'wp_ajax_session_check', 'my_session_check' );
+add_action( 'wp_ajax_nopriv_session_check', 'my_session_check' );
+function my_session_check() {
+    wp_send_json_success( array( 'active' => is_user_logged_in() ) );
+}
+
+// 2. A poller, loaded only for logged-in users, on the front end and in wp-admin.
+add_action( 'wp_enqueue_scripts', 'my_session_poller' );
+add_action( 'admin_enqueue_scripts', 'my_session_poller' );
+function my_session_poller() {
+    if ( ! is_user_logged_in() ) {
+        return; // Anonymous visitors get nothing — nothing to poll for.
+    }
+
+    wp_register_script( 'my-session-poller', false, array(), null, true );
+    wp_enqueue_script( 'my-session-poller' );
+    wp_add_inline_script( 'my-session-poller', sprintf(
+        "setInterval(function(){
+            fetch(%s,{method:'POST',credentials:'same-origin',
+                headers:{'Content-Type':'application/x-www-form-urlencoded'},
+                body:'action=session_check'})
+            .then(function(r){return r.ok?r.json():null;})
+            .then(function(j){if(j&&j.data&&j.data.active===false){window.location.reload();}})
+            .catch(function(){});
+        },60000);",
+        wp_json_encode( admin_url( 'admin-ajax.php' ) )
+    ) );
+}
+```
+
+A dead cookie makes WordPress treat the request as anonymous, so
+`is_user_logged_in()` returns false, the script reloads, and the redirect to
+wp-login happens on its own. Sixty seconds is a deliberate default: each
+open tab makes one small request per interval, so a five-second interval on
+a site with hundreds of concurrent members is tens of thousands of requests
+a minute. `admin-ajax.php` is exempt from every page cache I know of, which
+is why it's the endpoint here.
+
+<div class="pros">
+
+**Pros**
+
+- Actually does job two. The user's tab reloads to the login screen without them touching anything, in wp-admin *and* on the front end.
+- Catches every way a session can end: an admin's force logout, a logout on another device, a hit concurrent-session limit, an idle timeout.
+- Plain polling. Works on every WordPress host with no WebSockets, no Node sidecar, no third-party realtime service, no firewall changes.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- It's a companion plugin you're now maintaining, with the interval hard-coded.
+- No settings screen, so changing the interval means editing code.
+- Nothing prevents someone from setting the interval to one second and paying for it in server load.
+
+</div>
+
+That snippet is, give or take a settings panel, the
+[Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/) for
+the free [Loggedin plugin](/software/plugins/loggedin/). The add-on puts
+the interval on the **Users → Loggedin → Settings** screen, defaults it to
+60 seconds, loads the poller only for logged-in users, and forces a hard
+reload past the browser cache so a freshly cached members' page can't
+linger after the session is gone. It also plays correctly with the
+[Auto Logout add-on](/software/plugins/loggedin/auto-logout/): the poll
+requests are checked for validity but never count as user activity, so a
+tab left open on an unattended screen still times out on schedule.
+
+### Putting job one and job two together
+
+The reason the add-on lives under Loggedin is that the plugin already covers
+job one from the admin, in a way the core button doesn't:
+
+- **Force Logout panel** (free, in the core plugin) — type a user ID, email,
+  or username and every session for that account ends in one click. No
+  scrolling to the bottom of an Edit User screen.
+- **[Active Sessions add-on](/software/plugins/loggedin/active-sessions/)** —
+  a sortable, searchable list of everyone signed in right now, with a
+  per-user modal showing each device's IP, user-agent, login time and
+  expiry. Sign out one device, all of a user's devices, or select several
+  users and bulk sign-out. This is the "just the stolen laptop" option none
+  of the core methods give you without reading raw meta.
+- **Real-time Logout add-on** — the poller above, so whichever of those
+  buttons you press, the user's tabs are on the login screen within a
+  minute.
+
+### How the methods compare
+
+<div class="table-wrap">
+
+| | Core button | Password reset | Code / WP-CLI | Loggedin + Real-time Logout |
+| --- | :---: | :---: | :---: | :---: |
+| Ends the session on the server | ✓ | ✓ | ✓ | ✓ |
+| Sign out one device only | — | — | manual | ✓ |
+| Bulk sign-out of many users | — | — | scripted | add-on |
+| User keeps their password | ✓ | — | ✓ | ✓ |
+| Open tabs reload on their own (wp-admin) | Heartbeat | Heartbeat | Heartbeat | ✓ |
+| Open tabs reload on their own (front end) | — | — | — | ✓ |
+| Non-technical owners can do it | partly | ✓ | — | ✓ |
+
+</div>
+
+## Wrapping up
+
+Force-logging-out a WordPress user is two jobs, and core only makes the
+first one easy. `destroy_all()`, the **Log Out Everywhere** button, and
+`wp user session destroy` all end the session on the server, and a password
+reset or a salt rotation does it with a hammer. None of them touch the tab
+the user already has open. On the front end, that tab stays rendered until
+they click.
+
+Closing that gap takes a script in the browser that asks the server
+whether the session is still alive and reloads when it isn't. You've now
+seen the whole thing in forty lines, and the
+[Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/)
+packages it with a settings panel on top of the free
+[Loggedin plugin](/software/plugins/loggedin/), whose Force Logout panel and
+[Active Sessions add-on](/software/plugins/loggedin/active-sessions/)
+handle the first job from the same screen. If what you actually need is
+for idle users to sign themselves out, that's the
+[Auto Logout add-on](/software/plugins/loggedin/auto-logout/), covered in
+[its own guide](/blog/auto-logout-inactive-users-wordpress/).
+
+— JJ

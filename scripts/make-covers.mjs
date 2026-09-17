@@ -151,6 +151,33 @@ const PICTOGRAMS = {
       <circle cx="652" cy="488" r="9" fill="${s}"/>
       <rect x="680" y="480" width="130" height="16" rx="7" fill="${s}"/>
     </g>`,
+  // concurrent logins: three device frames, the newest one full-hue and crossed out
+  devices: (h, s) => `
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="596" y="352" width="112" height="136" rx="14" stroke="${s}" stroke-width="10"/>
+      <line x1="636" y1="462" x2="668" y2="462" stroke="${s}" stroke-width="10"/>
+      <rect x="744" y="352" width="112" height="136" rx="14" stroke="${s}" stroke-width="10"/>
+      <line x1="784" y1="462" x2="816" y2="462" stroke="${s}" stroke-width="10"/>
+      <rect x="892" y="352" width="112" height="136" rx="14" stroke="${h}" stroke-width="10"/>
+      <g stroke="${h}" stroke-width="12">
+        <line x1="926" y1="398" x2="970" y2="442"/>
+        <line x1="970" y1="398" x2="926" y2="442"/>
+      </g>
+    </g>`,
+  // force logout: browser window with a full-hue arrow leaving through the frame
+  exit: (h, s) => `
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M760 340 H636 C627 340 620 347 620 356 V524 C620 533 627 540 636 540 H760" stroke="${s}" stroke-width="10"/>
+      <line x1="620" y1="392" x2="760" y2="392" stroke="${s}" stroke-width="10"/>
+      <circle cx="652" cy="366" r="7" fill="${s}" stroke="none"/>
+      <circle cx="680" cy="366" r="7" fill="${s}" stroke="none"/>
+      <rect x="656" y="430" width="70" height="16" rx="7" fill="${s}" stroke="none"/>
+      <rect x="656" y="470" width="50" height="16" rx="7" fill="${s}" stroke="none"/>
+      <g stroke="${h}" stroke-width="13">
+        <line x1="800" y1="466" x2="980" y2="466"/>
+        <polyline points="932,418 980,466 932,514"/>
+      </g>
+    </g>`,
   // incident postmortem: browser window + full-hue alert
   incident: (h, s) => `
     <g fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -179,6 +206,8 @@ const COVERS = [
   { file: 'cover-laravel-bail.png', hue: 'red', art: 'bail', slug: '// laravel-bail' },
   { file: 'cover-partial-string-search-php.png', hue: 'purple', art: 'search', slug: '// str-search' },
   { file: 'cover-active-login-sessions-wordpress.png', hue: 'cyan', art: 'sessions', slug: '// active-sessions' },
+  { file: 'cover-limit-concurrent-logins-wordpress.png', hue: 'blue', art: 'devices', slug: '// limit-logins' },
+  { file: 'cover-force-logout-wordpress-realtime.png', hue: 'sky', art: 'exit', slug: '// force-logout' },
 ];
 
 const W = 1600;

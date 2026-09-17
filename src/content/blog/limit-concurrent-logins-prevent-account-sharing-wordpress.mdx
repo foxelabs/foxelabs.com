@@ -1,0 +1,310 @@
+---
+title: "How to limit concurrent logins and stop account sharing in WordPress"
+description: WordPress lets one account stay signed in on as many devices as it likes — a phone, a laptop, and three friends' browsers all at once. Here are four ways to cap concurrent logins per user, from a ten-line snippet to a free plugin with three enforcement modes, with honest pros and cons for each.
+seoTitle: How to limit concurrent logins and stop account sharing in WordPress
+seoDescription: Four ways to limit simultaneous logins per WordPress user and stop password sharing — a wp_authenticate_user snippet, a single-session snippet, session cookies, or the free Loggedin plugin — with the pros and cons of each.
+pubDate: 2026-09-17
+author: Joel James
+track: oss
+heroImage: covers/cover-limit-concurrent-logins-wordpress.svg
+heroImageAlt: Minimal blue line-art of three device frames with the newest one crossed out on a dark blue-tinted ground
+tags:
+  - wordpress
+  - security
+  - loggedin
+faq:
+  - q: How do I limit concurrent logins in WordPress?
+    a: WordPress has no built-in limit, so you have to add one. You can count a user's active session tokens with WP_Session_Tokens inside the wp_authenticate_user filter and reject the login when the count is at your cap, or install the free Loggedin plugin, which adds a per-user session limit and three modes for what happens when it is reached.
+  - q: How do I stop users from sharing their WordPress account?
+    a: Cap the number of simultaneous sessions an account can hold. With the limit set to 1, a second person signing in either fails with an error or kicks the first person out, which makes sharing a password impractical. The free Loggedin plugin does this from a single setting, and its Block New mode is the strictest option.
+  - q: Can WordPress restrict a user to one device at a time?
+    a: Not out of the box. WordPress creates a separate session token for every browser and device, and never compares them. A plugin or snippet has to count those tokens at login and act on the result. Loggedin with a limit of 1 and Logout All mode gives you exactly one active device per account.
+  - q: Does limiting logins log out users who are already signed in?
+    a: No. The check only runs when a new login happens, so existing sessions keep working until they expire, the user logs out, or a later login displaces them under the rule you chose. Installing Loggedin or changing its limit never signs anyone out on the spot.
+  - q: Does a concurrent login limit work with WooCommerce, MemberPress or LearnDash?
+    a: Yes, as long as the plugin logs users in through the standard WordPress authentication flow, which nearly every membership, LMS and e-commerce plugin does. Loggedin hooks wp_authenticate_user and check_password, so any login that passes through wp_signon is covered without integration code.
+  - q: Can I set a different login limit for each user role?
+    a: Not with a single global snippet, but the loggedin_reached_limit filter and the Limit Per Role add-on for Loggedin both let you vary the cap by role, for example five sessions for administrators and one for subscribers. The Limit Per User add-on overrides the cap for one specific account from its profile screen.
+---
+
+Sell a membership, a course, or a subscription on WordPress and sooner or
+later you'll notice the same login being used from two cities at once. One
+paid account, a household of viewers. One student seat, a whole study group.
+WordPress does nothing about this: every browser and device that signs in
+gets its own session, and core never counts them. There's no "maximum
+devices" setting, no "sign out other sessions on login" option, nothing.
+
+For a personal blog that's fine. For plenty of sites it's revenue walking
+out the door:
+
+- A membership site on MemberPress, Paid Memberships Pro, or Restrict Content
+  Pro where one password is being shared across a family, a classroom, or a
+  Discord server.
+- An LMS install on LearnDash, LifterLMS, or Tutor LMS, where the seat someone
+  paid for should be used by that someone.
+- A WooCommerce Subscriptions or Easy Digital Downloads store where
+  subscriber counts are supposed to mean something.
+- A client portal or intranet with a one-device-at-a-time policy that an
+  auditor will actually check.
+
+Below are four ways to limit concurrent logins per user in WordPress, from
+a ten-line snippet to an admin setting, with honest pros and cons for each.
+Two of them are code you can paste today. One is a common piece of bad
+advice. The last one is the plugin I've maintained for this exact job
+since 2016.
+
+## First, what does "logged in" mean in WordPress?
+
+When a user signs in, WordPress generates a random **session token**, stores
+it against the user in the `wp_usermeta` table (meta key `session_tokens`),
+and puts the same token in the browser's authentication cookie. Every request
+after that sends the cookie back, and WordPress checks it against the stored
+tokens.
+
+Two consequences matter here:
+
+- **One session per browser, per device.** A phone and a laptop are two
+  sessions. Chrome and Safari on the same laptop are two. An incognito
+  window is a third.
+- **Sessions are independent.** Nothing in core links them, compares them,
+  or limits them. A single account can hold fifty valid tokens and WordPress
+  is perfectly happy.
+
+That storage row is where every method below gets its count. The official
+API for reading it is `WP_Session_Tokens`, and its `get_all()` method
+returns only the tokens that haven't expired, which is exactly the number
+you want to compare against a limit.
+
+## Method 1 — Block the new login when the user is at the limit
+
+The most direct approach: count the user's live sessions at login time and
+refuse the login if they're already at the cap. WordPress runs the
+`wp_authenticate_user` filter after it has found the user but before it
+checks the password, and returning a `WP_Error` from it stops the login with
+your message on the login screen.
+
+```php
+/**
+ * Reject a login when the account already holds `$limit` active sessions.
+ */
+add_filter( 'wp_authenticate_user', function ( $user ) {
+    if ( is_wp_error( $user ) ) {
+        return $user; // Something upstream already failed.
+    }
+
+    $limit    = 1;
+    $sessions = WP_Session_Tokens::get_instance( $user->ID )->get_all();
+
+    if ( count( $sessions ) >= $limit ) {
+        return new WP_Error(
+            'too_many_sessions',
+            'This account is already signed in on another device. Sign out there first.'
+        );
+    }
+
+    return $user;
+} );
+```
+
+Drop that into a small companion plugin (or a code-snippets plugin) and a
+second login for the same account fails with that message. Set `$limit` to
+2 or 3 to allow a phone plus a laptop.
+
+<div class="pros">
+
+**Pros**
+
+- Ten lines. No settings screen, no dependencies.
+- Uses the official `WP_Session_Tokens` API, so expired tokens are already filtered out and any session storage backend (Redis, Memcached) is honoured.
+- Runs on every login that goes through `wp_signon()`, which is every membership, LMS, and e-commerce plugin I've met.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- **It locks people out of their own account.** Forgot to sign out on the office PC? You can't get in from home until that session expires, which is 2 days, or 14 with "Remember Me". Someone will email you.
+- No way for the user to fix it themselves. Core has a "Log Out Everywhere Else" button on the profile screen, but they can't reach the profile screen because they can't log in.
+- One global number. Administrators and subscribers get the same cap.
+- Nothing tells the site owner it's happening. Blocked logins are silent unless you log them.
+
+</div>
+
+This is the strictest possible policy and the right one for some
+compliance-driven sites. For a paid membership it's usually too blunt: the
+person you lock out is far more often a legitimate customer on a second
+device than a password-sharer.
+
+## Method 2 — Let the new login in and sign out everyone else
+
+The friendlier version: don't block anyone, just make the newest login the
+only one. When WordPress sets the logged-in cookie it fires the
+`set_logged_in_cookie` action with the freshly created token, and
+`WP_Session_Tokens` has a `destroy_others()` method that ends every session
+*except* that one.
+
+```php
+/**
+ * Single-session accounts: a new login ends every other session.
+ */
+add_action( 'set_logged_in_cookie', function ( $cookie, $expire, $expiration, $user_id, $scheme, $token ) {
+    WP_Session_Tokens::get_instance( $user_id )->destroy_others( $token );
+}, 10, 6 );
+```
+
+The effect is what consumer apps call "you've been signed out because your
+account was used on another device." The account sharer's friend logs in,
+the sharer gets kicked, and after the third round of that they stop sharing.
+
+<div class="pros">
+
+**Pros**
+
+- Nobody is ever locked out. The new login always works.
+- Self-correcting for account sharing: the two people knock each other out until one of them gives up.
+- Same official API as Method 1, so it works with any session storage.
+
+</div>
+
+<div class="cons">
+
+**Cons**
+
+- **The limit is always one.** `destroy_others()` keeps exactly the current token. Allowing a phone *and* a laptop means finding and destroying the oldest session yourself, and the API has no "drop the oldest" primitive — you'd be reading the raw `session_tokens` meta and sorting by login time.
+- The kicked-out device finds out on its next click, not immediately. An open tab keeps rendering as signed-in until it makes a request. (More on that in the [force-logout guide](/blog/force-logout-wordpress-user-all-devices-instantly/).)
+- Fires on *every* login, including a password reset or an SSO round-trip, so a user who re-authenticates on one device drops their others.
+- Still one global rule for every role.
+
+</div>
+
+Between Method 1 and Method 2 you have the two real strategies: block the
+new login, or displace an old one. Everything after this is about making
+them configurable.
+
+## Method 3 — Shorten the session cookie (doesn't actually do this)
+
+You'll see this recommended in forum threads: "just make sessions expire
+faster with `auth_cookie_expiration`." It's a fine filter and it does
+something useful, but it doesn't limit concurrent logins.
+
+```php
+add_filter( 'auth_cookie_expiration', fn () => 4 * HOUR_IN_SECONDS );
+```
+
+That shortens how long *each* session lives. A shared account can still be
+signed in on ten devices at once; they'll just each need to log in again
+every four hours. For a password-sharer, that's a mild inconvenience, not a
+deterrent. If what you actually want is idle users signed out, that's a
+different problem with its own
+[guide](/blog/auto-logout-inactive-users-wordpress/).
+
+The same goes for two-factor authentication plugins. 2FA proves the person
+logging in has the second factor, and a determined sharer will happily read
+a code off their phone to a friend. It doesn't cap sessions.
+
+## Method 4 — A configurable limit from the admin (recommended)
+
+Everything above converges on one design: count live tokens at login,
+compare against a limit, then either block or displace. The free
+[Loggedin plugin](/software/plugins/loggedin/) ships that as a settings
+panel under **Users → Loggedin**, and it's what I've maintained for this
+job since 2016:
+
+- **Active Logins Limit** — any number from 1 upwards. The default is 1,
+  which already stops account sharing on a fresh install.
+- **Three modes for the limit:**
+  - **Logout Oldest** — the user's single oldest session is ended and the
+    new login goes through. Their other devices stay signed in. This is the
+    consumer-app behaviour, and the "allow a phone and a laptop but not a
+    third" rule Method 2 can't express.
+  - **Logout All** — every other session ends and the new device becomes the
+    only one. Method 2, as a radio button.
+  - **Block New** — the login is refused with an error on wp-login. Method 1,
+    with a message you can change through the `loggedin_error_message`
+    filter.
+- **Force Logout** — an admin panel that takes a user ID, email, or username
+  and clears every session for that account in one click, for when someone
+  is locked out under Block New and can't reach their other devices.
+- **WP-CLI** — `wp loggedin sessions list <user>`, `count`, and `destroy`,
+  plus `wp loggedin settings set maximum 3` for deploy scripts.
+- **Hooks for the edge cases** — `loggedin_bypass` exempts a service account
+  or a whole role from the limit; `loggedin_reached_limit` lets you override
+  the verdict per user, role, or capability.
+
+It runs in the same two places the snippets do, `wp_authenticate_user` for
+Block New and `check_password` for the two logout modes, so anything that
+authenticates through the normal WordPress flow is covered. No cron, no
+background requests, no remote calls: the whole plugin runs at the moment a
+login happens.
+
+### Different limits for different roles and users
+
+The one thing a global snippet genuinely can't do well is vary the cap. Two
+add-ons handle that:
+
+- [Limit Per Role](/software/plugins/loggedin/limit-per-role/) sets a
+  separate cap per WordPress role, so administrators can have five sessions
+  while subscribers get one. A user with several roles gets the highest
+  configured limit.
+- [Limit Per User](/software/plugins/loggedin/limit-per-user/) adds a field
+  to the profile screen to override the cap for one account, for a shared
+  editorial login or a customer on a higher tier.
+
+Both hook the same `loggedin_reached_limit` filter you could hook yourself,
+which is the point: the plugin is the snippet with the last 80% finished.
+
+### How the methods compare
+
+<div class="table-wrap">
+
+| | Block snippet | Single-session snippet | Shorter cookie | Loggedin |
+| --- | :---: | :---: | :---: | :---: |
+| Actually caps simultaneous sessions | ✓ | ✓ | — | ✓ |
+| Limit above 1 | ✓ | — | n/a | ✓ |
+| Keep the newest login working | — | ✓ | n/a | ✓ |
+| Kick only the oldest device | — | — | — | ✓ |
+| Unlock a locked-out user from the admin | — | n/a | — | ✓ |
+| Per-role or per-user limits | manual | manual | — | add-on |
+| Non-technical owners can configure it | — | — | — | ✓ |
+
+</div>
+
+## Picking a mode
+
+The choice matters more than the number:
+
+- **Block New** when the account is a compliance boundary: a clinic, a
+  finance back office, a client portal where "only one device at a time" is
+  a written policy. Pair it with the Force Logout panel so support can
+  unlock people.
+- **Logout Oldest** for paid memberships and courses. It stops sharing
+  without ever locking a real customer out, and a limit of 2 or 3 gives
+  everyone room for a phone and a laptop.
+- **Logout All** for the strictest "exactly one device" experience with no
+  lockouts. Best on staff accounts, where the person being signed out
+  elsewhere is the same person who just logged in.
+
+And whatever you pick, change the error message. The core text for a
+blocked login is accurate but cold; "You're already signed in on another
+device — sign out there, or contact support" saves a ticket.
+
+## Wrapping up
+
+WordPress creates a fresh session for every device and never counts them,
+which is why one paid account can be open across a whole friend group. You
+can refuse a login at the cap with the `wp_authenticate_user` filter, or
+make each new login the only one with `destroy_others()` on the
+`set_logged_in_cookie` action, and now you know what each one costs:
+lockouts on one side, a hard limit of one on the other.
+
+For a site where stopping account sharing is a business requirement rather
+than a weekend experiment, the free
+[Loggedin plugin](/software/plugins/loggedin/) puts both strategies, plus
+the "kick the oldest device" mode neither snippet can do cleanly, behind one
+setting, with per-role and per-user limits as add-ons. If you also want to
+see who's signed in right now, that's the
+[Active Sessions add-on](/software/plugins/loggedin/active-sessions/),
+covered in [its own guide](/blog/view-active-login-sessions-wordpress/).
+
+— JJ
