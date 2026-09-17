@@ -1298,6 +1298,16 @@ textarea.field { resize: vertical; min-height: 120px; }
 .prose-foxe strong { color: var(--text); font-weight: var(--fw-heading); }
 .prose-foxe a { color: var(--text); font-weight: var(--fw-medium); }
 .prose-foxe a:hover { color: var(--text-strong); }
+/* Inline links in running copy get an underline so they read as links.
+   Classed links (buttons, chips, cards) keep their own styling. */
+.prose-foxe a:not([class]) {
+  text-decoration: underline;
+  text-decoration-color: var(--text-faint);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.15s ease;
+}
+.prose-foxe a:not([class]):hover { text-decoration-color: currentColor; }
 
 .prose-foxe ul, .prose-foxe ol { padding-left: 1.5em; }
 .prose-foxe ul { list-style: disc; }
