@@ -115,6 +115,30 @@ const projects = defineCollection({
       rating: z.string().optional(),
       since: z.string().optional(),
       features: z.array(z.string()).default([]),
+      // Icon grid under the hero, summarising the product in three or four
+      // cards. Same shape the trading track uses; keeps body copy short.
+      highlights: z
+        .array(z.object({ icon: z.string(), title: z.string(), body: z.string() }))
+        .default([]),
+      // Measured before/after numbers for performance-led products. Real
+      // measurements only — an unset array simply drops the band.
+      metrics: z
+        .object({
+          heading: z.string(),
+          lead: z.string().optional(),
+          // How the numbers were produced, e.g. the theme, post and tooling.
+          method: z.string(),
+          rows: z.array(
+            z.object({
+              label: z.string(),
+              before: z.string(),
+              after: z.string(),
+              // Optional short win, e.g. '−38%'.
+              delta: z.string().optional(),
+            })
+          ),
+        })
+        .optional(),
       screenshots: z.array(screenshot(image)).default([]),
     }),
   ]),

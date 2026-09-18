@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import Nav from '../../../components/Nav.astro';
@@ -8,10 +8,12 @@ import CtaBanner from '../../../components/CtaBanner.astro';
 import Section from '../../../components/ui/Section.astro';
 import Faq from '../../../components/ui/Faq.astro';
 import Screenshots from '../../../components/ui/Screenshots.astro';
+import Metrics from '../../../components/ui/Metrics.astro';
+import RelatedPosts from '../../../components/ui/RelatedPosts.astro';
 import ResourceLinks from '../../../components/ui/ResourceLinks.astro';
 import { categoryMeta, categoryPath, projectPath, addonPath } from '../../../config/tracks';
 import { breadcrumbLd, faqLd, softwareApplicationLd } from '../../../config/seo';
-import { accentFor } from '../../../config/accents';
+import { accentFor, HUES } from '../../../config/accents';
 
 export async function getStaticPaths() {
   const projects = await getCollection(
@@ -25,6 +27,9 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+// The MDX body, rendered as the page's Overview. Without this every word
+// written below a project's frontmatter is dropped on the floor.
+const { Content } = await render(project);
 
 // Same ordered sibling list the category grid uses, so this page's hue matches
 // the card that opened it.
@@ -244,6 +249,53 @@ const facts = [
       </div>
     </section>
 
+    {data.highlights.length > 0 && (
+      <Section variant="alt" rule="top">
+        <span class="eyebrow">Highlights</span>
+        <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
+          What you get out of the box
+        </h2>
+        <div class="grid-3">
+          {data.highlights.map((h, i) => (
+            <div class="card card--pad" style={`gap:var(--space-150);--hue:${HUES[i % HUES.length]}`}>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span class="icon-tile tint"><Icon name={h.icon} size={22} aria-hidden="true" /></span>
+                <span class="mono" style="font-size:var(--text-xs);color:var(--hue)">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              <h3 style="font-size:1.25rem">{h.title}</h3>
+              <p style="margin:0;font-size:var(--text-md);line-height:1.55">{h.body}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+    )}
+
+    <!-- Overview: the MDX body -->
+    <Section rule="top">
+      <div class="overview">
+        <span class="eyebrow">Overview</span>
+        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">About {data.name}</h2>
+        <p style="margin:0 0 var(--space-350);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
+          {data.summary}
+        </p>
+        <div class="prose-foxe prose-foxe--compact">
+          <Content />
+        </div>
+      </div>
+    </Section>
+
+    {data.metrics && (
+      <Section rule="top">
+        <Metrics
+          heading={data.metrics.heading}
+          lead={data.metrics.lead}
+          method={data.metrics.method}
+          rows={data.metrics.rows}
+          hue={accent.color}
+        />
+      </Section>
+    )}
+
     {data.screenshots.length > 0 && (
       <Section id="screenshots" variant="alt" rule="top">
         <Screenshots
@@ -300,6 +352,12 @@ const facts = [
       </Section>
     )}
 
+    <RelatedPosts
+      tag={project.id}
+      heading={`Guides for ${data.name}`}
+      lead={`Walkthroughs and write-ups covering ${data.name} in practice.`}
+    />
+
     <CtaBanner />
   </main>
   <Footer />
@@ -312,5 +370,12 @@ const facts = [
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-250) var(--space-200);
+  }
+
+  /* The body runs to a reading measure rather than the full container — the
+     same width the trading product pages give their overview. */
+  .overview {
+    max-width: 720px;
+    margin-inline: auto;
   }
 </style>

@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import Nav from '../../../../components/Nav.astro';
 import Footer from '../../../../components/Footer.astro';
@@ -37,6 +37,10 @@ export async function getStaticPaths() {
 }
 
 const { addon, parent } = Astro.props;
+// The MDX body, rendered as the page's Overview. The add-on files already
+// carry full write-ups (comparison tables included) — without this they never
+// reach the page.
+const { Content } = await render(addon);
 
 // Same ordered list the plugin page's add-on grid uses, so this page keeps the
 // colour of the card that opened it.
@@ -156,6 +160,20 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
       </div>
     </section>
 
+    <!-- Overview: the MDX body -->
+    <Section rule="top">
+      <div class="overview">
+        <span class="eyebrow">Overview</span>
+        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">About {data.name}</h2>
+        <p style="margin:0 0 var(--space-350);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
+          {data.summary}
+        </p>
+        <div class="prose-foxe prose-foxe--compact">
+          <Content />
+        </div>
+      </div>
+    </Section>
+
     {data.screenshots.length > 0 && (
       <Section variant="alt" rule="top">
         <Screenshots
@@ -178,4 +196,12 @@ if (data.faq.length > 0) structuredData.push(faqLd(data.faq));
   </main>
   <Footer />
 </BaseLayout>
+
+<style>
+  /* Reading measure for the body, matching the parent plugin page. */
+  .overview {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+</style>
 

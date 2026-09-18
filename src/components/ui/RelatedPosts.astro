@@ -1,0 +1,46 @@
+---
+// Guides written about one product, pulled onto that product's page. The tie is
+// the tag: a post tagged with the project's id (e.g. `loggedin`) belongs here,
+// which is the convention the blog already follows. A product with no posts yet
+// renders nothing rather than an empty band.
+import { getCollection } from 'astro:content';
+import PostGrid from '../PostGrid.astro';
+import Section from './Section.astro';
+import { tagSlug, tagPath } from '../../config/blog';
+
+interface Props {
+  /** Project id to match against post tags, e.g. 'lazy-load-for-comments'. */
+  tag: string;
+  heading: string;
+  lead?: string;
+  /** Cap so the row stays one grid line. */
+  limit?: number;
+  variant?: 'light' | 'alt';
+}
+
+const { tag, heading, lead, limit = 3, variant = 'light' } = Astro.props;
+
+const slug = tagSlug(tag);
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .filter((post) => post.data.tags.some((t) => tagSlug(t) === slug))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const shown = posts.slice(0, limit);
+---
+{shown.length > 0 && (
+  <Section variant={variant} rule="top">
+    <span class="eyebrow">Guides</span>
+    <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">{heading}</h2>
+    {lead && (
+      <p style="margin:0 0 var(--space-500);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
+        {lead}
+      </p>
+    )}
+    <PostGrid posts={shown} />
+    {posts.length > shown.length && (
+      <p style="margin:var(--space-300) 0 0">
+        <a href={tagPath(tag)} class="link-more">All {posts.length} guides →</a>
+      </p>
+    )}
+  </Section>
+)}

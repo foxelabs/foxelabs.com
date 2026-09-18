@@ -23,18 +23,79 @@ since: '2016'
 order: 4
 features:
   - Loads native WordPress comments on scroll or click
-  - Cuts initial page weight and requests
-  - Works with the default comment system — no lock-in
+  - Works with classic themes and block themes
+  - Serves comments inline to crawlers, so SEO is unaffected
+  - No jQuery, no third-party service, no lock-in
   - Zero configuration to get started
+highlights:
+  - icon: mingcute:mouse-line
+    title: Two ways to defer
+    body: >-
+      Fetch comments automatically as the reader nears them, or hold everything
+      behind a Load Comments button. A third setting turns lazy loading off
+      without deactivating the plugin.
+  - icon: mingcute:search-line
+    title: Crawlers still see everything
+    body: >-
+      Search engines are detected by user agent and served the original inline
+      comment markup, so a deferred thread stays indexable. On by default.
+  - icon: mingcute:layout-line
+    title: Classic and block themes
+    body: >-
+      Swaps the output of comments_template() on classic themes and the
+      rendered core/comments block on block themes, whichever applies.
+  - icon: mingcute:lightning-line
+    title: Cached, not re-parsed
+    body: >-
+      The rendered comments block is stored per post in a transient, so the
+      REST endpoint answers from cache instead of walking the block tree
+      on every request.
 faq:
   - q: How do I lazy load WordPress comments?
     a: Install Lazy Load for Comments and choose a load method under Comments → Lazy Load. The native WordPress comment section is then held back until the reader scrolls to it or clicks a button, instead of loading with every page view.
   - q: Does lazy loading comments affect SEO?
-    a: Comments loaded on demand are not present in the initial HTML, so they may not be indexed. That is usually a fair trade — comment text rarely drives rankings, while the page-weight reduction improves Core Web Vitals, which do. If a page depends on its comment content for search traffic, leave that content loading normally.
+    a: No, not with the default settings. The plugin detects search-engine crawlers by user agent and serves them the original inline comment markup, so the thread stays indexable even though human visitors get it on demand. The setting can be turned off under Comments → Lazy Load if you would rather always lazy load.
+  - q: Does it work with block themes and full site editing?
+    a: Yes. The plugin checks whether the active theme is a block theme and replaces the rendered core/comments block; on classic themes it swaps the comments_template() output instead. No template editing is needed either way.
+  - q: Will it work with my caching plugin?
+    a: Yes. The markup rendered server-side is a plain HTML placeholder, so full-page caches can store it safely, and the comments themselves come from a public REST endpoint that is equally cache-friendly.
   - q: Does it work with plugins that replace WordPress comments?
-    a: It targets the native WordPress comment system, so there is no lock-in and no third-party service involved. Comment systems that render their own embed (Disqus, for example) need a plugin built for them — Disqus Conditional Load handles that case.
+    a: No — it handles the default WordPress comment system only. Disqus, Jetpack Comments and similar replace the comment area entirely, so there is nothing left for this plugin to defer. For Disqus specifically, Disqus Conditional Load does the same job.
+  - q: Can I disable lazy loading on one specific post or page?
+    a: Yes, with the lazy_load_for_comments_can_lazy_load filter. Return false for the posts you want to keep loading comments inline and the plugin leaves them alone.
   - q: Is any configuration required?
-    a: No. The plugin works as soon as it is activated, with sensible defaults. The settings under Comments → Lazy Load exist if you want to change the load method or the button text.
+    a: No. The plugin works as soon as it is activated, with sensible defaults. The settings under Comments → Lazy Load exist if you want to change the load method, the minimum comment count or the button text.
+screenshots:
+  - src: ./screenshots/lazy-load-for-comments/loading-behaviour.png
+    tab: Loading behaviour
+    alt: The Lazy Load for Comments settings screen in the WordPress admin showing the load method, minimum comments threshold and search-engine options
+    heading: One dropdown decides everything
+    body: >-
+      Pick On scroll, On button click or Disabled, set how many comments a post
+      needs before lazy loading kicks in, and choose whether a spinner covers
+      the fetch. Disable for search engines keeps crawlers on the inline markup.
+    caption: Defaults are set so an activated plugin needs no visit to this screen.
+    crumb: Comments → Lazy Load
+  - src: ./screenshots/lazy-load-for-comments/load-button.png
+    tab: Load button
+    alt: The Load Button settings for Lazy Load for Comments, with fields for button text, button style and extra CSS classes
+    heading: The button is yours
+    body: >-
+      With the button method, set the label, choose between your theme's own
+      button style and the plugin's minimal built-in one, and add any CSS
+      classes you want to hang your own styling on.
+    caption: Inherit theme style is the default, so the button matches the post it sits in.
+    crumb: Comments → Lazy Load → Load Button
+  - src: ./screenshots/lazy-load-for-comments/cache.png
+    tab: Cache
+    alt: The cache panel for Lazy Load for Comments with a toggle for storing comments markup and a Clear comments cache button
+    heading: Re-render only when it changes
+    body: >-
+      The parsed comments markup is kept in a transient per post so the REST
+      endpoint renders quickly. Clear comments cache flushes every post at once
+      after a template or block edit.
+    caption: Turn the cache off while you are debugging comment markup, back on afterwards.
+    crumb: Comments → Lazy Load → Cache
 ---
 
 ## What it does
@@ -43,44 +104,74 @@ Lazy Load for Comments holds back the WordPress comments section until the reade
 scrolls to it or asks for it, so pages with long comment threads load fast up
 front.
 
+A long thread pulls in dozens of avatars, gravatar lookups and reply scripts —
+all downloaded before the visitor has reached them, and most of them never seen.
+Version 2 fetches the rendered comments over the WordPress REST API instead, on
+demand, without changing how your comment template looks.
+
 ## Why it exists
 
 Not every visitor reads the comments — but every visitor pays for loading them.
-This plugin defers that cost to the moment it's actually needed. Maintained since 2016.
+This plugin defers that cost to the moment it's actually needed. Maintained since
+2016.
 
-## How loading works
+## Choosing a load method
 
-Everything lives under **Comments → Lazy Load** in the WordPress admin. The
-**Load Method** decides when comments appear:
+Everything lives under **Comments → Lazy Load**. The **Load Method** decides when
+comments appear:
 
-- **On scroll** — comments fetch automatically as the reader nears them. This is
-  the default and the smoothest option.
-- **On button click** — nothing loads until the reader clicks a **Load Comments**
-  button you can label and style yourself.
-- **Disabled** — lazy loading is off; comments load with the page, exactly like
-  stock WordPress.
+<div class="table-wrap">
 
-A **Minimum Comments** threshold lets you skip lazy loading on lightly-discussed
-posts — with the default of `1`, posts with no comments yet still show the form
-normally so readers can leave the first one. An optional spinner covers the brief
-fetch.
+| Method | When comments load | Best for |
+| --- | --- | --- |
+| **On scroll** | Automatically, as the reader nears the comment area | Most sites — nothing to click, nothing to learn |
+| **On button click** | Only when the reader clicks *Load Comments* | Very long threads, or pages where comments are secondary |
+| **Disabled** | With the page, exactly like stock WordPress | Turning the plugin off on one site without deactivating it |
+
+</div>
+
+A **Minimum Comments** threshold skips lazy loading on lightly-discussed posts —
+with the default of `1`, posts with no comments yet still show the form normally
+so readers can leave the first one. An optional spinner covers the brief fetch.
 
 ## Customising the button
 
 With the *On button click* method you control the button end to end: its text,
-whether it inherits your theme's button style or uses the plugin's minimal built-in
-style, and any extra CSS classes you want to hang your own styling on.
+whether it inherits your theme's button style or uses the plugin's minimal
+built-in style, and any extra CSS classes you want to hang your own styling on.
 
 ## SEO-safe by default
 
-Lazy loaded comments are fetched with JavaScript, so **Disable for Search Engines**
-serves the full comment markup to crawlers instead — keeping that content indexable.
-Leave it on.
+Lazy loaded comments are fetched with JavaScript, so **Disable for Search
+Engines** serves the full comment markup to crawlers instead — keeping that
+content indexable. Leave it on.
 
 ## Caching on block themes
 
 On block themes the plugin caches the serialized `core/comments` block in a
-transient the first time a post is viewed, so the REST endpoint re-renders from the
-cache instead of parsing the block tree on every request. The cache clears itself
-when you switch themes, and an admin-only **Clear comments cache** action flushes it
-on demand after template changes.
+transient the first time a post is viewed, so the REST endpoint re-renders from
+the cache instead of parsing the block tree on every request. The cache clears
+itself when you switch themes, and an admin-only **Clear comments cache** action
+flushes it on demand after template changes.
+
+## Skipping one post
+
+Settings apply site-wide, but a filter opts individual posts out — useful for a
+page whose discussion is the reason people arrive:
+
+```php
+add_filter( 'lazy_load_for_comments_can_lazy_load', function ( $can ) {
+	if ( is_page( 'contact' ) ) {
+		return false;
+	}
+
+	return $can;
+} );
+```
+
+## What it does not do
+
+It handles the **default** WordPress comment system only. Disqus, Jetpack
+Comments and other third-party systems replace the comment area with their own
+embed, so there is nothing left for this plugin to defer — for Disqus, [Disqus
+Conditional Load](/software/plugins/disqus-conditional-load/) does the same job.

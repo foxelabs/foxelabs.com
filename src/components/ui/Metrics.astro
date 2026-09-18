@@ -1,0 +1,109 @@
+---
+// Before/after proof. One row per measurement, the "after" column carrying the
+// weight. Every number here is measured — the field is left unset rather than
+// filled with an estimate, so an empty band is the honest state.
+interface Row {
+  label: string;
+  before: string;
+  after: string;
+  delta?: string;
+}
+
+interface Props {
+  heading: string;
+  lead?: string;
+  /** How the numbers were produced. Rendered under the table, not hidden. */
+  method: string;
+  rows: Row[];
+  /** The product's hue, for the delta pills. */
+  hue?: string;
+}
+
+const { heading, lead, method, rows, hue = 'var(--hue-blue)' } = Astro.props;
+---
+<span class="eyebrow">Measured</span>
+<h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">{heading}</h2>
+{lead && (
+  <p style="margin:0 0 var(--space-400);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">
+    {lead}
+  </p>
+)}
+
+<div class="metrics" style={`--hue:${hue}`}>
+  {rows.map((row) => (
+    <div class="metric">
+      <span class="kicker">{row.label}</span>
+      <div class="metric__pair">
+        <span class="metric__before">{row.before}</span>
+        <span class="metric__arrow" aria-hidden="true">/</span>
+        <span class="metric__after">{row.after}</span>
+      </div>
+      {row.delta && <span class="metric__delta">{row.delta}</span>}
+      <span class="sr-only">
+        {row.label}: {row.before} without the plugin, {row.after} with it.
+      </span>
+    </div>
+  ))}
+</div>
+
+<p class="metrics__method">{method}</p>
+
+<style>
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+
+  .metric {
+    background: var(--bg);
+    padding: var(--space-300);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+
+  /* The pair reads left-to-right as "was / is". The struck "before" is the
+     only place on the site where a number is deliberately hard to read. */
+  .metric__pair {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .metric__before {
+    font-size: var(--text-md);
+    color: var(--text-faint);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+
+  .metric__arrow { color: var(--text-faint); font-size: var(--text-small); }
+
+  .metric__after {
+    font-size: var(--text-h3);
+    font-weight: var(--fw-heading);
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+
+  .metric__delta {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--hue);
+  }
+
+  .metrics__method {
+    margin: var(--space-250) 0 0;
+    font-size: var(--text-small);
+    line-height: 1.6;
+    color: var(--text-faint);
+    max-width: 640px;
+  }
+</style>
