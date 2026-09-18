@@ -64,7 +64,8 @@ const fonts = [
   { name: 'Inconsolata', data: asset('src/assets/fonts/inconsolata-500.ttf'), weight: 500 as const, style: 'normal' as const },
 ];
 
-// Rasterised from public/foxe.svg, which satori cannot read. A build input
+// Rasterised from public/foxe.svg, which satori cannot read (the
+// OG cards are dark, so the white artwork is the one used). A build input
 // only, so it lives in src/assets rather than being served.
 const MARK = 'src/assets/og/mark.png';
 

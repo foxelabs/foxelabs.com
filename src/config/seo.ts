@@ -15,7 +15,7 @@ export const SITE = {
   name: 'Foxe Labs',
   url: 'https://foxelabs.com',
   // Square logo for Organization markup.
-  logo: 'https://foxelabs.com/web-app-manifest-512x512.png',
+  logo: 'https://foxelabs.com/favicon/web-app-manifest-512x512.png',
   // Default share banner (1200×630) — the generated site card. Per-page cards
   // live at /og/<path>.png; see config/og.ts.
   banner: 'https://foxelabs.com/og/index.png',

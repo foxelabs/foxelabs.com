@@ -68,14 +68,14 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
     <link rel="preload" href={spaceGroteskWoff2} as="font" type="font/woff2" crossorigin />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
-    {/* One icon for every theme: the fox head knocked out of a rounded tile in
-        the accent quad, so it reads on light and dark tabs alike. .ico is the
-        fallback for browsers without SVG icons — Safari never uses the SVG. */}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any" />
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-    <link rel="icon" href="/favicon.ico" sizes="48x48 32x32 16x16" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <link rel="manifest" href="/site.webmanifest" />
+    {/* One icon for every theme: the fox head on a rounded dark tile, which
+        holds its shape on light and dark tabs alike. .ico is the fallback for
+        browsers without SVG icons — Safari never uses the SVG. */}
+    <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" sizes="any" />
+    <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" href="/favicon/favicon.ico" sizes="48x48 32x32 16x16" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
+    <link rel="manifest" href="/favicon/site.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="Foxe Labs Blog" href="/rss.xml" />
     <meta name="theme-color" content="#0a0a0b" />
     {/* Dark is the default, as in the products. A stored choice of light is the

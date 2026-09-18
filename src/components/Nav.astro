@@ -4,6 +4,7 @@
 // chrome cannot drift from what actually ships.
 import { getCollection } from 'astro:content';
 import { Icon } from 'astro-icon/components';
+import BrandMark from './ui/BrandMark.astro';
 import { trackConfig, type Track } from '../config/tracks';
 import { accentFor, categoryAccent } from '../config/accents';
 
@@ -107,7 +108,7 @@ const plainLinks = [
 <div class="nav-shell" data-nav-shell>
   <header class="nav">
     <a href="/" class="brand" aria-label="Foxe Labs — home">
-      <img src="/foxe.svg" alt="" class="brand-logo" width="26" height="26" />
+      <BrandMark size={26} class="brand-logo" />
       <span class="brand__name">Foxe Labs</span>
     </a>
 

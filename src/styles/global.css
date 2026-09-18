@@ -324,7 +324,18 @@
   font-weight: var(--fw-heading);
   letter-spacing: -0.01em;
 }
-.brand-logo { display: block; }
+/* One file for both themes. The artwork is a single-colour silhouette, so the
+   SVG is used as a mask and the colour comes from `currentColor` — white on
+   the dark theme, near-black on the light one, straight from the text colour
+   the lockup already inherits. A second fixed-fill copy would only repeat the
+   same geometry. */
+.brand-logo {
+  display: block;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: url('/foxe.svg') center / contain no-repeat;
+  mask: url('/foxe.svg') center / contain no-repeat;
+}
 
 /* ---- Navigation -------------------------------------------------------- */
 .nav-shell {
