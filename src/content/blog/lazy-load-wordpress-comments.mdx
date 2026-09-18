@@ -1,0 +1,253 @@
+---
+title: "How to lazy load WordPress comments (and why your page speed needs it)"
+description: A 100-comment thread ships around 100 avatar requests and hundreds of kilobytes before the reader has finished the first paragraph. Here's how to defer the WordPress comment section until someone actually scrolls to it — with a free plugin or by hand — without hurting SEO.
+seoTitle: How to Lazy Load WordPress Comments Without Hurting SEO
+seoDescription: Lazy load WordPress comments to cut avatar requests and hundreds of kB from the initial load. Plugin setup, DIY code, caching notes and the SEO question answered.
+pubDate: 2026-09-19
+author: Joel James
+track: oss
+heroImage: covers/cover-lazy-load-wordpress-comments.svg
+heroImageAlt: Minimal emerald line-art of stacked comment bubbles with the last one loading on demand
+tags:
+  - wordpress
+  - performance
+faq:
+  - q: How do I lazy load comments in WordPress?
+    a: Install the free Lazy Load for Comments plugin and pick a load method under Comments → Lazy Load — On scroll fetches the thread automatically as the reader nears it, On button click holds it behind a Load Comments button. The native comment section is then fetched over the REST API on demand instead of loading with every page view. No template editing is needed.
+  - q: Do comments slow down a WordPress site?
+    a: The comment text itself is cheap; the avatars beside it are not. Every distinct commenter adds a Gravatar request made during the initial page load. At the WordPress default of 96px, a 100-comment thread can add roughly 100 requests and around 690 kB before the reader has scrolled anywhere near the comments.
+  - q: Does lazy loading comments hurt SEO?
+    a: Not if crawlers are handled. Lazy Load for Comments detects search-engine crawlers by user agent and serves them the original inline comment markup, so the thread stays fully indexable while human visitors get it on demand. That behaviour is on by default.
+  - q: Does lazy loading comments work with caching plugins?
+    a: Yes. The page is rendered with a plain HTML placeholder where the comments would be, so full-page caches store it safely, and the comments themselves come from a public REST endpoint that is equally cacheable.
+  - q: Can I lazy load WordPress comments without a plugin?
+    a: Partially. Core's get_avatar puts loading="lazy" on avatar images, which helps in browsers but still renders the whole thread server-side and still loads comment-reply.js. Truly deferring the thread means suppressing comments_template output and fetching it with JavaScript — the DIY sketch in this guide shows the moving parts and where it gets tricky.
+  - q: Does lazy loading work with Disqus or Jetpack Comments?
+    a: No. Those systems replace the WordPress comment area with their own embed, so there is nothing native left to defer. For Disqus specifically, Disqus Conditional Load does the equivalent job for the Disqus embed.
+---
+
+Nobody puts the comment section above the fold, but every WordPress page loads
+it as if they did. The moment a post renders, WordPress renders every comment
+with it — and with each comment comes an avatar request to Gravatar, fired
+while the reader is still on the first paragraph. Most visitors never scroll
+that far. All of them pay for it.
+
+This guide covers how to lazy load WordPress comments so the thread — avatars,
+reply script and all — loads only when a reader actually wants it: the
+two-minute plugin route, the numbers behind why it matters, a DIY sketch for
+the build-it-yourself crowd, and a straight answer to the SEO question.
+
+## The quick answer
+
+Install the free
+[Lazy Load for Comments plugin](/software/plugins/lazy-load-for-comments/) and
+pick when comments should appear:
+
+1. Install and activate **Lazy Load for Comments** from the WordPress plugin
+   directory.
+2. Open **Comments → Lazy Load**.
+3. Choose a **Load Method** — *On scroll* fetches comments automatically as
+   the reader nears them; *On button click* holds them behind a *Load
+   Comments* button — and save.
+
+That's the whole job. The defaults handle the rest: crawlers keep getting the
+inline markup so SEO is unaffected, posts with no comments still show the form
+so someone can leave the first one, and both classic and block themes work
+without touching a template. The rest of this guide is the why and the
+fine-tuning.
+
+## What a comment thread actually costs
+
+Comment *text* is nearly free — a few kilobytes of HTML. The expensive part is
+everything WordPress attaches to it:
+
+- **One avatar request per distinct commenter.** WordPress asks Gravatar for
+  every commenter's picture at render time. A live Gravatar response at the
+  default 96px runs about **12.7 kB** for an account with a photo and about
+  **1.4 kB** for the generated fallback.
+- **`comment-reply.js`** (2.9 kB), enqueued on any page with threaded comments
+  enabled — read or not.
+- **Connection overhead.** Those avatar requests go to a third-party host,
+  with everything that implies for DNS, TLS and queueing on a cold visit.
+
+Put that together for a 100-comment thread with 100 distinct commenters, half
+of them holding a Gravatar account: roughly **100 requests and ~690 kB**
+downloaded up front. Your own figure moves with avatar size, how many
+commenters repeat, and how many have Gravatar accounts — but the shape doesn't
+change. The comment section is routinely the heaviest thing on a
+well-optimised post, and it sits at the very bottom of the page.
+
+The Core Web Vitals angle follows directly. None of those avatars are your LCP
+element, but they compete with it: bandwidth and connection slots spent on
+images nobody has scrolled to are bandwidth and slots not spent on the hero
+image, fonts and CSS that decide your measured load. On bandwidth-constrained
+mobile connections — where most field data comes from — that contention is the
+difference between a green and an amber LCP.
+
+Lazy loading flips the deal: readers who want comments wait a beat for them;
+the majority who don't get a lighter page. WordPress made exactly this trade
+for images in core years ago. Comments are the same trade with a bigger
+payload.
+
+## How lazy loading comments works
+
+The mechanism is simple to state: render the page with a placeholder where the
+comment section would be, then fetch the real thread with JavaScript when the
+reader gets close (or clicks). Lazy Load for Comments does this against the
+**native** WordPress comment system:
+
+- On **classic themes** it swaps the output of `comments_template()`; on
+  **block themes** it replaces the rendered `core/comments` block. Either way
+  your markup, walker and styling are untouched — it's your comment template,
+  fetched later.
+- The thread arrives via the **WordPress REST API**, rendered server-side, so
+  what gets injected is exactly what inline rendering would have produced.
+- On block themes the parsed block markup is **cached in a transient per
+  post**, so the REST endpoint re-renders from cache instead of parsing the
+  block tree on every request.
+
+No jQuery, no third-party service, and nothing proprietary holding your
+comments — deactivate the plugin and the thread renders inline again, exactly
+as before.
+
+## Choosing a load method
+
+Everything lives under **Comments → Lazy Load**. The **Load Method** dropdown
+is the decision that matters:
+
+<div class="table-wrap">
+
+| Method | When comments load | Best for |
+| --- | --- | --- |
+| **On scroll** | Automatically, as the reader nears the comment area | Most sites — nothing to click, nothing to learn |
+| **On button click** | Only when the reader clicks *Load Comments* | Very long threads, or pages where comments are secondary |
+| **Disabled** | With the page, exactly like stock WordPress | Turning lazy loading off without deactivating the plugin |
+
+</div>
+
+*On scroll* is the right default for almost everyone: the fetch starts before
+the thread enters the viewport, so a reader scrolling at a normal pace never
+sees the seam. *On button click* is the stronger saving — the thread costs
+nothing unless explicitly requested — at the price of one click, which makes
+sense when threads run into the hundreds or when comments are an appendix
+rather than the point.
+
+Two settings refine it:
+
+- **Minimum Comments** skips lazy loading on lightly-discussed posts. With the
+  default of `1`, a post with no comments yet shows the form normally, so
+  nothing stands between a reader and the first comment.
+- With the button method, the **Load Button** panel controls the label, lets
+  the button inherit your theme's own button styling (the default) or use the
+  plugin's minimal built-in style, and takes extra CSS classes for your own
+  styling.
+
+## The SEO question, answered
+
+The reflex worry: "if comments load with JavaScript, does Google stop seeing
+them?" It's a fair worry — comment threads are indexable long-tail content,
+often full of the exact phrasing real people search for.
+
+The plugin's answer is **Disable for Search Engines**, on by default: crawlers
+are detected by user agent and served the original inline comment markup,
+while human visitors get the deferred version. The content in the index and
+the content on the page are identical — the only thing that differs is *when*
+a browser downloads it, which is precisely the arrangement Google's own
+guidance on lazy loading asks for.
+
+So: leave the setting on and lazy loading comments costs you nothing in
+search. Turn it off only if you'd rather every client, crawler included, get
+the deferred treatment.
+
+## Can you do it without a plugin?
+
+Partly, and it's worth being honest about which part.
+
+The free win core already gives you: `get_avatar()` adds `loading="lazy"` to
+avatar images, so browsers defer fetching off-screen avatars on their own.
+That softens the payload problem in modern browsers — but the thread is still
+rendered server-side into every page, `comment-reply.js` still loads, and
+browser-level image laziness is an eagerness heuristic, not a guarantee.
+
+Truly deferring the thread means doing what the plugin does. The sketch, for a
+classic theme:
+
+```php
+// 1. Replace the comments template output with a placeholder.
+add_filter( 'comments_template', function ( $template ) {
+	if ( ! is_singular() || 0 === (int) get_comments_number() ) {
+		return $template; // Nothing worth deferring.
+	}
+
+	// Point WordPress at a stub template that prints only a marker div.
+	return get_stylesheet_directory() . '/comments-placeholder.php';
+} );
+```
+
+Then a `comments-placeholder.php` that outputs
+`<div id="deferred-comments" data-post="<?php the_ID(); ?>"></div>`, a REST
+endpoint that renders the real `comments_template()` for a post ID, and an
+`IntersectionObserver` that fetches it and swaps the markup in when the
+placeholder approaches the viewport.
+
+Workable — but the sketch is the easy 20%. The remaining 80% is what turns it
+into a plugin: serving crawlers the inline markup so you don't trade page
+weight for indexability, re-initialising `comment-reply.js` so threaded reply
+links work in the injected markup, handling block themes where
+`comments_template()` never runs and it's the `core/comments` block you need
+to intercept, caching the rendered thread so the REST hit stays cheap, and
+skipping the whole dance when a post has nothing to defer. If you want the
+exercise, it's a good one. If you want the result,
+[the plugin](/software/plugins/lazy-load-for-comments/) is those edge cases,
+maintained since 2016.
+
+## Caching plugins, block themes and other edge cases
+
+**Full-page caching** — WP Rocket, W3 Total Cache, Cache Enabled, a CDN in
+front — is the happy path, not a conflict. The cached page contains a static
+placeholder, and the comments arrive from a public REST endpoint that caches
+just as well. If anything, lazy loading makes cached pages *more* correct: new
+comments show up in the fetched thread even while the cached page itself is
+stale.
+
+**Block themes and full site editing** work out of the box: the plugin detects
+a block theme and swaps the rendered `core/comments` block instead of the
+classic template. After editing your comments template part, use the
+**Clear comments cache** action under **Comments → Lazy Load → Cache** so the
+per-post transient re-renders with the new markup.
+
+**Excluding a specific post** is a one-filter job — useful for a page whose
+discussion is the reason people arrive:
+
+```php
+add_filter( 'lazy_load_for_comments_can_lazy_load', function ( $can ) {
+	if ( is_page( 'community-thread' ) ) {
+		return false;
+	}
+
+	return $can;
+} );
+```
+
+**What it won't do:** third-party comment systems. Disqus, Jetpack Comments
+and friends replace the WordPress comment area with their own embed, so
+there's no native thread left to defer — their embeds are their own
+performance story. For Disqus, that story has its own fix:
+[Disqus Conditional Load](/software/plugins/disqus-conditional-load/) defers
+the Disqus embed the same way this plugin defers native comments.
+
+## Wrapping up
+
+Every WordPress page pays for its comment thread up front — avatars, requests
+and reply script — and on a busy post that's an easy few hundred kilobytes
+spent on content most visitors never reach. Lazy loading moves that cost to
+the readers who actually scroll down, keeps crawlers on the full inline markup
+so nothing leaves the index, and plays nicely with whatever caching you
+already run.
+
+The setup is genuinely the two-minute version: install
+[Lazy Load for Comments](/software/plugins/lazy-load-for-comments/), pick
+*On scroll* under **Comments → Lazy Load**, and the heaviest lazy win left on
+most WordPress sites is done.
+
+— JJ

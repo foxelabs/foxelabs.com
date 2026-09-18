@@ -178,6 +178,19 @@ const PICTOGRAMS = {
         <polyline points="932,418 980,466 932,514"/>
       </g>
     </g>`,
+  // lazy comments: two settled bubbles + full-hue bubble still arriving
+  comments: (h, s) => `
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M636 332 H944 C953 332 960 339 960 348 V416 C960 425 953 432 944 432 H700 L660 468 V432 H636 C627 432 620 425 620 416 V348 C620 339 627 332 636 332 Z" stroke="${s}" stroke-width="10"/>
+      <rect x="660" y="364" width="200" height="16" rx="7" fill="${s}" stroke="none"/>
+      <rect x="660" y="396" width="140" height="16" rx="7" fill="${s}" stroke="none"/>
+      <path d="M700 500 H1008 C1017 500 1024 507 1024 516 V584 C1024 593 1017 600 1008 600 H988 V636 L948 600 H700 C691 600 684 593 684 584 V516 C684 507 691 500 700 500 Z" stroke="${h}" stroke-width="11"/>
+      <g fill="${h}" stroke="none">
+        <circle cx="812" cy="550" r="9"/>
+        <circle cx="854" cy="550" r="9"/>
+        <circle cx="896" cy="550" r="9"/>
+      </g>
+    </g>`,
   // incident postmortem: browser window + full-hue alert
   incident: (h, s) => `
     <g fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -208,6 +221,7 @@ const COVERS = [
   { file: 'cover-active-login-sessions-wordpress.png', hue: 'cyan', art: 'sessions', slug: '// active-sessions' },
   { file: 'cover-limit-concurrent-logins-wordpress.png', hue: 'blue', art: 'devices', slug: '// limit-logins' },
   { file: 'cover-force-logout-wordpress-realtime.png', hue: 'sky', art: 'exit', slug: '// force-logout' },
+  { file: 'cover-lazy-load-wordpress-comments.png', hue: 'emerald', art: 'comments', slug: '// lazy-comments' },
 ];
 
 const W = 1600;
