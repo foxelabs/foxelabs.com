@@ -43,13 +43,8 @@ highlights:
     title: Classic and block themes
     body: >-
       Swaps the output of comments_template() on classic themes and the
-      rendered core/comments block on block themes, whichever applies.
-  - icon: mingcute:lightning-line
-    title: Cached, not re-parsed
-    body: >-
-      The rendered comments block is stored per post in a transient, so the
-      REST endpoint answers from cache instead of walking the block tree
-      on every request.
+      rendered core/comments block on block themes, and caches the result per
+      post so the fetch stays quick either way.
 metrics:
   heading: What a 100-comment thread costs before anyone scrolls to it
   eyebrow: Estimated

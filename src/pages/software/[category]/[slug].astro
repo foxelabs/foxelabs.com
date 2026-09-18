@@ -270,20 +270,6 @@ const facts = [
       </Section>
     )}
 
-    <!-- Overview: the MDX body -->
-    <Section rule="top">
-      <div class="overview">
-        <span class="eyebrow">Overview</span>
-        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">About {data.name}</h2>
-        <p style="margin:0 0 var(--space-350);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
-          {data.summary}
-        </p>
-        <div class="prose-foxe prose-foxe--compact">
-          <Content />
-        </div>
-      </div>
-    </Section>
-
     {data.metrics && (
       <Section rule="top">
         <Metrics
@@ -308,6 +294,22 @@ const facts = [
         />
       </Section>
     )}
+
+    <!-- Overview: the MDX body. Kept below the tour so the proof — numbers and
+         screenshots — is what a reader meets first; the detail is for whoever
+         is still scrolling. -->
+    <Section rule="top">
+      <div class="overview">
+        <span class="eyebrow">Overview</span>
+        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">About {data.name}</h2>
+        <p style="margin:0 0 var(--space-350);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
+          {data.summary}
+        </p>
+        <div class="prose-foxe prose-foxe--compact">
+          <Content />
+        </div>
+      </div>
+    </Section>
 
     {addons.length > 0 && (
       <Section id="addons" rule="top">
