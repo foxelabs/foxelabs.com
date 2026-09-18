@@ -1,7 +1,8 @@
 ---
-// Before/after proof. One row per measurement, the "after" column carrying the
-// weight. Every number here is measured — the field is left unset rather than
-// filled with an estimate, so an empty band is the honest state.
+// Before/after proof. One row per figure, the "after" column carrying the
+// weight. The eyebrow says what kind of number the reader is looking at, and
+// `method` spells out where it came from — a band that cannot say that
+// honestly should not be filled in at all.
 interface Row {
   label: string;
   before: string;
@@ -14,14 +15,16 @@ interface Props {
   lead?: string;
   /** How the numbers were produced. Rendered under the table, not hidden. */
   method: string;
+  /** What kind of number these are. Never 'Measured' for arithmetic. */
+  eyebrow?: 'Measured' | 'Estimated';
   rows: Row[];
   /** The product's hue, for the delta pills. */
   hue?: string;
 }
 
-const { heading, lead, method, rows, hue = 'var(--hue-blue)' } = Astro.props;
+const { heading, lead, method, eyebrow = 'Measured', rows, hue = 'var(--hue-blue)' } = Astro.props;
 ---
-<span class="eyebrow">Measured</span>
+<span class="eyebrow">{eyebrow}</span>
 <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">{heading}</h2>
 {lead && (
   <p style="margin:0 0 var(--space-400);font-size:var(--text-body);line-height:1.55;color:var(--text-subtle);max-width:620px">

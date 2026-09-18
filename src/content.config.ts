@@ -120,13 +120,17 @@ const projects = defineCollection({
       highlights: z
         .array(z.object({ icon: z.string(), title: z.string(), body: z.string() }))
         .default([]),
-      // Measured before/after numbers for performance-led products. Real
-      // measurements only — an unset array simply drops the band.
+      // Before/after numbers for performance-led products. An unset field
+      // simply drops the band.
       metrics: z
         .object({
           heading: z.string(),
           lead: z.string().optional(),
-          // How the numbers were produced, e.g. the theme, post and tooling.
+          // Says what kind of number this is. 'Measured' is only honest for a
+          // real lab run; arithmetic from stated inputs is 'Estimated'.
+          eyebrow: z.enum(['Measured', 'Estimated']).default('Measured'),
+          // How the numbers were produced — the run's setup, or the inputs the
+          // arithmetic starts from. Always rendered, never hidden.
           method: z.string(),
           rows: z.array(
             z.object({

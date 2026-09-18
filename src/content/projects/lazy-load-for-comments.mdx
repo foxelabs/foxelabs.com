@@ -50,6 +50,33 @@ highlights:
       The rendered comments block is stored per post in a transient, so the
       REST endpoint answers from cache instead of walking the block tree
       on every request.
+metrics:
+  heading: What a 100-comment thread costs before anyone scrolls to it
+  eyebrow: Estimated
+  lead: >-
+    Comment text is cheap; the avatars beside it are not. Every commenter means
+    one more request to Gravatar, made while the reader is still on the first
+    paragraph. Deferring the thread removes all of it from the initial load.
+  method: >-
+    Worked out from live Gravatar responses at the WordPress default of 96px —
+    12.7 kB for an account with a photo, 1.4 kB for the fallback — assuming 100
+    distinct commenters, half of them with a Gravatar account, plus WordPress
+    core's comment-reply.js at 2.9 kB. Arithmetic from those inputs, not a lab
+    benchmark: your own figure moves with avatar size, how many commenters have
+    a Gravatar, and how many of them repeat.
+  rows:
+    - label: Avatar requests
+      before: '100'
+      after: '0'
+      delta: deferred until asked for
+    - label: Avatar payload
+      before: ~690 kB
+      after: 0 kB
+      delta: the bulk of a comment section
+    - label: comment-reply.js
+      before: 2.9 kB
+      after: 0 kB
+      delta: loaded with the thread
 faq:
   - q: How do I lazy load WordPress comments?
     a: Install Lazy Load for Comments and choose a load method under Comments → Lazy Load. The native WordPress comment section is then held back until the reader scrolls to it or clicks a button, instead of loading with every page view.
@@ -66,7 +93,7 @@ faq:
   - q: Is any configuration required?
     a: No. The plugin works as soon as it is activated, with sensible defaults. The settings under Comments → Lazy Load exist if you want to change the load method, the minimum comment count or the button text.
 screenshots:
-  - src: ./screenshots/lazy-load-for-comments/loading-behaviour.png
+  - src: ./screenshots/lazy-load-for-comments/loading-behaviour.jpg
     tab: Loading behaviour
     alt: The Lazy Load for Comments settings screen in the WordPress admin showing the load method, minimum comments threshold and search-engine options
     heading: One dropdown decides everything
@@ -76,7 +103,7 @@ screenshots:
       the fetch. Disable for search engines keeps crawlers on the inline markup.
     caption: Defaults are set so an activated plugin needs no visit to this screen.
     crumb: Comments → Lazy Load
-  - src: ./screenshots/lazy-load-for-comments/load-button.png
+  - src: ./screenshots/lazy-load-for-comments/load-button.jpg
     tab: Load button
     alt: The Load Button settings for Lazy Load for Comments, with fields for button text, button style and extra CSS classes
     heading: The button is yours
@@ -86,7 +113,7 @@ screenshots:
       classes you want to hang your own styling on.
     caption: Inherit theme style is the default, so the button matches the post it sits in.
     crumb: Comments → Lazy Load → Load Button
-  - src: ./screenshots/lazy-load-for-comments/cache.png
+  - src: ./screenshots/lazy-load-for-comments/cache.jpg
     tab: Cache
     alt: The cache panel for Lazy Load for Comments with a toggle for storing comments markup and a Clear comments cache button
     heading: Re-render only when it changes
