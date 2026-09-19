@@ -1,0 +1,13 @@
+---
+// Google AdSense site verification. The loader tag is what AdSense checks for
+// when confirming ownership of the domain; it also serves any ad units added
+// later. Production only, so local and preview builds stay clean.
+const ADSENSE_CLIENT = 'ca-pub-3721468428020034';
+---
+{import.meta.env.PROD && (
+  <script
+    async
+    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+    crossorigin="anonymous"
+  ></script>
+)}
