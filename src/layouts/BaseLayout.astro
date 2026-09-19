@@ -5,7 +5,6 @@ import '../styles/global.css';
 // preload covers both.
 import spaceGroteskWoff2 from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
 import Analytics from '../components/Analytics.astro';
-import AdSense from '../components/AdSense.astro';
 import { SITE, organizationLd, websiteLd } from '../config/seo';
 import { ogImageFor } from '../config/og';
 
@@ -128,7 +127,6 @@ const structuredData = [organizationLd(), websiteLd(), ...pageLd];
       <script type="application/ld+json" set:html={JSON.stringify(node)} />
     ))}
     <Analytics />
-    <AdSense />
   </head>
   <body>
     <a href="#main" class="skip-link">Skip to content</a>
