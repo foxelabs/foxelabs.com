@@ -1,0 +1,320 @@
+---
+title: "Why we built Convocept: ten years of fixing slow WordPress comments, then replacing them"
+description: Since 2014 we've shipped three plugins that work around comment sections — for Facebook Comments, Disqus and native WordPress comments — and watched Facebook shut its comments down for good. Convocept is what we built when deferring stopped being enough. Here's the reasoning, how it works and the numbers behind it.
+seoTitle: "Convocept: A Fast, Native WordPress Comment System (Why We Built It)"
+seoDescription: Convocept is a free WordPress comment system with zero JavaScript on page load, threaded replies, upvotes, subscriptions and a Disqus importer. Why we built it and how it works.
+pubDate: 2026-10-13
+author: Joel James
+track: oss
+heroImage: covers/cover-why-we-built-convocept.svg
+heroImageAlt: Minimal blue line-art of a dotted comment bubble and an outlined bubble leading to a solid Convocept speech-bubble mark on a dark blue-tinted ground
+tags:
+  - wordpress
+  - performance
+  - plugins
+faq:
+  - q: What is Convocept?
+    a: Convocept is a free, GPL-licensed WordPress plugin by Foxe Labs that replaces a theme's comment section with a fast, modern comment system — threaded replies, upvotes, pinned comments, email subscriptions, moderation in the thread and a Disqus importer. Comments stay ordinary WordPress comments in the native wp_comments table, and the page loads no comment JavaScript until a reader reaches the comments.
+  - q: Is Convocept a good Disqus alternative?
+    a: Yes, if you want Disqus-style features without a third-party service. Convocept keeps every comment in your own WordPress database, renders the thread into the page HTML so search engines can read it, shows no ads and adds no third-party tracking. Its built-in importer brings Disqus comments over with their replies, and it can be re-run without creating duplicates.
+  - q: How fast is Convocept?
+    a: On page load it adds 0 KB of JavaScript and 0 extra requests; its stylesheet, about 4 KB gzipped, is inlined next to the comments. The interactive script, about 6 KB gzipped, loads only when a reader nears the comments or starts typing. In our tests a post with 200 comments scored 99–100 in Lighthouse, against 100 for the same post with no comments.
+  - q: Does Convocept work with page caching?
+    a: Yes. Nothing personal is printed into the cached HTML — no nonces, no commenter names — so WP Rocket, LiteSpeed Cache, Cloudflare and other page caches can serve the same page to everyone. Per-reader details such as a logged-in name or a reader's own votes load separately after the page is shown.
+  - q: What happened to Facebook Comments on WordPress sites?
+    a: Meta permanently shut down the Facebook Comments embed, along with other Facebook social plugins, on February 10, 2026. Sites that used it lost their comment sections, and because those comments were stored by Facebook rather than in WordPress, they could not be exported or recovered. A native comment system such as Convocept keeps every comment in the site's own WordPress database, so a third party shutting down cannot take the comments with it.
+  - q: Do I still need Lazy Load for Comments or Disqus Conditional Load with Convocept?
+    a: No. Convocept already keeps its script off the initial page load, and it replaces both the native comment section and Disqus. Disqus Conditional Load is for sites that want to keep Disqus; Lazy Load for Comments is for sites that want to keep core comments exactly as they are, only lighter.
+  - q: Where are Convocept comments stored?
+    a: In the standard WordPress comment tables, exactly as WordPress stores them. Convocept adds a little comment metadata (such as upvote counts and pins) and two small tables for subscriptions and votes. Akismet, backups, exports and the core Comments screen keep working, and deactivating Convocept brings the theme's comment section back with every comment intact.
+  - q: Is Convocept free?
+    a: Yes. Convocept is free on WordPress.org under the GPL, and every feature in it is fully working with no account and no API key. Planned paid add-ons will extend it later; the core plugin stays free.
+---
+
+For more than a decade, the comment section has been the part of a WordPress
+page we kept having to fix. Not the content, not the theme — the comments. In
+2014 we shipped two plugins to stop embedded comment systems from slowing sites
+down: one for Facebook Comments, one for Disqus. In 2016 we shipped a third to
+do the same for native WordPress comments. Together they have run on thousands
+of sites — and one of them no longer can, because Facebook switched its
+comments off.
+
+[Convocept](https://convocept.com) is what came next. Instead of finding new
+ways to postpone the comment section, we rebuilt it: a fast, native WordPress
+comment system that loads no JavaScript until readers reach the comments, keeps
+every comment in your own database, and gives readers the threaded, voteable,
+subscribable discussion they expect from a modern site.
+
+This post is the why — what ten years of workarounds (and one shutdown)
+taught us, the decisions that shaped Convocept, and the numbers we hold it to.
+
+## The short answer
+
+**Convocept is a free WordPress plugin that replaces your theme's comment
+section with a fast, server-rendered comment system.** It adds threaded
+replies, upvotes, pinned comments, email subscriptions, in-place moderation and
+a Disqus importer. Comments stay ordinary WordPress comments in `wp_comments`.
+The page ships 0 KB of comment JavaScript; a roughly 6 KB script loads only
+when a reader gets near the thread.
+
+It's on [WordPress.org](https://wordpress.org/plugins/convocept/), and the full
+feature tour lives on [convocept.com](https://convocept.com).
+
+## Ten years of working around the comment section
+
+### 2014: Lazy Facebook Comments
+
+Facebook Comments was an easy way to get a lively comment section: readers were
+already logged in, and every comment could show up on their timeline. It was
+also heavy. The embed pulled Facebook's SDK, styles and an iframe onto every
+page that had it.
+
+Lazy Facebook Comments (later renamed Lazy Social Comments) loaded that embed
+only when a reader scrolled to the comments or clicked to show them. It ran on
+WordPress sites for more than eleven years.
+
+### 2014: Disqus Conditional Load
+
+Plenty of sites moved to Disqus for a better commenting experience than core
+WordPress offered. The trade-off showed up in page speed: the Disqus embed
+brings its own scripts, styles and iframe onto every page that has comments,
+whether the reader scrolls down or not.
+
+[Disqus Conditional Load](/software/plugins/disqus-conditional-load/) defers
+that embed until a reader scrolls to the comments or clicks to load them. It
+works, and it's still the right tool for sites that want to keep Disqus. But it
+can only move the cost, not remove it — and it does nothing about where the
+comments live. With Disqus, the thread sits on Disqus's servers, inside an
+iframe, outside your page's HTML.
+
+### 2016: Lazy Load for Comments
+
+Native WordPress comments have the opposite problem. They're yours and they're
+in the page, but every comment arrives with the page: the whole thread renders
+server-side and every commenter's avatar is requested while the reader is still
+on the first paragraph. On a busy post that's
+[hundreds of kilobytes of avatars](/blog/lazy-load-wordpress-comments/) spent
+on content most visitors never reach.
+
+[Lazy Load for Comments](/software/plugins/lazy-load-for-comments/) defers the
+native comment section and fetches it on demand. It keeps comments indexable by
+serving crawlers the original markup. Again, it works — but it inherits
+everything else about core comments, including a reader experience that has
+barely changed in a decade.
+
+### 2026: the day Facebook switched its comments off
+
+On **February 10, 2026**, Meta permanently shut down the Facebook Comments
+embed, along with its other social plugins. There was no workaround and no
+migration path. Every site that used it lost its Facebook comments overnight.
+
+Worse, those comments had never been the sites' to keep. They were stored by
+Facebook, not in WordPress, so they couldn't be exported or recovered — years of
+discussion under some posts simply gone. Our plugin's only job was to lazy load
+an embed that no longer existed, so its final release removed the Facebook code,
+restored native WordPress comments and explained what had happened. It is now
+discontinued.
+
+No amount of lazy loading could have protected those comments. The lesson was
+about ownership, not speed: **a comment section you don't host is one you can
+lose.**
+
+### What deferring couldn't fix
+
+Running these plugins for years, the same three requests kept coming up:
+
+1. **"I want Disqus features without Disqus."** Replies that stay threaded,
+   upvotes, a way to follow a discussion by email — without ads, third-party
+   tracking or handing the thread to another company that can change the terms
+   or, as Facebook showed, turn it off.
+2. **"I want comments that are fast *and* in the HTML."** Deferring either
+   hides the thread from the initial HTML or relies on detecting crawlers.
+   Neither is as simple as the comments just being there.
+3. **"I'm running three plugins to get one decent comment section."** A comment
+   system, a subscriptions plugin, an anti-spam layer and a lazy loader, each
+   with its own settings and its own weight.
+
+Deferring was the right answer for the problem we had in 2014. It wasn't the
+right answer for the problem people actually have now: comments that are fast,
+full-featured *and* yours. So we stopped deferring and started over.
+
+## The decisions that shaped Convocept
+
+### Render on the server, enhance in the browser
+
+Convocept renders the thread in PHP, as part of your page. Readers and search
+engines get every visible comment as plain HTML straight away — no iframe, no
+placeholder, no crawler detection. The comment form is a real HTML form, so with
+JavaScript disabled readers can still read, reply and post the normal WordPress
+way.
+
+JavaScript only adds things on top: posting without a page reload, inline
+replies, sorting, voting, previews. And when the script needs new markup — the
+next page of comments, a freshly posted reply — the server returns HTML
+rendered from the same PHP templates. There is one copy of the comment markup,
+not one in PHP and another in JavaScript.
+
+### Zero JavaScript until it's needed
+
+The interactive script isn't on the initial page at all. It loads when a reader
+scrolls near the comments or starts typing in the form. A reader who never
+reaches the comments never downloads a byte of comment JavaScript, and the
+script is vanilla JavaScript with no framework, no jQuery and no third-party
+code.
+
+### Safe for every page cache
+
+A lot of comment plugins quietly break full-page caching: they print a nonce or
+a commenter's saved name into the HTML, so a cached copy is either wrong or has
+to be skipped. Convocept prints nothing personal into the page. Per-reader
+details — a logged-in name, saved form fields, a reader's own votes — load
+separately after the page is shown. That means WP Rocket, LiteSpeed Cache,
+Cloudflare and other page caches can serve the same HTML to everyone.
+
+### Native comments, no lock-in
+
+Every comment is a normal WordPress comment in the standard tables — the
+direct answer to what happened with Facebook Comments. No outside service holds
+your discussion, so no outside service can shut it down. Convocept adds a little
+metadata (upvote counts, pins) and two small tables for subscriptions and votes,
+and that's it. Akismet, Antispam Bee, backups, exports
+and the core Comments screen all keep working. Deactivate Convocept and your
+theme's comment section comes back with every comment intact.
+
+### One plugin instead of three
+
+Subscriptions, spam protection and moderation are built in rather than bolted
+on. Readers can follow replies to their comment or a whole discussion, with
+double opt-in and one-click unsubscribe, and emails go out in the background in
+batches. Spam checks add a hidden honeypot, a timing check, a link limit and
+per-visitor rate limits on top of WordPress's own rules and Akismet — no
+CAPTCHA.
+
+## The numbers we hold it to
+
+Performance claims are easy to make and easy to let slip. Convocept's are
+budgets enforced in continuous integration: a change that breaks one doesn't
+ship.
+
+| Measure | Budget | Convocept 1.0 |
+| --- | --- | --- |
+| JavaScript on page load | 0 KB | 0 KB |
+| Interactive script (gzipped) | ≤ 8 KB | about 6 KB |
+| Stylesheet (gzipped, inlined) | ≤ 5 KB | under 4 KB |
+| Extra requests on page load | 0 | 0 |
+| Layout shift from comments | none | none |
+
+Two results from our own testing put those budgets in context:
+
+- **Lighthouse:** a post with 200 comments scored 99–100, against 100 for the
+  same post with no comments at all.
+- **Scale:** a 100,000-comment Disqus export imported through WP-CLI, and
+  subscription emails sent in batches to 5,000 subscribers without slowing
+  down posting.
+
+## What's in Convocept 1.0
+
+- **Comment thread:** threaded replies with inline reply forms, sorting by
+  oldest, newest or top, *Load more comments* and *Show more replies*, and
+  comment links that open the right page and highlight the comment.
+- **Composer:** a formatting toolbar for bold, italic, links, code and quotes,
+  safe Markdown, a preview and a short edit window after posting.
+- **Engagement:** upvotes, pinned comments and author badges.
+- **Subscriptions:** reply and post subscriptions, subscribe without commenting
+  (in the thread, with a block or the `[convocept_subscribe]` shortcode) and a
+  page where readers manage their subscriptions.
+- **Moderation:** approve, pin, mark as spam or trash right in the thread, and
+  the Comments screen shows why a comment was held.
+- **SEO:** schema.org structured data for every comment and reply, joining the
+  Yoast SEO or Rank Math schema graph when either is active, and crawlable
+  pagination links.
+- **Privacy and accessibility:** no external requests or cookies of its own
+  (Gravatar avatars aside, while *Show Avatars* is on), WordPress's export and
+  erase tools cover subscriptions and votes, and the thread is checked against
+  WCAG 2.2 AA in light and dark colours.
+- **Themes:** works in classic and block themes with its own clean design, your
+  theme's font and an accent colour; restyle it with CSS custom properties or
+  override its templates.
+
+The complete list, with screenshots, is on the
+[Convocept features page](https://convocept.com/features/).
+
+## How Convocept compares
+
+| | Core WordPress comments | Disqus | Convocept |
+| --- | --- | --- | --- |
+| Where comments are stored | Your database | Disqus's servers | Your database |
+| Comments survive if the service ends | Yes | Only if exported in time | Yes |
+| Comments in the page HTML | Yes | No (iframe) | Yes |
+| Comment JavaScript on page load | `comment-reply.js` | Disqus embed | 0 KB |
+| Threaded replies | Yes | Yes | Yes |
+| Upvotes and pinned comments | No | Yes | Yes |
+| Reply and post subscriptions | No | Yes | Yes |
+| Ads or third-party tracking | No | Ads on the free plan | No |
+| Works without JavaScript | Yes | No | Yes |
+
+The [Convocept vs Disqus](https://convocept.com/compare/disqus/) and
+[Convocept vs wpDiscuz](https://convocept.com/compare/wpdiscuz/) pages go
+feature by feature.
+
+## Where that leaves our other comment plugins
+
+Convocept doesn't make the earlier plugins wrong; it serves a different site.
+
+- **Used Lazy Facebook Comments?** That plugin is discontinued along with
+  Facebook Comments itself, and your site is back on native WordPress comments.
+  Convocept turns those into a modern comment section, and this time the
+  comments stay in your own database.
+- **Keeping Disqus?** [Disqus Conditional Load](/software/plugins/disqus-conditional-load/)
+  is still the way to stop the embed from loading on every page.
+- **Keeping core comments exactly as they are, only lighter?**
+  [Lazy Load for Comments](/software/plugins/lazy-load-for-comments/) defers the
+  native thread without changing how it looks or works.
+- **Want a better comment section altogether?** That's Convocept — and you
+  don't need either of the others alongside it, because it already keeps its
+  script off the initial page load and replaces both Disqus and the core
+  comment section.
+
+## Moving to Convocept
+
+From core WordPress comments, there's nothing to migrate: activate Convocept and
+your existing comments appear in the new thread. Comments stay open, closed and
+moderated exactly as set in **Settings → Discussion**.
+
+From Disqus, it takes four steps:
+
+1. In the Disqus admin, export your comments (**Moderation → Export**). Disqus
+   emails you an XML file.
+2. Install Convocept and open **Comments → Convocept → Import**.
+3. Upload the file, review the **dry run**, then start the import. Replies stay
+   under their parents, and running it again never creates duplicates. Very
+   large exports can use `wp convocept import disqus export.xml.gz`.
+4. Deactivate the Disqus plugin. Your comments now render from your own
+   database.
+
+Coming from wpDiscuz? It stores standard WordPress comments, so they show up in
+Convocept the moment you activate it. The
+[migration guides](https://convocept.com/migrate/) cover each route in detail.
+
+## What's next
+
+Version 1.1 adds importers for Subscribe to Comments Reloaded subscribers and
+wpDiscuz votes, plus a free **Insights** dashboard built from your own comment
+data, with no tracking. Version 1.2 is planned to bring reactions, an AI spam
+check and support for the WordPress Abilities API. The
+[roadmap](https://convocept.com/roadmap/) has the details.
+
+## Try it
+
+Convocept is free on [WordPress.org](https://wordpress.org/plugins/convocept/):
+search for **Convocept** under **Plugins → Add New** and activate it. Setup
+guides are in the [documentation](https://docs.foxelabs.com/software/convocept/getting-started),
+the product overview is on our [Convocept page](/software/plugins/convocept/),
+and everything else — features, comparisons, migration guides — is on
+[convocept.com](https://convocept.com).
+
+If you try it, tell us how it goes on the
+[support forum](https://wordpress.org/support/plugin/convocept/). Ten years of
+comment plugins taught us that the best ideas come from the people running them.
+
+— JJ

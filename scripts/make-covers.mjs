@@ -191,6 +191,22 @@ const PICTOGRAMS = {
         <circle cx="896" cy="550" r="9"/>
       </g>
     </g>`,
+  // why we built Convocept: two older comment bubbles (one deferred, dashed)
+  // leading to the full-hue Convocept mark, its lines cut out in the ground
+  convocept: (h, s, g) => `
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M551 330 H719 C728 330 735 337 735 346 V394 C735 403 728 410 719 410 H595 L563 438 V410 H551 C542 410 535 403 535 394 V346 C535 337 542 330 551 330 Z" stroke="${s}" stroke-width="10" stroke-dasharray="2 22"/>
+      <path d="M591 450 H759 C768 450 775 457 775 466 V514 C775 523 768 530 759 530 H635 L603 558 V530 H591 C582 530 575 523 575 514 V466 C575 457 582 450 591 450 Z" stroke="${s}" stroke-width="10"/>
+      <g stroke="${s}" stroke-width="10">
+        <line x1="815" y1="430" x2="871" y2="430"/>
+        <polyline points="851,410 871,430 851,450"/>
+      </g>
+      <path d="M957 350 H1013 A52 52 0 0 1 1065 402 V458 A52 52 0 0 1 1013 510 H905 V402 A52 52 0 0 1 957 350 Z" fill="${h}" stroke="none"/>
+      <g stroke="${g}" stroke-width="16">
+        <line x1="952" y1="417" x2="1017" y2="417"/>
+        <line x1="952" y1="442" x2="992" y2="442"/>
+      </g>
+    </g>`,
   // incident postmortem: browser window + full-hue alert
   incident: (h, s) => `
     <g fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -222,6 +238,7 @@ const COVERS = [
   { file: 'cover-limit-concurrent-logins-wordpress.png', hue: 'blue', art: 'devices', slug: '// limit-logins' },
   { file: 'cover-force-logout-wordpress-realtime.png', hue: 'sky', art: 'exit', slug: '// force-logout' },
   { file: 'cover-lazy-load-wordpress-comments.png', hue: 'emerald', art: 'comments', slug: '// lazy-comments' },
+  { file: 'cover-why-we-built-convocept.png', hue: 'blue', art: 'convocept', slug: '// why-convocept' },
 ];
 
 const W = 1600;
@@ -233,7 +250,7 @@ for (const c of COVERS) {
   const support = mix(hue, 0.38, ground); // supporting shapes at 38% over it
   const svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="${W}" height="${H}" fill="${ground}"/>
-  ${PICTOGRAMS[c.art](hue, support)}
+  ${PICTOGRAMS[c.art](hue, support, ground)}
   <text x="64" y="836" font-family="Inconsolata" font-size="40" font-weight="500" fill="${hue}">${c.slug}</text>
 </svg>`;
   const resvg = new Resvg(svg, {
