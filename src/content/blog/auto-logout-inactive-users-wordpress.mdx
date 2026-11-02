@@ -4,6 +4,7 @@ description: WordPress keeps a login alive for 2 days — 14 with "Remember Me" 
 seoTitle: How to automatically log out inactive users in WordPress
 seoDescription: Four ways to auto logout idle WordPress users — shorten the session cookie, a PHP idle-timeout snippet, a JavaScript timer, or a per-role admin tool — with the pros and cons of each.
 pubDate: 2026-09-04
+updatedDate: 2026-11-02
 author: Joel James
 track: oss
 heroImage: covers/cover-auto-logout-inactive-users-wordpress.svg
@@ -14,7 +15,7 @@ tags:
   - loggedin
 faq:
   - q: How do I automatically log out inactive users in WordPress?
-    a: WordPress has no built-in idle timeout, so you have to add one. You can shorten the session cookie with the auth_cookie_expiration filter, write a PHP snippet that tracks last activity and destroys stale sessions, or install the free Loggedin plugin with its Auto Logout add-on, which adds an idle timeout in minutes, a warning countdown, and per-role rules from the admin.
+    a: WordPress has no built-in idle timeout, so you have to add one. You can shorten the session cookie with the auth_cookie_expiration filter, write a PHP snippet that tracks last activity and destroys stale sessions, or install the free Loggedin plugin, which has auto logout built in since version 3.4, with an idle timeout in minutes, a warning countdown, and per-role rules from the admin.
   - q: How long does a WordPress login session last by default?
     a: 48 hours, or 14 days if the user ticks "Remember Me" on the login form. Both values are hard-coded in core and apply to every user and role. They can be changed with the auth_cookie_expiration filter or a plugin that wraps it.
   - q: Does WordPress log users out when they close the browser?
@@ -22,7 +23,7 @@ faq:
   - q: What is a good idle timeout for a WordPress site?
     a: Fifteen minutes is a sensible default for logged-in work. Compliance-driven setups (PCI DSS, HIPAA-adjacent) commonly use 5–15 minutes for privileged roles like administrators and shop managers, and an hour or more for low-risk roles that are only reading content.
   - q: Can I set a different auto logout time per user role in WordPress?
-    a: Not with core APIs alone — auth_cookie_expiration can branch on the user, but a true per-role idle timeout needs activity tracking per user. The Auto Logout add-on for the free Loggedin plugin does this from the admin, with the shortest timeout winning when a user holds multiple roles.
+    a: Not with core APIs alone — auth_cookie_expiration can branch on the user, but a true per-role idle timeout needs activity tracking per user. The free Loggedin plugin does this from the admin, with the shortest timeout winning when a user holds multiple roles.
   - q: Does a JavaScript inactivity timer actually secure a WordPress session?
     a: Not by itself. A script that redirects to the logout URL after X idle minutes stops working the moment the tab is closed, the laptop lid drops, or JavaScript is disabled — and the server-side session stays valid the whole time. Real enforcement has to happen server-side, with the browser timer only handling the visible countdown.
 ---
@@ -53,12 +54,12 @@ a warning countdown — with honest pros and cons for each.
 ## The quick answer
 
 WordPress has no idle timeout. The fastest way to add one is the free
-[Loggedin plugin](/software/plugins/loggedin/) with its
-[Auto Logout add-on](/software/plugins/loggedin/auto-logout/):
+[Loggedin plugin](/software/plugins/loggedin/), which has auto logout built in
+since version 3.4:
 
-1. Install and activate Loggedin, then the Auto Logout add-on.
-2. Open **Users → Loggedin → Settings**.
-3. Set the idle timeout in minutes, optionally per role, turn on the warning
+1. Install and activate Loggedin.
+2. Open **Users → Loggedin → Auto logout**.
+3. Set the idle timeout in minutes, optionally per role, set the warning
    countdown, and save.
 
 Idle users are signed out on the server, with a "Stay signed in" prompt
@@ -263,8 +264,8 @@ Everything above converges on one design: server-side activity tracking and
 enforcement, a JavaScript layer for the countdown and punctual logout, throttled
 writes so tracking doesn't hammer the database, and per-role rules because an
 administrator and a subscriber don't warrant the same timeout. That's precisely
-what the [Auto Logout add-on](/software/plugins/loggedin/auto-logout/) for the
-free [Loggedin plugin](/software/plugins/loggedin/) ships as a settings panel:
+what the free [Loggedin plugin](/software/plugins/loggedin/) ships, built in
+since version 3.4, as its **Auto logout** page:
 
 - **Idle timeout in minutes** — from 1 minute up to 30 days, off by default so
   installing it never logs anyone out by surprise.
@@ -286,14 +287,14 @@ free [Loggedin plugin](/software/plugins/loggedin/) ships as a settings panel:
   tabs alive with no extra requests; and writes are throttled to roughly one
   small database write per user per quarter of the timeout.
 
-It lives on the **Users → Loggedin → Settings** screen. Set the minutes, save,
-done.
+It lives on the **Users → Loggedin → Auto logout** page. Set the minutes, save,
+done. Auto logout used to be a paid add-on; since Loggedin 3.4 it's free.
 
 ### How the methods compare
 
 <div class="table-wrap">
 
-| | auth_cookie_expiration | PHP snippet | JS timer | Auto Logout |
+| | auth_cookie_expiration | PHP snippet | JS timer | Loggedin |
 | --- | :---: | :---: | :---: | :---: |
 | True idle timeout (not just shorter sessions) | — | ✓ | looks like one | ✓ |
 | Enforced server-side | ✓ | ✓ | — | ✓ |
@@ -306,7 +307,7 @@ done.
 </div>
 
 The snippet methods are perfectly good for a developer who wants one specific
-behaviour and owns the codebase. The add-on is the same architecture with the
+behaviour and owns the codebase. Loggedin is the same architecture with the
 last 80% finished — worth it the moment "log out idle users" is a requirement
 someone will audit rather than a weekend experiment.
 
@@ -342,10 +343,11 @@ solves, and where the sharp edges are (Heartbeat, multi-tab sync, per-session
 tracking, expired nonces).
 
 For a site where idle logout is a requirement rather than an experiment, the
-[Auto Logout add-on](/software/plugins/loggedin/auto-logout/) packages that whole
+free [Loggedin plugin](/software/plugins/loggedin/) packages that whole
 architecture — server-side enforcement, warning countdown, per-role timeouts,
-custom session lengths — into one settings panel on top of the free
-[Loggedin plugin](/software/plugins/loggedin/). And if you also want to see who's
+custom session lengths — into one settings page. Everything else in
+[Loggedin 3.4](/blog/loggedin-3-4-wordpress-session-manager/) is covered in
+its release post. And if you also want to see who's
 signed in right now, or end a specific session yourself, that's the
 [Active Sessions add-on](/software/plugins/loggedin/active-sessions/) — covered
 in [its own guide](/blog/view-active-login-sessions-wordpress/).

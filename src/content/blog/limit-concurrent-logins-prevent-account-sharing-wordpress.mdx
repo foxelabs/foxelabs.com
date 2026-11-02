@@ -4,6 +4,7 @@ description: WordPress lets one account stay signed in on as many devices as it 
 seoTitle: How to limit concurrent logins and stop account sharing in WordPress
 seoDescription: Four ways to limit simultaneous logins per WordPress user and stop password sharing — a wp_authenticate_user snippet, a single-session snippet, session cookies, or the free Loggedin plugin — with the pros and cons of each.
 pubDate: 2026-09-17
+updatedDate: 2026-11-02
 author: Joel James
 track: oss
 heroImage: covers/cover-limit-concurrent-logins-wordpress.svg
@@ -22,7 +23,7 @@ faq:
   - q: Does limiting logins log out users who are already signed in?
     a: No. The check only runs when a new login happens, so existing sessions keep working until they expire, the user logs out, or a later login displaces them under the rule you chose. Installing Loggedin or changing its limit never signs anyone out on the spot.
   - q: Does a concurrent login limit work with WooCommerce, MemberPress or LearnDash?
-    a: Yes, as long as the plugin logs users in through the standard WordPress authentication flow, which nearly every membership, LMS and e-commerce plugin does. Loggedin hooks wp_authenticate_user and check_password, so any login that passes through wp_signon is covered without integration code.
+    a: Yes, as long as the plugin logs users in through the standard WordPress authentication flow, which nearly every membership, LMS and e-commerce plugin does. Loggedin checks Block New on wp_authenticate_user and applies Logout Oldest and Logout All as the session is created, so any login that passes through wp_signon is covered without integration code, and social login, magic-link and popup logins are covered under the two logout modes too.
   - q: Can I set a different login limit for each user role?
     a: Not with a single global snippet, but the loggedin_reached_limit filter and the Limit Per Role add-on for Loggedin both let you vary the cap by role, for example five sessions for administrators and one for subscribers. The Limit Per User add-on overrides the cap for one specific account from its profile screen.
 ---
@@ -59,8 +60,8 @@ WordPress has no login limit. The fastest way to add one is the free
 [Loggedin plugin](/software/plugins/loggedin/):
 
 1. Install and activate Loggedin from WordPress.org.
-2. Open **Users → Loggedin → Settings**.
-3. Set **Active Logins Limit** (1 stops sharing outright, 2 or 3 allows a
+2. Open **Users → Loggedin → Login limits**.
+3. Set **Maximum active sessions** (1 stops sharing outright, 2 or 3 allows a
    phone and a laptop), pick **Logout Oldest**, **Logout All** or
    **Block New**, and save.
 
@@ -224,11 +225,11 @@ a code off their phone to a friend. It doesn't cap sessions.
 
 Everything above converges on one design: count live tokens at login,
 compare against a limit, then either block or displace. The free
-[Loggedin plugin](/software/plugins/loggedin/) ships that as a settings
-panel under **Users → Loggedin**, and it's what I've maintained for this
-job since 2016:
+[Loggedin plugin](/software/plugins/loggedin/) ships that as its
+**Login limits** page under **Users → Loggedin**, and it's what I've
+maintained for this job since 2016:
 
-- **Active Logins Limit** — any number from 1 upwards. The default is 1,
+- **Maximum active sessions** — any number from 1 upwards. The default is 1,
   which already stops account sharing on a fresh install.
 - **Three modes for the limit:**
   - **Logout Oldest** — the user's single oldest session is ended and the
@@ -238,20 +239,26 @@ job since 2016:
   - **Logout All** — every other session ends and the new device becomes the
     only one. Method 2, as a radio button.
   - **Block New** — the login is refused with an error on wp-login. Method 1,
-    with a message you can change through the `loggedin_error_message`
-    filter.
-- **Force Logout** — an admin panel that takes a user ID, email, or username
-  and clears every session for that account in one click, for when someone
-  is locked out under Block New and can't reach their other devices.
-- **WP-CLI** — `wp loggedin sessions list <user>`, `count`, and `destroy`,
-  plus `wp loggedin settings set maximum 3` for deploy scripts.
+    with a message you can write on the **Lockout & recovery** page. Since
+    3.4 the password is checked first, so a wrong password gets WordPress's
+    usual error, and a blocked user can email themselves a single-use link
+    that signs out their other devices.
+- **Don't limit administrators** — one switch, so nobody locks themselves
+  out of their own site.
+- **Force Logout** — on the Sessions page, type a user ID, email, or
+  username and every session for that account ends in one click; the Users
+  screen has a **Sign out everywhere** link on every row.
+- **WP-CLI** — `wp loggedin sessions list <user>`, `count`, `destroy` and
+  `destroy-all`, plus `wp loggedin settings set maximum 3` for deploy
+  scripts.
 - **Hooks for the edge cases** — `loggedin_bypass` exempts a service account
   or a whole role from the limit; `loggedin_reached_limit` lets you override
   the verdict per user, role, or capability.
 
-It runs in the same two places the snippets do, `wp_authenticate_user` for
-Block New and `check_password` for the two logout modes, so anything that
-authenticates through the normal WordPress flow is covered. No cron, no
+Block New runs where Method 1 does, on `wp_authenticate_user`. The two
+logout modes run as the new session is created (`attach_session_information`),
+so they also cover social login, magic-link and popup login plugins that
+skip the login form. No cron, no
 background requests, no remote calls: the whole plugin runs at the moment a
 login happens.
 
@@ -293,8 +300,8 @@ The choice matters more than the number:
 
 - **Block New** when the account is a compliance boundary: a clinic, a
   finance back office, a client portal where "only one device at a time" is
-  a written policy. Pair it with the Force Logout panel so support can
-  unlock people.
+  a written policy. Turn on self-unlock so blocked users can free
+  themselves, and keep Force Logout for the rest.
 - **Logout Oldest** for paid memberships and courses. It stops sharing
   without ever locking a real customer out, and a limit of 2 or 3 gives
   everyone room for a phone and a laptop.

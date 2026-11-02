@@ -220,6 +220,25 @@ const PICTOGRAMS = {
         <path d="M980 396 L1052 520 L908 520 Z" stroke-width="11"/>
       </g>
     </g>`,
+  // Loggedin 3.4: three session rows guarded by a full-hue shield, its
+  // padlock cut out in the ground
+  shield: (h, s, g) => `
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="560" y="330" width="230" height="48" rx="12" stroke="${s}" stroke-width="8"/>
+      <circle cx="592" cy="354" r="9" fill="${s}" stroke="none"/>
+      <rect x="620" y="346" width="120" height="16" rx="7" fill="${s}" stroke="none"/>
+      <rect x="560" y="398" width="230" height="48" rx="12" stroke="${s}" stroke-width="8"/>
+      <circle cx="592" cy="422" r="9" fill="${s}" stroke="none"/>
+      <rect x="620" y="414" width="150" height="16" rx="7" fill="${s}" stroke="none"/>
+      <rect x="560" y="466" width="230" height="48" rx="12" stroke="${s}" stroke-width="8"/>
+      <circle cx="592" cy="490" r="9" fill="${s}" stroke="none"/>
+      <rect x="620" y="482" width="96" height="16" rx="7" fill="${s}" stroke="none"/>
+      <path d="M930 296 L1046 338 V428 C1046 500 996 546 930 568 C864 546 814 500 814 428 V338 Z" fill="${h}" stroke="none"/>
+      <path d="M902 436 V412 A28 28 0 0 1 958 412 V436" stroke="${g}" stroke-width="13"/>
+      <rect x="888" y="432" width="84" height="64" rx="12" fill="${g}" stroke="none"/>
+      <circle cx="930" cy="458" r="8" fill="${h}" stroke="none"/>
+      <line x1="930" y1="462" x2="930" y2="478" stroke="${h}" stroke-width="7"/>
+    </g>`,
 };
 
 // One entry per post: cover file name (unchanged, so frontmatter keeps
@@ -239,6 +258,7 @@ const COVERS = [
   { file: 'cover-force-logout-wordpress-realtime.png', hue: 'sky', art: 'exit', slug: '// force-logout' },
   { file: 'cover-lazy-load-wordpress-comments.png', hue: 'emerald', art: 'comments', slug: '// lazy-comments' },
   { file: 'cover-why-we-built-convocept.png', hue: 'blue', art: 'convocept', slug: '// why-convocept' },
+  { file: 'cover-loggedin-3-4.png', hue: 'red', art: 'shield', slug: '// loggedin-3.4' },
 ];
 
 const W = 1600;

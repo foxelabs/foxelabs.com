@@ -4,7 +4,7 @@ description: WordPress lists every account that exists, but never the ones signe
 seoTitle: How to view active login sessions on a WordPress site
 seoDescription: Four ways to see who's currently signed in to WordPress — SQL, WP-CLI, a PHP snippet, and a one-click admin tool — with the pros and cons of each.
 pubDate: 2026-06-27
-updatedDate: 2026-08-03
+updatedDate: 2026-11-02
 author: Joel James
 track: oss
 heroImage: covers/cover-active-login-sessions-wordpress.svg
@@ -21,7 +21,7 @@ faq:
   - q: Does closing the browser log a user out of WordPress?
     a: No. The session token stays on the server until the user clicks Log Out, the token expires (2 days by default, or 14 days if "Remember Me" was ticked), or another login displaces it. A closed tab still counts as an active session.
   - q: How do I force log out a WordPress user?
-    a: In code, call WP_Session_Tokens::get_instance($user_id)->destroy_all(). In WP-CLI, run "wp user session destroy <user>". In the admin, use the free Loggedin plugin's Force Logout panel, or the Active Sessions add-on to sign out a single device.
+    a: In code, call WP_Session_Tokens::get_instance($user_id)->destroy_all(). In WP-CLI, run "wp user session destroy <user>". In the admin, use the free Loggedin plugin's Force Logout or its Sign out everywhere link on the Users screen, or the Active Sessions add-on to sign out a single device.
 ---
 
 WordPress is famously bad at one thing: telling you who's actually signed in right
@@ -259,9 +259,11 @@ of information you need in the database, but no UI to look at it. The fastest wa
 close that gap is to add the missing UI.
 
 The free [Loggedin plugin](/software/plugins/loggedin/) already adds a
-concurrent-login limit and a Force Logout panel to the **Users → Loggedin** screen.
-Its [Active Sessions add-on](/software/plugins/loggedin/active-sessions/) extends
-that screen with a dedicated **Sessions** tab showing every user with at least one
+concurrent-login limit and Force Logout under **Users → Loggedin**, and since 3.4
+it shows each user's session count and last login on the Users screen, plus a
+**Your sessions** list on every profile.
+Its [Active Sessions add-on](/software/plugins/loggedin/active-sessions/) adds
+a dedicated **Active sessions** page showing every user with at least one
 live session, in one sortable, searchable list:
 
 - One row per user — display name, username, email, role, session count, last login
@@ -274,7 +276,7 @@ live session, in one sortable, searchable list:
 - **Single-session sign-out** — revoke one device without disturbing the others
   (perfect for a stolen phone or an old tablet the user forgot about).
 - **One-click sign-out-all** — kill every session for a user, same as Loggedin's
-  Force Logout panel but without typing the username.
+  Force Logout but without typing the username.
 - **Bulk sign-out from the list** — select multiple users and sign them all out in
   one action (handy after a credential leak or a refund batch).
 
@@ -311,8 +313,9 @@ ships the API; you just have to call it.
 - **All sessions for a user, in code:** `WP_Session_Tokens::get_instance( $user_id )->destroy_all();`
 - **All sessions for a user, in WP-CLI:** `wp user session destroy <user>`
 - **All sessions for a user, in the admin:** the core
-  [Loggedin plugin](/software/plugins/loggedin/)'s Force Logout panel (free) accepts
-  a user ID, email, or username and clears them in one click.
+  [Loggedin plugin](/software/plugins/loggedin/)'s Force Logout (free) accepts
+  a user ID, email, or username and clears them in one click, and its Users
+  screen has a **Sign out everywhere** link on every row.
 - **Per-device sign-out in the admin:** the
   [Active Sessions add-on](/software/plugins/loggedin/active-sessions/)'s per-user
   modal — the only built-in option here that lets you revoke a single device

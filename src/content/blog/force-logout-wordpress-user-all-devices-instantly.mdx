@@ -4,6 +4,7 @@ description: Ending a WordPress session on the server is easy — the user's ope
 seoTitle: How to force log out a WordPress user from all devices instantly
 seoDescription: Four ways to force logout a WordPress user on every device — the core Log Out Everywhere button, a password reset, WP-CLI and destroy_all(), or a polling script that reloads their open tabs — and why the user still looks signed in until you add the last one.
 pubDate: 2026-09-17
+updatedDate: 2026-11-02
 author: Joel James
 track: oss
 heroImage: covers/cover-force-logout-wordpress-realtime.svg
@@ -53,8 +54,9 @@ actually show the login screen is the free
 [Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/):
 
 1. Install and activate Loggedin, then the Real-time Logout add-on.
-2. Open **Users → Loggedin → Settings**, type the user's ID, email or
-   username into **Force Logout**, and click the button.
+2. Open **Users → Loggedin → Sessions**, type the user's ID, email or
+   username into **Force Logout**, and click the button. Or use **Sign out
+   everywhere** on the user's row on the Users screen.
 3. Every session for that user ends on the server, and within the polling
    interval (60 seconds by default) each tab they have open reloads to
    wp-login.
@@ -271,16 +273,16 @@ the free [Loggedin plugin](/software/plugins/loggedin/), which handles all of
 the above:
 
 - **One setting.** The refresh interval sits on the
-  **Users → Loggedin → Settings** screen, 60 seconds by default.
+  **Users → Loggedin → Login limits** page, 60 seconds by default.
 - **Front end and wp-admin.** Open tabs reload to wp-login within the
   interval, including members' areas and course pages where core's Heartbeat
   doesn't run.
 - **Catches every way a session ends.** An admin's force logout, a logout on
-  another device, a hit concurrent-session limit, or an idle timeout from the
-  [Auto Logout add-on](/software/plugins/loggedin/auto-logout/).
+  another device, a hit concurrent-session limit, or an idle timeout from Loggedin's built-in
+  [auto logout](https://docs.foxelabs.com/software/loggedin/auto-logout).
 - **Loads only for logged-in users**, and forces a hard reload past the
   browser cache so a cached page can't linger after the session is gone.
-- **Plays correctly with Auto Logout.** Poll requests are checked but never
+- **Plays correctly with auto logout.** Poll requests are checked but never
   count as activity.
 - **Works on every host.** It's plain polling, with no WebSockets, no Node
   process, no third-party realtime service and no firewall changes.
@@ -290,9 +292,11 @@ the above:
 The reason the add-on lives under Loggedin is that the plugin already covers
 job one from the admin, in a way the core button doesn't:
 
-- **Force Logout panel** (free, in the core plugin) — type a user ID, email,
-  or username and every session for that account ends in one click. No
-  scrolling to the bottom of an Edit User screen.
+- **Force Logout and Sign out everywhere** (free, in the core plugin) — type
+  a user ID, email, or username on the Sessions page, or click **Sign out
+  everywhere** on the user's row on the Users screen, and every session for
+  that account ends in one click. **Logout All Users** does the same for
+  everyone on the site at once, and the Users screen has a bulk action.
 - **[Active Sessions add-on](/software/plugins/loggedin/active-sessions/)** —
   a sortable, searchable list of everyone signed in right now, with a
   per-user modal showing each device's IP, user-agent, login time and
@@ -311,7 +315,7 @@ job one from the admin, in a way the core button doesn't:
 | --- | :---: | :---: | :---: | :---: |
 | Ends the session on the server | ✓ | ✓ | ✓ | ✓ |
 | Sign out one device only | — | — | manual | ✓ |
-| Bulk sign-out of many users | — | — | scripted | add-on |
+| Bulk sign-out of many users | — | — | scripted | ✓ |
 | User keeps their password | ✓ | — | ✓ | ✓ |
 | Open tabs reload on their own (wp-admin) | Heartbeat | Heartbeat | Heartbeat | ✓ |
 | Open tabs reload on their own (front end) | — | — | — | ✓ |
@@ -334,11 +338,10 @@ hammering the server, fighting the page cache, or keeping idle sessions
 alive. The
 [Real-time Logout add-on](/software/plugins/loggedin/realtime-logout/)
 does exactly that from one setting on top of the free
-[Loggedin plugin](/software/plugins/loggedin/), whose Force Logout panel and
+[Loggedin plugin](/software/plugins/loggedin/), whose Force Logout, Sign out everywhere and
 [Active Sessions add-on](/software/plugins/loggedin/active-sessions/)
 handle the first job from the same screen. If what you actually need is
-for idle users to sign themselves out, that's the
-[Auto Logout add-on](/software/plugins/loggedin/auto-logout/), covered in
-[its own guide](/blog/auto-logout-inactive-users-wordpress/).
+for idle users to sign themselves out, that's built into Loggedin since
+3.4, covered in [its own guide](/blog/auto-logout-inactive-users-wordpress/).
 
 — JJ

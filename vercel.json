@@ -1,4 +1,16 @@
 {
   "buildCommand": "astro build",
-  "trailingSlash": true
+  "trailingSlash": true,
+  "redirects": [
+    {
+      "source": "/software/plugins/loggedin/auto-logout",
+      "destination": "/software/plugins/loggedin/",
+      "permanent": true
+    },
+    {
+      "source": "/software/plugins/loggedin/auto-logout/",
+      "destination": "/software/plugins/loggedin/",
+      "permanent": true
+    }
+  ]
 }

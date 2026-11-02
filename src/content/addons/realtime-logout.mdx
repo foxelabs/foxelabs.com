@@ -5,7 +5,7 @@ seoTitle: "WordPress Real-time Logout — Instantly Sign Out Open Tabs"
 seoDescription: Bounce already-logged-out WordPress tabs straight back to the login screen instead of leaving them rendering as if signed in. Polling interval you control.
 summary: Polls the server on an interval so a session ended elsewhere bounces open tabs straight back to the login screen, instead of lingering until the next click.
 parent: loggedin
-location: Settings tab
+location: Login limits page
 tier: premium
 price: From $24.99
 order: 3
@@ -30,7 +30,7 @@ faq:
   - q: Does the polling script slow down my site for visitors?
     a: No. The script is only enqueued when there is a logged-in user, on both the front end and the admin. Anonymous visitors are served nothing at all, so cached, logged-out traffic is completely unaffected.
   - q: Does Real-time Logout keep idle sessions alive?
-    a: No. If you also run the Auto Logout add-on, its polling requests are checked for validity but never count as user activity, so a tab left open on an unattended screen still times out on schedule.
+    a: No. With Loggedin's built-in auto logout on, these polling requests are checked for validity but never count as user activity, so a tab left open on an unattended screen still times out on schedule.
 screenshots:
   - src: ./screenshots/realtime-logout/settings.png
     tab: Settings panel
@@ -61,8 +61,8 @@ the tab hard-reloads and WordPress redirects to wp-login.
 
 It catches every way a session can end: an admin using Force Logout or
 [Active Sessions](/software/plugins/loggedin/active-sessions/), a logout on
-another device, a hit concurrent-session limit, or an idle timeout from
-[Auto Logout](/software/plugins/loggedin/auto-logout/).
+another device, a hit concurrent-session limit, or an idle timeout from Loggedin's built-in
+[auto logout](https://docs.foxelabs.com/software/loggedin/auto-logout).
 
 ## Set the interval
 
@@ -90,7 +90,7 @@ visitors get nothing — cached, logged-out traffic is untouched.
 
 On its own it makes admin action feel decisive rather than delayed. Paired
 with [Active Sessions](/software/plugins/loggedin/active-sessions/), a
-sign-out is both easy to trigger and quick to land. Paired with
-[Auto Logout](/software/plugins/loggedin/auto-logout/), an idle timeout
+sign-out is both easy to trigger and quick to land. Paired with Loggedin's built-in
+[auto logout](https://docs.foxelabs.com/software/loggedin/auto-logout), an idle timeout
 reaches even a tab the browser has throttled — and those poll requests never
 count as activity, so nothing is kept alive by the checking itself.
