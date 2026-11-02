@@ -34,25 +34,25 @@ faq:
 screenshots:
   - src: ./screenshots/active-sessions/sessions-list.png
     tab: Sessions list
-    alt: The Active Sessions tab in WordPress listing every user with a live login session, with the appearance panel open showing sort, density and column options
+    alt: The Loggedin Active sessions page in WordPress listing every signed-in user with their role, active session count, last login and last IP
     heading: Everyone signed in, right now
-    body: One row per user with a live session — searchable by name or email, sortable by session count or last login, and openable for per-device detail. The appearance panel sets the sort, the row density and which columns show.
+    body: One row per user with a live session — searchable by name or email, sortable by session count or last login, and openable for per-device detail. The gear menu sets the sort, the row density and which columns show.
     caption: The list opens on last login, newest first — what an admin arriving on this screen is usually looking for.
-    crumb: Users → Loggedin → Sessions
+    crumb: Users → Loggedin → Active sessions
   - src: ./screenshots/active-sessions/session-detail.png
     tab: Per-device detail
     alt: The Active Sessions per-user modal showing each WordPress session with its device, IP address, login time and expiry
     heading: Every device, listed separately
     body: Device, the IP the session started from, when it signed in and when it expires — with a Sign out button on each session individually.
     caption: Ending one session leaves the user's other devices untouched.
-    crumb: Users → Loggedin → Sessions
+    crumb: Users → Loggedin → Active sessions
   - src: ./screenshots/active-sessions/bulk-signout.png
     tab: Bulk sign-out
-    alt: Two rows ticked in the Active Sessions list with the bulk bar showing the selected count and a Sign out all action
+    alt: Two users ticked on the Loggedin Active sessions page, with the bar below showing 2 items selected and a Sign out all action
     heading: Clear many users at once
     body: Tick rows in the list and sign them all out in one action. The bar along the bottom keeps count of what is selected before anything happens.
     caption: Every destroy-all path fires the core plugin's own action, so existing audit logging covers it.
-    crumb: Users → Loggedin → Sessions
+    crumb: Users → Loggedin → Active sessions
 
 ---
 

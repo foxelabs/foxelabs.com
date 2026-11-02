@@ -20,9 +20,9 @@ features:
   - Enforced on the next login, with nonce and capability checks
 faq:
   - q: How do I limit concurrent logins for one WordPress user?
-    a: Install the free Loggedin plugin with the Limit Per User add-on, edit the account under Users → All Users, and enter a number in the Concurrent Sessions Limit field. That account is capped at that number regardless of your global setting.
+    a: Install the free Loggedin plugin with the Limit Per User add-on, edit the account under Users → All Users, and enter a number in the Maximum active sessions field under Login limit. That account is capped at that number regardless of your global setting.
   - q: Where is the per-user login limit field?
-    a: On the WordPress profile screen — both your own profile and the edit-user screen administrators see. It sits near the bottom under a Loggedin heading. There is no separate settings panel for this add-on.
+    a: On the WordPress profile screen — both your own profile and the edit-user screen administrators see. It sits near the bottom under a Login limit heading. There is no separate settings panel for this add-on.
   - q: What happens if I leave the per-user limit blank?
     a: The account falls back to your global limit, or to its role limit if you also run Limit Per Role. Entering zero behaves the same way, and the add-on deletes the stored value rather than keeping a meaningless row.
   - q: Which limit wins when several Loggedin add-ons are active?
@@ -34,9 +34,9 @@ faq:
 screenshots:
   - src: ./screenshots/limit-per-user/profile-field.png
     tab: Profile field
-    alt: The Concurrent Sessions Limit field on the WordPress user profile screen, overriding the global login limit for one account
+    alt: The Login limit field on the WordPress Edit User screen, setting maximum active sessions for one account
     heading: No settings screen at all
-    body: The override lives on the profile screen an admin is already editing, under a Loggedin heading near the bottom of the page.
+    body: The override lives on the profile screen an admin is already editing, under a Login limit heading near the bottom of the page.
     caption: Blank means "use the global limit" — and so does zero, which removes the stored value entirely.
     crumb: Users → All Users → Edit
 
@@ -56,7 +56,7 @@ everyone else exactly as they were.
 
 There's no panel to hunt for. The control is a single number field on the
 WordPress profile screen — your own profile, and the edit-user screen admins
-see — under a **Loggedin** heading near the bottom of the page.
+see — under a **Login limit** heading near the bottom of the page.
 
 Leave it blank to use whatever limit already applies. Enter a number to cap
 that one account. It saves with the profile itself, via the normal **Update
