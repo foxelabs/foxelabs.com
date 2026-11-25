@@ -75,6 +75,7 @@ const CASED: Record<string, string> = {
   js: 'JS', sql: 'SQL', wp: 'WP', ai: 'AI', xauusd: 'XAUUSD',
   wordpress: 'WordPress', javascript: 'JavaScript', typescript: 'TypeScript',
   metatrader: 'MetaTrader', mysql: 'MySQL', github: 'GitHub', mt5: 'MT5', mt4: 'MT4',
+  youtube: 'YouTube',
 };
 export const tagLabel = (tag: string): string =>
   tagSlug(tag)

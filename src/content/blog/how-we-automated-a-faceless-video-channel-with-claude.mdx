@@ -1,0 +1,265 @@
+---
+title: "How we run a daily faceless video channel with Claude, from research to posting"
+description: Elsewhere, Once posts a true, fact-checked story every day on YouTube, Instagram, Facebook and X, with a written version and sources on its own website. Nobody on our side touches any of it. Here is the pipeline behind it, built from Claude Code routines, plain Markdown instructions and a few small tools.
+seoTitle: "How We Automated a Faceless YouTube Shorts Channel with Claude"
+seoDescription: How Foxe Labs runs Elsewhere, Once, a daily faceless short-video channel, end to end with Claude Code routines — research, fact-check, voiceover, animated film, posting and website.
+pubDate: 2026-11-25
+author: Joel James
+track: media
+heroImage: covers/cover-automated-channel-with-claude.svg
+heroImageAlt: Minimal purple line-art of four pipeline stages, a document, a sound wave, a play button and a highlighted send arrow, joined by a line on a dark purple-tinted ground
+tags:
+  - automation
+  - claude
+  - ai
+  - youtube
+  - elsewhere-once
+draft: false
+faq:
+  - q: What is Elsewhere, Once?
+    a: Elsewhere, Once is a daily short-video channel from Foxe Labs. Each day it tells one true story from somewhere in the world in about a minute, in simple English, on YouTube, Instagram, Facebook and X. Every story is also written up at elsewhereonce.com with its sources and fact-check notes.
+  - q: Can Claude run a YouTube channel on its own?
+    a: For Elsewhere, Once it does. Three scheduled Claude Code routines pick and fact-check the story, write the script, make the voiceover and the animated film, post the video to four networks and publish the story page on the website. Each routine follows a Markdown instruction file kept in the channel's repository.
+  - q: How are the stories fact-checked?
+    a: Every story needs at least two independent, reliable sources. Claude reads the source pages, checks each date, number, name and outcome against them, and writes fact-check notes that say what was confirmed, what is disputed and which numbers were rounded. A story that cannot be verified well is dropped before anything is written.
+  - q: How is the voiceover made?
+    a: With the ElevenLabs API, through a small Node script in the repository. It returns the audio plus the start and end time of every word, and the film's scene cuts and captions are timed from those word times. The API key is a network secret of the cloud environment, so the agent never sees it.
+  - q: What does a human still do?
+    a: Nothing in the daily run. We change the channel by editing its instruction files and reviewing those changes in git, the same way we change code, and we read the reports each routine leaves when it finishes.
+---
+
+Every day at 5 PM India time, a new story goes out on
+[Elsewhere, Once](/media/channels/elsewhere-once/): a short, true, fact-checked
+story from somewhere in the world, about a minute long. It lands on YouTube,
+Instagram, Facebook and X at the same time, and half an hour later it has its
+own page on [elsewhereonce.com](https://elsewhereonce.com) with the written
+version, the sources and the fact-check notes.
+
+Nobody on our side touches any of it. There is no editor, no voice actor, no
+animator and no one with a phone open at 5 PM. Picking the story, checking the
+facts, writing the script, recording the voice, animating the film, posting it
+and publishing the web page are all done by Claude, on a schedule.
+
+We're a software lab, so we built the channel the way we build software: small
+tools, written instructions under version control, checks that fail loudly, and
+a deploy that runs itself. This post is how it works, and what we learned
+putting it together.
+
+## The short answer
+
+**Elsewhere, Once runs on three scheduled Claude Code routines.** Each one is a
+Claude agent that starts at a fixed time in a cloud environment, checks out the
+channel's repository and follows a Markdown instruction file in it.
+
+| Time (IST) | Routine | What it leaves behind |
+| --- | --- | --- |
+| 5:36 AM | Story, voice and film | A research doc, a voiceover with word timings, an animated film, the finished MP4 and its cover |
+| 5:00 PM | Posting | The video live on YouTube, Instagram, Facebook and X, with each network's own title and caption |
+| 5:30 PM | Website | A new story page on elsewhereonce.com, built, committed and deployed |
+
+The first video went out on 19 November 2026. Since then the channel has
+posted every day without a manual step.
+
+## Why automate a channel at all
+
+A daily channel is a deployment problem wearing a creative hat. The hard part is
+not making one good video; it's making one every single day, at the same
+quality, with the facts right, for months. A team of one can't hold that pace by
+hand next to other work, and the first thing to slip is always the boring part:
+checking sources.
+
+So we split the job the way we'd split a release pipeline. Each stage has an
+input, an output and a written definition of done. If a stage can't meet its
+definition, it stops and says why instead of shipping something half-right.
+
+## Instructions are files in the repo
+
+The routines' prompts are almost empty. Each one says, in effect, "check out the
+repository and follow this file". The real instructions live next to the code:
+
+- `tools/daily-film.md` is the morning routine: research, script, voice, film
+  and covers.
+- `PUBLISHING.md` is the website routine: how to turn a new video into a story
+  page.
+- The posting routine has its own checklist in the same style.
+
+That one decision made everything else easier. Changing how the channel works
+means editing Markdown and committing it, so every change has a diff, a message
+and a date. When a run goes wrong, we fix the instruction that allowed it, not
+the run. And the files double as documentation: there is no other description
+of the process to drift out of date.
+
+The instructions are written as checklists with exact formats rather than as
+advice. "Title it exactly `Elsewhere, Once — YYYY-MM-DD — <story>`" works;
+"give it a clear title" doesn't, because the next routine has to find that doc
+by its title.
+
+## Step 1: picking a story people will watch to the end
+
+A short lives or dies in its first two seconds, so a worthy story is not
+enough. The morning routine brainstorms at least eight candidates from different
+regions and fields, and scores each from 1 to 5 on hook, surprise, payoff,
+visual potential and global appeal. If nothing scores at least 4 on both hook
+and surprise, it brainstorms again.
+
+The winner then has to pass hard rules: real and documented, at least two
+independent reliable sources, not breaking news, not a tragedy told for shock,
+not about a private individual, and not partisan. To avoid repeats, the routine
+first lists every earlier story doc and rotates continents and fields.
+
+That's how the channel ended up with stories like the
+[city that fought traffic with mimes](https://elsewhereonce.com/stories/bogota-traffic-mimes/)
+and the [slime that designed a railway](https://elsewhereonce.com/stories/tokyo-slime-mould-railway/):
+odd enough to stop a thumb, solid enough to source.
+
+## Step 2: fact-check before a word is written
+
+Claude searches the web and reads the actual source pages, then checks every
+date, number, name and outcome it plans to use against them. Where sources
+disagree, or an outcome had several causes, the script has to say so. If a
+story can't be verified well, it's dropped and the next candidate takes its
+place.
+
+Only then does the routine write anything, and it writes exactly **one** research
+doc per run, in Claude Docs. The doc holds everything the later stages need:
+the summary, the voiceover script, a scene plan, captions, the YouTube title and
+description, the Instagram and Facebook caption, the X post and its first reply,
+the sources, and the fact-check notes. Every later stage reads from this doc, so
+the video, the posts and the web page can't tell different versions of the
+story.
+
+## Step 3: a script in simple English
+
+Many of the channel's viewers know only a little English. The instructions
+spell out what that means in practice: everyday words ("use", not "utilise"),
+one idea per sentence and none over 18 words, no idioms or slang, active voice,
+and big numbers rounded when the exact figure doesn't matter. Before saving,
+Claude rereads the script as someone who learned English at school a long time
+ago, and replaces anything they might not follow.
+
+Every script opens with the channel's signature, "Elsewhere, once…", and
+follows the same shape: hook, problem, twist, outcome, one-line takeaway. We
+started with a hard 60-second cap and dropped it. Cutting a sentence that makes
+the twist land, just to hit a number, made worse videos. Now length follows the
+story: most run 50 to 75 seconds, and nothing goes past 90.
+
+## Step 4: a voice, with every word timed
+
+The voiceover comes from the ElevenLabs API through a small, dependency-free
+Node script in the repository, `tools/voiceover.mjs`. It sends the script with
+the channel's voice and settings to the `with-timestamps` endpoint, which
+returns the audio **and** the start and end time of every character. The script
+turns that into a JSON file with the timing of every beat, sentence and word.
+
+Two details matter more than they look:
+
+- **Pause tightening.** ElevenLabs leaves generous pauses between paragraphs.
+  The script trims each long pause with ffmpeg and shifts every timestamp to
+  match, so the audio and the timings stay in sync.
+- **The key never touches the agent.** In the cloud environment the ElevenLabs
+  key is a network secret: the environment's proxy adds it to requests for
+  `api.elevenlabs.io` on the way out. The script sends no key, and Claude can't
+  read, print or store it. (One gotcha: Node's `fetch` ignores `HTTPS_PROXY`
+  unless `NODE_USE_ENV_PROXY` is set when Node starts, so the script restarts
+  itself with it set.)
+
+Each take costs credits, so the instructions only allow real takes, with at most
+two retries if the voice runs too long.
+
+## Step 5: an animated film, timed to the words
+
+The films are colourful, flat storybook animation, made as a Motion artifact in
+Claude: a film is a set of HTML, CSS and JavaScript modules, one per scene, plus
+a soft score. The house style is fixed in the instructions (a 1080 × 1920
+frame, 60 fps, the channel's palette and fonts), so the routine never has to ask
+anyone a question.
+
+The voice's word timings drive the edit. Every scene cut sits in a pause, never
+mid-sentence. Every caption appears on its first word and leaves just after its
+last. The film opens on a drawn map that zooms into the place, and ends with
+the channel's postmark stamping down.
+
+Then the routine checks its own work before anything is rendered: it runs each
+module through `node --check`, renders a still from the middle of every scene
+and looks at them side by side on a contact sheet, fixing any scene that is a
+plain name card, a caption that overlaps, or anything cut off at the edges.
+
+Finally it renders the real video: every frame at 60 fps through a headless
+browser into ffmpeg, the score to a WAV, then the voice and score mixed to about
+−14 LUFS and muxed into an MP4. The whole film step takes about twelve minutes.
+The one thing to watch here is fonts. The offline renderer doesn't fetch web
+fonts, so without help the captions fall back to a different typeface. The
+render ships the film's font files with it, and the routine checks a still for
+the right face before it renders the video.
+
+## Step 6: covers from the film itself
+
+Our first covers were drawn from scratch, and they looked artificial next to
+the video. So now the cover is a real still from the film: the routine renders a
+frame from the scene that sells the story best (the place and its characters,
+bright and busy), puts the title on a card in the film's own colours and fonts,
+and checks that no burned-in caption peeks out around it. The thumbnail looks
+exactly like the video because it is the video.
+
+## Step 7: posting to four networks
+
+At 5 PM the posting routine picks up the finished MP4 and its cover, and posts
+them to YouTube, Instagram, Facebook and X through each network's API, with the
+title, description and caption the research doc already holds for that network.
+
+Most of the work here was done earlier, in the doc. Each network gets its own
+copy, written to its own rules: a YouTube description that ends with the
+sources, an Instagram and Facebook caption with a handful of hashtags, and an X
+post that stands on its own without sound, counted to 280 characters by code
+rather than by eye. Links go in a first reply on X rather than in the post,
+because X tends to show posts with links to fewer people.
+
+## Step 8: the website writes itself
+
+Half an hour later, the website routine reads the channel's YouTube feed. A
+video is new if its ID isn't already in one of the story files in the repo,
+which makes the run safe to repeat: run it twice and the second run finds
+nothing to do.
+
+For each new video it finds the matching research doc, writes a story file (the
+written version, 300 to 400 words, plus every source and the fact-check notes),
+runs the build, commits it and pushes to `main`. Cloudflare Workers Builds
+deploys on push. Each story also gets a pin on the home page's world map and a
+stamp in its album.
+
+`PUBLISHING.md` opens with a sentence we wrote on purpose: *nobody reviews the
+result before it goes live*. So the safety net is the build. Every field is
+typed, the build fails if one is missing or wrong, and the routine only pushes a
+story that builds. If a video has no clearly matching doc, it isn't published,
+and the report says why.
+
+## What made it reliable
+
+Most of what we learned is ordinary engineering, applied to an agent:
+
+- **Write checklists, not briefs.** Exact titles, field rules, word limits and
+  file names. Anything the next stage relies on gets a fixed format.
+- **Keep one source of truth.** The research doc feeds the film, the posts and
+  the web page, so nothing can drift.
+- **Make runs safe to repeat.** "New" means "not already in the repo", and each
+  run creates exactly one doc.
+- **Let the agent check its own output.** Syntax checks, contact sheets of
+  stills, frames pulled from the final MP4, a build before every push.
+- **Fail loudly and narrowly.** A stage that can't finish keeps what it has,
+  writes down the blocker and lets the other stages carry on.
+- **Keep secrets out of the agent's reach.** Network secrets mean there is no
+  key in a prompt, a file or a log.
+- **Cap the spend.** Paid steps, like voice takes, have a retry limit written
+  into the instructions.
+
+## What's next
+
+The same three routines don't know anything about this particular channel
+except what's in their instruction files. That means a second channel is mostly
+a new set of files: a new voice, a new look, a new kind of story. We're working
+out which one comes next.
+
+In the meantime, there's a new true story every day at
+[elsewhereonce.com](https://elsewhereonce.com) and on
+[@elsewhereonce](https://www.youtube.com/@elsewhereonce). Made by a pipeline,
+checked like a newsroom.

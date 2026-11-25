@@ -239,6 +239,20 @@ const PICTOGRAMS = {
       <circle cx="930" cy="458" r="8" fill="${h}" stroke="none"/>
       <line x1="930" y1="462" x2="930" y2="478" stroke="${h}" stroke-width="7"/>
     </g>`,
+  // automated channel: four pipeline stages (doc, voice, film) joined by a
+  // line, ending in a full-hue send mark with its arrow cut out in the ground
+  pipeline: (h, s, g) => `
+    <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M600 420 H1000" stroke="${s}" stroke-width="10"/>
+      <rect x="512" y="372" width="96" height="96" rx="18" fill="${g}" stroke="${s}" stroke-width="10"/>
+      <path d="M538 402 H582 M538 420 H582 M538 438 H566" stroke="${s}" stroke-width="8"/>
+      <rect x="672" y="372" width="96" height="96" rx="18" fill="${g}" stroke="${s}" stroke-width="10"/>
+      <path d="M702 410 V430 M714 396 V444 M726 404 V436 M738 412 V428" stroke="${s}" stroke-width="8"/>
+      <rect x="832" y="372" width="96" height="96" rx="18" fill="${g}" stroke="${s}" stroke-width="10"/>
+      <path d="M869 398 L897 420 L869 442 Z" fill="${s}" stroke="${s}" stroke-width="6"/>
+      <circle cx="1040" cy="420" r="58" fill="${h}" stroke="none"/>
+      <path d="M1014 420 H1064 M1044 398 L1066 420 L1044 442" stroke="${g}" stroke-width="13"/>
+    </g>`,
 };
 
 // One entry per post: cover file name (unchanged, so frontmatter keeps
@@ -259,6 +273,7 @@ const COVERS = [
   { file: 'cover-lazy-load-wordpress-comments.png', hue: 'emerald', art: 'comments', slug: '// lazy-comments' },
   { file: 'cover-why-we-built-convocept.png', hue: 'blue', art: 'convocept', slug: '// why-convocept' },
   { file: 'cover-loggedin-3-4.png', hue: 'red', art: 'shield', slug: '// loggedin-3.4' },
+  { file: 'cover-automated-channel-with-claude.png', hue: 'purple', art: 'pipeline', slug: '// automated-channel' },
 ];
 
 const W = 1600;
