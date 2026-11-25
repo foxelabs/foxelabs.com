@@ -1,9 +1,9 @@
 import { defineCollection, z } from 'astro:content';
 import type { ImageFunction } from 'astro:content';
 import { glob } from 'astro/loaders';
-import { OSS_CATEGORIES, TRADING_CATEGORIES } from './config/tracks';
+import { MEDIA_CATEGORIES, OSS_CATEGORIES, TRACK_IDS, TRADING_CATEGORIES } from './config/tracks';
 
-// Shared fields across both tracks.
+// Shared fields across every section.
 const base = {
   name: z.string(),
   tagline: z.string(),
@@ -43,7 +43,7 @@ const screenshot = (image: ImageFunction) =>
     crumb: z.string().optional(),
   });
 
-// One collection, two shapes, discriminated on `track`.
+// One collection, one shape per section, discriminated on `track`.
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
   // Function form so the schema can use the image() helper for screenshots.
@@ -145,6 +145,40 @@ const projects = defineCollection({
         .optional(),
       screenshots: z.array(screenshot(image)).default([]),
     }),
+    // ---- Media (channels and shows) ----
+    z.object({
+      ...base,
+      track: z.literal('media'),
+      category: z.enum(MEDIA_CATEGORIES),
+      status: z.enum(['live', 'paused', 'coming-soon']).default('live'),
+      // e.g. 'Short video'
+      format: z.string(),
+      // e.g. 'A new story every day'
+      cadence: z.string().optional(),
+      // Language the episodes are made in.
+      language: z.string().default('English'),
+      // Year the first episode went out.
+      since: z.string().optional(),
+      // The channel's own website. Becomes the primary CTA when set.
+      websiteUrl: z.string().url().optional(),
+      websiteLabel: z.string().optional(),
+      // Where to watch, in the order the buttons appear.
+      networks: z
+        .array(
+          z.object({
+            network: z.enum(['youtube', 'instagram', 'facebook', 'x', 'tiktok', 'threads', 'spotify']),
+            url: z.string().url(),
+          })
+        )
+        .default([]),
+      // Defaults to /contact when unset.
+      contactUrl: z.string().optional(),
+      features: z.array(z.string()).default([]),
+      highlights: z
+        .array(z.object({ icon: z.string(), title: z.string(), body: z.string() }))
+        .default([]),
+      specs: z.array(z.object({ label: z.string(), value: z.string() })).default([]),
+    }),
   ]),
 });
 
@@ -163,8 +197,8 @@ const blog = defineCollection({
     // Relative path, e.g. 'covers/my-cover.jpg' — optimised via astro:assets.
     heroImage: image().optional(),
     heroImageAlt: z.string().optional(),
-    // Which track a post belongs to (for filtering + hub feed). Optional.
-    track: z.enum(['oss', 'trading']).optional(),
+    // Which section a post belongs to (sets its blog topic). Optional.
+    track: z.enum(TRACK_IDS).optional(),
     // Q&A pairs rendered as a visible FAQ section + FAQPage JSON-LD (SEO rich
     // results + GEO: clean, quotable answers for AI answer engines).
     faq: z.array(z.object({ q: z.string(), a: z.string() })).default([]),

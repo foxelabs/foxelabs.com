@@ -2,7 +2,7 @@
 //
 // Two levels, deliberately different in weight:
 //   Topic — one per post, derived from the post's `track`. A small, fixed set
-//           (Software, Trading, Writing) with a written description, so each
+//           (one per site section, plus Writing) with a written description, so each
 //           archive is a real landing page rather than a filtered list.
 //   Tag   — many per post, free-form in frontmatter. Cheap to add, so the
 //           archives stay thin by design and carry no hand-written copy.
@@ -21,6 +21,8 @@ export interface TopicMeta {
   seoTitle: string;
 }
 
+// One entry per section's `topic` in tracks.ts, plus Writing. An archive only
+// builds once a topic has posts, so a new section's entry can wait for its first.
 export const TOPIC_META: Record<Topic, TopicMeta> = {
   Software: {
     slug: 'software',
@@ -33,6 +35,12 @@ export const TOPIC_META: Record<Topic, TopicMeta> = {
     description:
       'Posts on expert advisor design, MQL5, risk, and running automated strategies on MetaTrader.',
     seoTitle: 'MQL5 & Expert Advisor Articles',
+  },
+  Media: {
+    slug: 'media',
+    description:
+      'Posts on the channels we run — how a story is researched, fact-checked, and made.',
+    seoTitle: 'Notes on Our Media Channels',
   },
   Writing: {
     slug: 'writing',

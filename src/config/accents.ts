@@ -8,9 +8,12 @@
 //
 // Every value resolves to a --acc-* token, which lightens on the dark theme.
 
-import type { OSS_CATEGORIES, TRADING_CATEGORIES } from './tracks';
+import type { MEDIA_CATEGORIES, OSS_CATEGORIES, TRADING_CATEGORIES } from './tracks';
 
-type CategorySlug = (typeof OSS_CATEGORIES)[number] | (typeof TRADING_CATEGORIES)[number];
+type CategorySlug =
+  | (typeof OSS_CATEGORIES)[number]
+  | (typeof TRADING_CATEGORIES)[number]
+  | (typeof MEDIA_CATEGORIES)[number];
 
 export interface Accent {
   name: string;
@@ -35,6 +38,7 @@ const CATEGORY_ACCENT: Record<CategorySlug, string> = {
   libraries: 'purple',
   'expert-advisors': 'amber',
   tools: 'emerald',
+  channels: 'purple',
 };
 
 /** Blog topics. Colour is keyed on the topic rather than the post, so a filter
@@ -43,6 +47,7 @@ const TOPIC_ACCENT: Record<string, string> = {
   Software: 'blue',
   Trading: 'amber',
   Writing: 'purple',
+  Media: 'emerald',
 };
 
 const byName = (name: string) => ACCENTS.find((a) => a.name === name) ?? ACCENTS[0];

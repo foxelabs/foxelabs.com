@@ -1,7 +1,8 @@
 import { getCollection } from 'astro:content';
 import type { APIRoute } from 'astro';
 import { SITE } from '../config/seo';
-import { TOPICS, TOPIC_META, topicPath } from '../config/blog';
+import { TOPICS, TOPIC_META, postTopic, topicPath } from '../config/blog';
+import { categoryList, projectPath, trackPath, TRACK_LIST } from '../config/tracks';
 
 // llms.txt — a plain-text map of the site for answer engines (ChatGPT,
 // Perplexity, Claude, AI Overviews). Generated from the same collections the
@@ -17,24 +18,21 @@ export const GET: APIRoute = async () => {
   const line = (name: string, path: string, note: string) =>
     `- [${name}](${path.startsWith('http') ? path : SITE.url + path}): ${note}`;
 
-  const byCategory = (track: string, category: string) =>
+  const byCategory = (track: (typeof TRACK_LIST)[number]['id'], category: string) =>
     projects
       .filter((p) => p.data.track === track && p.data.category === category)
       .sort((a, b) => a.data.order - b.data.order)
-      .map((p) =>
-        line(p.data.name, `/${track === 'oss' ? 'software' : 'trading'}/${p.data.category}/${p.id.split('/').pop()}/`, p.data.summary)
-      );
+      .map((p) => line(p.data.name, projectPath(track, p.data.category, p.id), p.data.summary));
 
   const sections = [
     `# ${SITE.name}`,
     '',
-    '> Foxe Labs (legally Foxe Labs LLP) is a small software lab based in Kerala, India. Two tracks: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5.',
+    '> Foxe Labs (legally Foxe Labs LLP) is a small software lab based in Kerala, India. It makes open-source WordPress plugins and PHP libraries, precision trading software for MetaTrader 5, and media: short, fact-checked story channels.',
     '',
-    'Everything on the software track is open source and free. Premium plugin add-ons are sold through Freemius with a 7-day money-back guarantee. On the trading track, Gold Scalpel is live on the MQL5 Market; the remaining trading products are in development and available by waitlist.',
+    'Everything in the software section is open source and free. Premium plugin add-ons are sold through Freemius with a 7-day money-back guarantee. In the trading section, Gold Scalpel is live on the MQL5 Market; the remaining trading products are in development and available by waitlist. The media channels are free to watch on their own websites and social networks.',
     '',
     '## Hubs',
-    line('Software', '/software/', 'All open-source WordPress plugins, PHP libraries, and apps.'),
-    line('Trading', '/trading/', 'All MetaTrader 5 expert advisors and trading tools.'),
+    ...TRACK_LIST.map((t) => line(t.label, trackPath(t.id), t.llms)),
     line('Blog', '/blog/', 'All posts, filterable by topic and tag.'),
     '',
     '## WordPress plugins',
@@ -56,16 +54,22 @@ export const GET: APIRoute = async () => {
     ...byCategory('trading', 'expert-advisors'),
     ...byCategory('trading', 'tools'),
     '',
+    '## Media',
+    ...categoryList('media').flatMap(([category]) => byCategory('media', category)),
+    '',
     '## Writing',
     ...posts
       .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
       .map((p) => line(p.data.title, `/blog/${p.id}/`, p.data.description)),
     '',
     '## Blog topics',
-    ...TOPICS.map((t) => line(`${t} posts`, topicPath(t), TOPIC_META[t].description)),
+    // Only topics with posts have an archive page.
+    ...TOPICS.filter((t) => posts.some((p) => postTopic(p) === t)).map((t) =>
+      line(`${t} posts`, topicPath(t), TOPIC_META[t].description)
+    ),
     '',
     '## Company',
-    line('About', '/about/', 'Who builds Foxe Labs, and how the two tracks fit together.'),
+    line('About', '/about/', 'Who builds Foxe Labs, and how its sections fit together.'),
     line('Contact', '/contact/', 'Support, licensing, and custom build enquiries.'),
     line('Terms of Service', '/legal/terms/', 'Terms governing the site, licenses, and software.'),
     line('Privacy Policy', '/legal/privacy/', 'What data is collected, why, and who processes it.'),

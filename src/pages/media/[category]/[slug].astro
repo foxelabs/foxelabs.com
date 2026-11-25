@@ -1,0 +1,246 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import CtaBanner from '../../../components/CtaBanner.astro';
+import Section from '../../../components/ui/Section.astro';
+import Faq from '../../../components/ui/Faq.astro';
+import ResourceLinks from '../../../components/ui/ResourceLinks.astro';
+import { categoryMeta, categoryPath, projectPath } from '../../../config/tracks';
+import { breadcrumbLd, faqLd } from '../../../config/seo';
+import { accentFor, HUES } from '../../../config/accents';
+import { Icon } from 'astro-icon/components';
+
+export async function getStaticPaths() {
+  const products = await getCollection(
+    'projects',
+    ({ data }) => !data.draft && data.track === 'media'
+  );
+  return products.map((product) => ({
+    params: { category: product.data.category, slug: product.id },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+const { data } = product;
+if (data.track !== 'media') throw new Error(`${product.id} is not a media project`);
+
+// Same ordered sibling list the category grid uses, so this page's hue matches
+// the card that opened it.
+const siblingIds = (await getCollection(
+  'projects',
+  ({ data: d }) => !d.draft && d.track === 'media' && d.category === data.category
+))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((p) => p.id);
+const { Content } = await render(product);
+const cat = categoryMeta('media', data.category);
+const accent = accentFor(siblingIds, product.id);
+
+const statusLabel: Record<string, string> = {
+  live: 'Live',
+  paused: 'Paused',
+  'coming-soon': 'Coming soon',
+};
+
+const NETWORKS: Record<string, { name: string; icon: string }> = {
+  youtube: { name: 'YouTube', icon: 'mingcute:youtube-line' },
+  instagram: { name: 'Instagram', icon: 'mingcute:instagram-line' },
+  facebook: { name: 'Facebook', icon: 'mingcute:facebook-line' },
+  x: { name: 'X', icon: 'mingcute:social-x-line' },
+  tiktok: { name: 'TikTok', icon: 'mingcute:tiktok-line' },
+  threads: { name: 'Threads', icon: 'mingcute:threads-line' },
+  spotify: { name: 'Spotify', icon: 'mingcute:spotify-line' },
+};
+
+/** '@handle' from a profile URL, for the hint under each network row. */
+const handleOf = (url: string) => {
+  const last = new URL(url).pathname.split('/').filter(Boolean).pop() ?? '';
+  return last.startsWith('@') ? last : `@${last}`;
+};
+
+const watchLinks = data.networks.map((n) => ({
+  href: n.url,
+  label: `Watch on ${NETWORKS[n.network].name}`,
+  icon: NETWORKS[n.network].icon,
+  hint: handleOf(n.url),
+}));
+const moreLinks = [
+  { href: data.contactUrl ?? '/contact/', label: 'Suggest a story', icon: 'mingcute:mail-line', hint: 'Ideas and partnerships' },
+];
+
+const path = projectPath('media', data.category, product.id);
+const structuredData = [
+  breadcrumbLd([
+    { name: 'Home', path: '/' },
+    { name: 'Media', path: '/media' },
+    { name: cat?.label ?? 'Media', path: categoryPath('media', data.category) },
+    { name: data.name, path },
+  ]),
+  ...(data.faq.length > 0 ? [faqLd(data.faq)] : []),
+];
+
+const specIcon: Record<string, string> = {
+  format: 'mingcute:video-line',
+  length: 'mingcute:time-line',
+  schedule: 'mingcute:calendar-line',
+  language: 'mingcute:translate-line',
+  'watch on': 'mingcute:play-circle-line',
+  since: 'mingcute:history-line',
+};
+---
+<BaseLayout
+  title={`${data.seoTitle ?? data.name} | Foxe Labs`}
+  description={data.seoDescription ?? data.summary}
+  imageAlt={`${data.name} — ${data.tagline}`}
+  jsonLd={structuredData}
+>
+  <Nav />
+  <main id="main">
+    <!-- Hero -->
+    <section class="page-hero">
+      <div class="cellgrid" aria-hidden="true"></div>
+      <div class="container-x split-hero" style="position:relative">
+        <div style="display:flex;flex-direction:column;gap:var(--space-250);align-items:flex-start">
+          <a href={categoryPath('media', data.category)} class="link-more">
+            ← All {cat?.label.toLowerCase() ?? 'media'}
+          </a>
+
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="chip chip--sm chip--muted chip--solid">
+              <span class="sync-dot" aria-hidden="true"></span>
+              {statusLabel[data.status] ?? data.status}
+            </span>
+            <span class="chip chip--sm chip--muted">{cat?.singular ?? 'Media'}</span>
+            {data.cadence && <span class="chip chip--sm chip--muted">{data.cadence}</span>}
+          </div>
+
+          <h1 style="font-size:var(--text-title);line-height:1.05">{data.name}</h1>
+          <p style="margin:0;font-size:var(--text-lead);line-height:1.5;color:var(--text-subtle)">
+            {data.tagline}
+          </p>
+
+          {data.features.length > 0 && (
+            <ul class="dot-list" style={`--dot-hue:${accent.color};margin-top:var(--space-150);font-size:var(--text-md);line-height:1.5`}>
+              {data.features.map((f) => (
+                <li>
+                  <Icon name="mingcute:check-line" size={16} style="color:var(--dot-hue);flex:none" aria-hidden="true" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div class="card" style="align-self:start">
+          <div style="padding:var(--space-300);display:flex;flex-direction:column;gap:var(--space-250)">
+            <span class="kicker" style={`color:${accent.color}`}>Free to watch</span>
+            {data.websiteUrl && (
+              <a href={data.websiteUrl} class="btn btn--primary" style="justify-content:center" target="_blank" rel="noopener noreferrer">
+                {data.websiteLabel ?? 'Visit the website'}
+                <span class="sr-only">(opens in new tab)</span>
+              </a>
+            )}
+            {watchLinks.length > 0 && <ResourceLinks links={watchLinks} />}
+            <ResourceLinks links={moreLinks} />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Highlights -->
+    {data.highlights.length > 0 && (
+      <Section variant="alt">
+        <span class="eyebrow">Highlights</span>
+        <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">Why people watch it</h2>
+        <div class="grid-3">
+          {data.highlights.map((h, i) => (
+            <div class="card card--pad" style={`gap:var(--space-150);--hue:${HUES[i % HUES.length]}`}>
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span class="icon-tile tint"><Icon name={h.icon} size={22} aria-hidden="true" /></span>
+                <span class="mono" style="font-size:var(--text-xs);color:var(--hue)">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              <h3 style="font-size:1.25rem">{h.title}</h3>
+              <p style="margin:0;font-size:var(--text-md);line-height:1.55">{h.body}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+    )}
+
+    <!-- Overview -->
+    <Section rule="top">
+      <div class="what">
+        <span class="eyebrow">Overview</span>
+        <h2 style="margin:14px 0 var(--space-150);font-size:var(--text-h2-lg)">About the {cat?.singular.toLowerCase() ?? 'channel'}</h2>
+        <p style="margin:0 0 var(--space-300);font-size:var(--text-body-lg);line-height:1.55;color:var(--text-subtle)">
+          {data.summary}
+        </p>
+        <div class="prose-foxe prose-foxe--compact">
+          <Content />
+        </div>
+
+        {data.specs.length > 0 && (
+          <>
+            <h2 style="margin:var(--space-500) 0 var(--space-200);font-size:var(--text-h3)">At a glance</h2>
+            <dl class="spec-grid">
+              {data.specs.map((s, i) => (
+                <div class="spec-grid__row">
+                  <dt>
+                    <Icon name={specIcon[s.label.toLowerCase()] ?? 'mingcute:information-line'} size={16} style={`color:${HUES[i % HUES.length]}`} aria-hidden="true" />
+                    {s.label}
+                  </dt>
+                  <dd>{s.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </>
+        )}
+      </div>
+    </Section>
+
+    {data.faq.length > 0 && (
+      <Section variant="alt" rule="top">
+        <Faq items={data.faq} />
+      </Section>
+    )}
+
+    <CtaBanner
+      heading="Have a story we should tell?"
+      body="Send a story idea or a partnership enquiry, and it reaches the people who research and make the channel."
+      primary={{ href: '/contact/', label: 'Get in touch' }}
+      secondary={{ href: '/media/', label: 'Browse all media' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Same label/value grid as the trading product pages. */
+  .spec-grid {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 var(--space-500);
+  }
+  .spec-grid__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-200);
+    padding: 11px 0;
+    font-size: var(--text-ui);
+    border-bottom: 1px solid var(--border);
+  }
+  .spec-grid dt { color: var(--text-subtle); display: flex; align-items: center; gap: 8px; }
+  .spec-grid dd { margin: 0; text-align: right; font-weight: var(--fw-medium); }
+  @media (max-width: 620px) {
+    .spec-grid { grid-template-columns: 1fr; }
+  }
+  .what {
+    max-width: 720px;
+    margin-inline: auto;
+  }
+</style>

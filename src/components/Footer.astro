@@ -2,6 +2,7 @@
 import { Icon } from 'astro-icon/components';
 import BrandMark from './ui/BrandMark.astro';
 import { SOCIALS } from '../config/seo';
+import { categoryList, categoryPath, TRACK_LIST } from '../config/tracks';
 
 interface Props {
   /** The compact single-row footer, for pages that fill the viewport themselves (404). */
@@ -9,23 +10,16 @@ interface Props {
 }
 const { slim = false } = Astro.props;
 
+// One column per site section (its categories, then its own extra links),
+// then the company columns.
 const columns = [
-  {
-    title: 'Software',
+  ...TRACK_LIST.map((t) => ({
+    title: t.label,
     links: [
-      { href: '/software/plugins/', label: 'WordPress Plugins' },
-      { href: '/software/libraries/', label: 'PHP Libraries' },
-      { href: '/software/', label: 'All software' },
+      ...categoryList(t.id).map(([slug, meta]) => ({ href: categoryPath(t.id, slug), label: meta.label })),
+      ...t.footer,
     ],
-  },
-  {
-    title: 'Trading',
-    links: [
-      { href: '/trading/expert-advisors/', label: 'Expert Advisors' },
-      { href: '/trading/tools/', label: 'Trading Tools' },
-      { href: '/trading/#waitlist', label: 'Waitlist' },
-    ],
-  },
+  })),
   {
     title: 'Company',
     links: [
@@ -56,7 +50,7 @@ const isExternal = (href: string) => href.startsWith('http');
 <footer class:list={['footer', slim && 'footer--slim']}>
   <div class="container-x">
     {!slim && (
-      <div class="footer__cols">
+      <div class="footer__cols" style={`--footer-cols:${columns.length}`}>
         <div class="footer__col">
           <span class="brand">
             <BrandMark size={22} class="brand-logo" />

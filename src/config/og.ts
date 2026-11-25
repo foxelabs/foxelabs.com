@@ -10,7 +10,7 @@
 // card in a timeline is the colour of the page it opens.
 import { getCollection } from 'astro:content';
 import type { OgCard } from '../lib/og';
-import { categoryMeta, categoryPath, projectPath, addonPath, topicOf, trackConfig } from './tracks';
+import { categoryMeta, categoryPath, projectPath, addonPath, topicOf, trackConfig, trackPath, TRACK_LIST } from './tracks';
 import { accentFor, categoryAccent, topicAccent } from './accents';
 import { TOPICS, TOPIC_META, postTopic, topicPath, tagIndex, tagPath } from './blog';
 import type { OgAccent } from '../lib/og';
@@ -32,25 +32,19 @@ const STATIC_CARDS: OgEntry[] = [
     slug: 'index',
     // Not 'Foxe Labs' — the masthead already says that, and a card should not
     // spend its one lozenge repeating itself.
-    eyebrow: 'Software & Trading',
+    eyebrow: TRACK_LIST.map((t) => t.label).join(' · '),
     accent: 'blue',
-    title: 'Open-source software and trading tools',
-    subtitle: 'WordPress plugins, PHP libraries, and precision MetaTrader software — built and used in-house.',
+    title: 'Open-source software, trading tools, and media',
+    subtitle: 'WordPress plugins, PHP libraries, MetaTrader software, and fact-checked story channels — built in-house.',
   },
-  {
-    slug: 'software',
-    eyebrow: 'Software',
-    accent: 'blue',
-    title: 'WordPress plugins and PHP libraries',
-    subtitle: 'Open source, GPL-licensed, documented, and maintained for years.',
-  },
-  {
-    slug: 'trading',
-    eyebrow: 'Trading',
-    accent: 'amber',
-    title: 'Expert advisors and trading tools',
-    subtitle: 'Engineered for prop firm and serious retail traders.',
-  },
+  // One hub card per section, from the section registry.
+  ...TRACK_LIST.map((t) => ({
+    slug: ogSlug(trackPath(t.id)),
+    eyebrow: t.label,
+    accent: t.share.accent,
+    title: t.share.title,
+    subtitle: t.share.subtitle,
+  })),
   {
     slug: 'blog',
     eyebrow: 'Blog',
@@ -63,7 +57,7 @@ const STATIC_CARDS: OgEntry[] = [
     eyebrow: 'About',
     accent: 'emerald',
     title: 'A small lab that ships and keeps shipping',
-    subtitle: 'Foxe Labs builds open-source tools and trading software, and runs on both.',
+    subtitle: 'Foxe Labs builds open-source tools, trading software, and media, and runs on all of it.',
   },
   {
     slug: 'contact',

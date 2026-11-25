@@ -11,7 +11,7 @@ import TrackCard from '../components/ui/TrackCard.astro';
 import PrincipleGrid from '../components/ui/PrincipleGrid.astro';
 import { Image } from 'astro:assets';
 import { faqLd } from '../config/seo';
-import { topicOf } from '../config/tracks';
+import { topicOf, trackPath, TRACK_LIST } from '../config/tracks';
 import { topicAccent } from '../config/accents';
 
 // Latest writing — real published posts, newest first. No fabricated releases.
@@ -35,31 +35,18 @@ const postMeta = (post: (typeof posts)[number]) => {
   };
 };
 
-// Two doors — a summary line per track, not an index.
-const tracks = [
-  {
-    id: 'software',
-    title: 'Software',
-    hue: 'var(--hue-emerald)',
-    icon: 'mingcute:code-line',
-    label: 'Open source · GPL',
-    body:
-      'WordPress plugins and PHP libraries, GPL-licensed and maintained in the open since 2014 — years of public changelogs and support threads behind each one.',
-    trail: 'WordPress plugins · PHP libraries · Apps',
-    href: '/software/',
-  },
-  {
-    id: 'trading',
-    title: 'Trading',
-    hue: 'var(--hue-amber)',
-    icon: 'mingcute:chart-line-line',
-    label: 'Built by traders',
-    body:
-      'Expert advisors and trading tools for MetaTrader 5, engineered like the software beside them — versioned, tested, and traded on our own accounts first.',
-    trail: 'Expert advisors · Trading tools',
-    href: '/trading/',
-  },
-];
+// One door per site section — a summary line each, not an index. Built from
+// the section registry, so a new section gets its door without touching this page.
+const tracks = TRACK_LIST.map((t) => ({
+  id: t.basePath.slice(1),
+  title: t.label,
+  hue: t.hue,
+  icon: t.icon,
+  label: t.kicker,
+  body: t.summary,
+  trail: t.trail,
+  href: trackPath(t.id),
+}));
 
 // Aggregate track record — the whole open-source history, product-agnostic.
 const stats = [
@@ -104,7 +91,7 @@ const faq = [
   {
     q: 'What is Foxe Labs?',
     a:
-      'Foxe Labs is a small software lab based in Kerala, India. We ship two things: open-source WordPress plugins and PHP libraries, and precision trading software for MetaTrader 5. The open-source work has been maintained since 2014 and has passed 2.7 million downloads.',
+      'Foxe Labs is a small software lab based in Kerala, India. We make open-source WordPress plugins and PHP libraries, precision trading software for MetaTrader 5, and media — short, fact-checked story channels such as Elsewhere, Once. The open-source work has been maintained since 2014 and has passed 2.7 million downloads.',
   },
   {
     q: 'Is Foxe Labs software open source?',
@@ -144,7 +131,8 @@ const faq = [
           <p style="margin:0;font-size:var(--text-lead);color:var(--text-subtle);max-width:540px">
             Foxe Labs is a small software lab. For a decade we have shipped open-source
             WordPress plugins and PHP libraries; now the same discipline goes into trading
-            tools — expert advisors, indicators, and a journal.
+            tools — expert advisors, indicators, and a journal — and into media, starting with
+            <a href="/media/channels/elsewhere-once/">Elsewhere, Once</a>.
           </p>
           <div style="display:flex;gap:14px;flex-wrap:wrap">
             <a href="/software/" class="btn btn--primary">
@@ -195,13 +183,13 @@ const faq = [
       </div>
     </section>
 
-    <!-- Two tracks -->
+    <!-- Sections -->
     <Section variant="alt" rule="top" id="tracks">
-      <span class="eyebrow">Two tracks</span>
+      <span class="eyebrow">What we make</span>
       <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
-        Everything we make, in two doors
+        Everything we make, one door each
       </h2>
-      <div class="grid-2">
+      <div class="grid-doors" style={`--doors:${tracks.length}`}>
         {tracks.map((track) => (
           <TrackCard
             id={track.id}

@@ -1,11 +1,12 @@
 ---
-// Site header. Brand, four section links, one primary action — with a mega
-// menu behind Software and Trading, built from the project collection so the
-// chrome cannot drift from what actually ships.
+// Site header. Brand, one link per site section plus Blog and About, one
+// primary action — with a mega menu behind each section, built from the
+// section registry and the project collection so the chrome cannot drift from
+// what actually ships.
 import { getCollection } from 'astro:content';
 import { Icon } from 'astro-icon/components';
 import BrandMark from './ui/BrandMark.astro';
-import { trackConfig, type Track } from '../config/tracks';
+import { trackConfig, trackPath, TRACK_LIST, type Track } from '../config/tracks';
 import { accentFor, categoryAccent } from '../config/accents';
 
 const path = Astro.url.pathname;
@@ -18,14 +19,6 @@ const projects = (await getCollection('projects', ({ data }) => !data.draft)).so
 /** The two projects each category leads with in the menu. The column header
     links to the category page, so the menu is a taste of the shelf rather than
     the shelf itself. A category missing here falls back to its first two by order. */
-/** Column icon per category; items use their own project icon. */
-const CATEGORY_ICON: Record<string, string> = {
-  plugins: 'mingcute:plugin-2-line',
-  libraries: 'mingcute:box-2-line',
-  'expert-advisors': 'mingcute:stock-line',
-  tools: 'mingcute:tool-line',
-};
-
 const MEGA_FEATURED: Record<string, string[]> = {
   plugins: ['convocept', 'loggedin'],
   libraries: ['wp-review-notice', 'wp-queue-process'],
@@ -49,55 +42,28 @@ const columnsFor = (track: Track) => {
         title: meta.label,
         href: `${basePath}/${slug}/`,
         color: categoryAccent(slug).color,
-        icon: CATEGORY_ICON[slug] ?? 'mingcute:box-2-line',
+        icon: meta.icon,
         count: items.length,
         items: shown.map((p) => ({
           name: p.data.name,
           tagline: p.data.tagline,
           href: `${basePath}/${slug}/${p.id}/`,
           hue: accentFor(ids, p.id).color,
-          icon: p.data.icon ?? CATEGORY_ICON[slug] ?? 'mingcute:box-2-line',
+          icon: p.data.icon ?? meta.icon,
         })),
       };
     })
     .filter((column) => column.items.length > 0);
 };
 
-const menus = [
-  {
-    id: 'software',
-    label: 'Software',
-    href: '/software/',
-    columns: columnsFor('oss'),
-    promo: {
-      eyebrow: 'Open source',
-      color: 'var(--hue-emerald)',
-      icon: 'mingcute:code-line',
-      meta: '110,000+ installs · GPL',
-      title: 'Every plugin and library in one place',
-      body: 'GPL-licensed WordPress plugins and PHP packages, maintained in the open.',
-      cta: 'Browse all software',
-      href: '/software/',
-    },
-  },
-  {
-    id: 'trading',
-    label: 'Trading',
-    href: '/trading/',
-    columns: columnsFor('trading'),
-    promo: {
-      eyebrow: 'Risk-first',
-      color: 'var(--hue-amber)',
-      icon: 'mingcute:chart-line-line',
-      meta: 'MetaTrader 5 · traded in-house',
-      title: 'Engineering discipline, pointed at the markets',
-      body:
-        'Every system is tested before it ships. Trading carries substantial risk — nothing here is financial advice.',
-      cta: 'Browse all trading',
-      href: '/trading/',
-    },
-  },
-];
+// One menu per section. A section with nothing published yet gets no menu.
+const menus = TRACK_LIST.map((t) => ({
+  id: t.basePath.slice(1),
+  label: t.label,
+  href: trackPath(t.id),
+  columns: columnsFor(t.id),
+  promo: { ...t.promo, color: t.hue, icon: t.icon, href: trackPath(t.id) },
+})).filter((menu) => menu.columns.length > 0);
 
 const plainLinks = [
   { href: '/blog/', label: 'Blog', hue: 'var(--hue-blue)' },
@@ -148,7 +114,7 @@ const plainLinks = [
 
   {menus.map((menu) => (
     <div class="mega" id={`mega-${menu.id}`} data-mega={menu.id} hidden>
-      <div class="mega__inner">
+      <div class="mega__inner" style={`--mega-cols:${Math.max(2, menu.columns.length)}`}>
         {menu.columns.map((column) => (
           <div class="mega__col">
             <a href={column.href} class="mega__title" style={`--hue:${column.color}`}>

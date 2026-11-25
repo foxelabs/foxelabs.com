@@ -1,0 +1,177 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Nav from '../../components/Nav.astro';
+import Footer from '../../components/Footer.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import Section from '../../components/ui/Section.astro';
+import PageHeader from '../../components/ui/PageHeader.astro';
+import Faq from '../../components/ui/Faq.astro';
+import PrincipleGrid from '../../components/ui/PrincipleGrid.astro';
+import TrackCard from '../../components/ui/TrackCard.astro';
+import MediaCard from '../../components/ui/MediaCard.astro';
+import { Icon } from 'astro-icon/components';
+import { categoryList, categoryPath, projectPath, trackConfig } from '../../config/tracks';
+import { categoryAccent } from '../../config/accents';
+import { breadcrumbLd, collectionPageLd, faqLd } from '../../config/seo';
+
+const section = trackConfig.media;
+
+const products = (await getCollection(
+  'projects',
+  ({ data }) => !data.draft && data.track === 'media'
+)).sort((a, b) => a.data.order - b.data.order);
+
+const count = (cat: string) => products.filter((p) => p.data.category === cat).length;
+
+// Category boxes only earn their space once there is more than one shelf.
+const categories = categoryList('media');
+const categoryBoxes = categories.map(([slug, meta]) => ({
+  title: meta.label,
+  description: meta.description,
+  badge: `${count(slug)} ${count(slug) === 1 ? meta.singular.toLowerCase() : meta.label.toLowerCase()}`,
+  href: categoryPath('media', slug),
+  accent: categoryAccent(slug),
+  icon: meta.icon,
+}));
+
+const principles = [
+  {
+    title: 'True, and checked',
+    icon: 'mingcute:file-check-line',
+    color: 'var(--hue-blue)',
+    body: 'Every story is researched and fact-checked before a word is written. If it cannot be sourced, it is not made.',
+  },
+  {
+    title: 'Sources on show',
+    icon: 'mingcute:link-line',
+    color: 'var(--hue-purple)',
+    body: 'Each story has a page that lists where it came from, so anyone can check it for themselves.',
+  },
+  {
+    title: 'Short and clear',
+    icon: 'mingcute:time-line',
+    color: 'var(--hue-amber)',
+    body: 'About a minute per story, in simple English — easy to watch, easy to share, easy to follow.',
+  },
+  {
+    title: 'Mistakes fixed in public',
+    icon: 'mingcute:edit-2-line',
+    color: 'var(--hue-emerald)',
+    body: 'When a detail is wrong, the story page is corrected and says so. Every channel has a way to report one.',
+  },
+];
+
+const faq = [
+  {
+    q: 'What media does Foxe Labs make?',
+    a:
+      'Foxe Labs runs Elsewhere, Once, a daily short-video channel of true, fact-checked stories from around the world. It is free to watch on YouTube, Instagram, Facebook and X, and every story is written up with its sources at elsewhereonce.com.',
+  },
+  {
+    q: 'How are the stories checked?',
+    a:
+      'Each story is researched from published sources before it is written. The story page lists those sources and notes what was confirmed, what is disputed, and which numbers were rounded.',
+  },
+  {
+    q: 'Can I suggest a story or work with you?',
+    a:
+      'Yes. Send a story idea or a partnership enquiry through the contact page. Corrections to a story go to the channel itself, through its corrections page, so they reach the story fastest.',
+  },
+];
+---
+<BaseLayout
+  title="Media — Fact-Checked Story Channels | Foxe Labs"
+  description="Short, true, fact-checked stories from around the world, researched and produced in-house by Foxe Labs — starting with Elsewhere, Once."
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: section.label, path: section.basePath },
+    ]),
+    collectionPageLd({
+      name: 'Foxe Labs Media',
+      description:
+        'Short, true, fact-checked stories from around the world, researched and produced in-house by Foxe Labs.',
+      url: `${section.basePath}/`,
+      items: products.map((p) => ({ name: p.data.name, path: projectPath('media', p.data.category, p.id) })),
+    }),
+    faqLd(faq),
+  ]}
+>
+  <Nav />
+  <main id="main">
+    <PageHeader
+      eyebrow="Media"
+      color={section.hue}
+      title="True stories, checked before they are told."
+      lead="Short videos about real places and real people, researched and fact-checked here, and published with the sources they came from."
+    >
+      <div style="display:flex;gap:14px;flex-wrap:wrap">
+        {products[0] && (
+          <a href={projectPath('media', products[0].data.category, products[0].id)} class="btn btn--primary">
+            <Icon name={products[0].data.icon ?? section.icon} size={16} aria-hidden="true" />
+            {products[0].data.name}
+          </a>
+        )}
+        <a href="/contact/" class="btn btn--ghost">
+          <Icon name="mingcute:mail-line" size={16} aria-hidden="true" />
+          Suggest a story
+        </a>
+      </div>
+    </PageHeader>
+
+    {categoryBoxes.length > 1 && (
+      <Section variant="alt" rule="top">
+        <span class="eyebrow">Categories</span>
+        <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">Browse by kind</h2>
+        <div class="grid-2">
+          {categoryBoxes.map((box) => (
+            <TrackCard
+              linkCard
+              title={box.title}
+              body={box.description}
+              hue={box.accent.color}
+              icon={box.icon}
+              kicker={box.badge}
+              trail={`Explore ${box.title.toLowerCase()}`}
+              href={box.href}
+            />
+          ))}
+        </div>
+      </Section>
+    )}
+
+    {products.length > 0 && (
+      <Section rule="top">
+        <span class="eyebrow">Channels</span>
+        <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">What we publish</h2>
+        <div class="grid-3">
+          {products.map((p) => (
+            <MediaCard
+              product={p}
+              siblings={products.filter((q) => q.data.category === p.data.category).map((q) => q.id)}
+            />
+          ))}
+        </div>
+      </Section>
+    )}
+
+    <Section variant="alt" rule="top">
+      <span class="eyebrow">Principles</span>
+      <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">How the stories are made</h2>
+      <PrincipleGrid items={principles} />
+    </Section>
+
+    <Section rule="top">
+      <Faq items={faq} />
+    </Section>
+
+    <CtaBanner
+      heading="Have a story we should tell?"
+      body="Send a story idea or a partnership enquiry, and it reaches the people who research and make the channel."
+      primary={{ href: '/contact/', label: 'Get in touch' }}
+      secondary={{ href: '/software/', label: 'Browse the software' }}
+    />
+  </main>
+  <Footer />
+</BaseLayout>

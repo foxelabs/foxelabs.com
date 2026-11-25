@@ -1,0 +1,48 @@
+---
+// Listing card for a media channel, shared by the Media hub and its category
+// pages so the two never drift. The hue is positional among the channel's
+// category siblings, the same rule every other listing uses.
+import type { CollectionEntry } from 'astro:content';
+import { Icon } from 'astro-icon/components';
+import { categoryMeta, projectPath } from '../../config/tracks';
+import { accentFor } from '../../config/accents';
+
+interface Props {
+  product: CollectionEntry<'projects'>;
+  /** Ordered ids of the channel's category siblings; defaults to just itself. */
+  siblings?: string[];
+  /** Heading level: h2 on a category page, h3 under a hub section heading. */
+  as?: 'h2' | 'h3';
+}
+
+const { product, siblings, as: Heading = 'h3' } = Astro.props;
+const { data } = product;
+if (data.track !== 'media') throw new Error(`MediaCard: ${product.id} is not a media project`);
+
+const hue = accentFor(siblings ?? [product.id], product.id).color;
+const statusLabel: Record<string, string> = {
+  live: 'Live',
+  paused: 'Paused',
+  'coming-soon': 'Coming soon',
+};
+---
+<a
+  href={projectPath('media', data.category, product.id)}
+  class="card card--pad card--hover"
+  style={`gap:var(--space-150);--hue:${hue}`}
+>
+  <div class="icon-tile tint">
+    <Icon name={data.icon ?? categoryMeta('media', data.category)?.icon ?? 'mingcute:video-line'} size={22} aria-hidden="true" />
+  </div>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+    <span class="kicker" style="color:var(--hue)">{data.format}</span>
+    <span class="chip chip--sm chip--muted">{statusLabel[data.status] ?? data.status}</span>
+  </div>
+  <Heading style="font-size:var(--text-h3)">{data.name}</Heading>
+  <p style="margin:0;font-size:var(--text-md);line-height:1.55;flex:1">{data.summary}</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+    {data.cadence && <span class="chip chip--sm chip--muted">{data.cadence}</span>}
+    <span class="chip chip--sm chip--muted">{data.language}</span>
+  </div>
+  <span class="link-more">View details →</span>
+</a>

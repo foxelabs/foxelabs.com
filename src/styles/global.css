@@ -418,7 +418,9 @@
   margin-inline: auto;
   padding: var(--space-400) var(--container-pad) var(--space-500);
   display: grid;
-  grid-template-columns: 1fr 1fr 300px;
+  /* --mega-cols is set per menu; never fewer than two slots, so a one-category
+     section keeps the same column width as the others. */
+  grid-template-columns: repeat(var(--mega-cols, 2), minmax(0, 1fr)) 300px;
   gap: var(--space-500);
   align-items: start;
 }
@@ -495,6 +497,8 @@
 .mega__item:focus-visible .mega__arrow { opacity: 1; transform: none; }
 
 .mega__promo {
+  /* Always the last track, even when a section has fewer columns than slots. */
+  grid-column: -2 / -1;
   position: relative;
   overflow: hidden;
   align-self: stretch;
@@ -685,6 +689,16 @@ a.chip:hover { color: var(--text); border-color: var(--border-strong); text-deco
 }
 @media (max-width: 720px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+/* Section doors (home, about): one column per site section, set as --doors.
+   Below the three-up width they stack, so an odd count never leaves an orphan. */
+.grid-doors {
+  display: grid;
+  gap: var(--space-250);
+  grid-template-columns: repeat(var(--doors, 2), minmax(0, 1fr));
+}
+@media (max-width: 960px) {
+  .grid-doors { grid-template-columns: 1fr; }
 }
 
 .dot-list {
@@ -1025,7 +1039,8 @@ textarea.field { resize: vertical; min-height: 120px; }
 }
 .footer__cols {
   display: grid;
-  grid-template-columns: 2fr repeat(4, 1fr);
+  /* --footer-cols is the number of link columns, set by Footer.astro. */
+  grid-template-columns: 2fr repeat(var(--footer-cols, 4), minmax(0, 1fr));
   gap: var(--space-400);
 }
 .footer__col {
@@ -1071,6 +1086,12 @@ textarea.field { resize: vertical; min-height: 120px; }
   display: flex;
   align-items: center;
   gap: var(--space-200);
+}
+/* With five or more link columns the brand column takes its own row on
+   narrower desktops, so the link columns keep a readable width. */
+@media (max-width: 1100px) and (min-width: 861px) {
+  .footer__cols { grid-template-columns: repeat(var(--footer-cols, 4), minmax(0, 1fr)); }
+  .footer__col:first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 860px) {
   .footer__cols { grid-template-columns: 1fr 1fr; gap: var(--space-300); }

@@ -9,31 +9,41 @@ import PrincipleGrid from '../components/ui/PrincipleGrid.astro';
 import { Image } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import { breadcrumbLd, personLd } from '../config/seo';
+import { trackPath, TRACK_LIST, type Track } from '../config/tracks';
 import joelImg from '../assets/joel.jpg';
 
-// Two doors — same card language as the home page.
-const tracks = [
-  {
-    title: 'Software',
-    hue: 'var(--hue-emerald)',
-    icon: 'mingcute:code-line',
+// One door per site section — same card language as the home page. The copy
+// here is first person, so sections are given their own lines; a section
+// without one falls back to its registry summary.
+const aboutCopy: Partial<Record<Track, { label: string; body: string; trail: string }>> = {
+  oss: {
     label: 'Open source · GPL',
     body:
       'Open-source WordPress plugins and PHP libraries — documented, maintained, and shipped release after release for years.',
     trail: 'Explore the software',
-    href: '/software/',
   },
-  {
-    title: 'Trading',
-    hue: 'var(--hue-amber)',
-    icon: 'mingcute:chart-line-line',
+  trading: {
     label: 'Risk-first',
     body:
       'Expert advisors, a universal journal, and precision utilities — engineered risk-first and traded on my own accounts.',
     trail: 'Explore the trading tools',
-    href: '/trading/',
   },
-];
+  media: {
+    label: 'Researched · sourced',
+    body:
+      'Short, true stories, researched and fact-checked here and published with their sources — starting with Elsewhere, Once.',
+    trail: 'Explore the media',
+  },
+};
+const tracks = TRACK_LIST.map((t) => ({
+  title: t.label,
+  hue: t.hue,
+  icon: t.icon,
+  label: aboutCopy[t.id]?.label ?? t.kicker,
+  body: aboutCopy[t.id]?.body ?? t.summary,
+  trail: aboutCopy[t.id]?.trail ?? `Explore ${t.label.toLowerCase()}`,
+  href: trackPath(t.id),
+}));
 
 const founderLinks = [
   { href: 'https://x.com/Joel_James', label: 'X', icon: 'mingcute:social-x-line' },
@@ -163,13 +173,13 @@ const principles = [
       </div>
     </section>
 
-    <!-- Two tracks -->
+    <!-- Sections -->
     <Section variant="alt" rule="top">
-      <span class="eyebrow">Two tracks</span>
+      <span class="eyebrow">What the lab makes</span>
       <h2 style="margin:14px 0 var(--space-500);font-size:var(--text-h2-lg)">
-        One lab, pointed at two problems
+        One lab, pointed at different problems
       </h2>
-      <div class="grid-2">
+      <div class="grid-doors" style={`--doors:${tracks.length}`}>
         {tracks.map((track) => (
           <TrackCard
             title={track.title}

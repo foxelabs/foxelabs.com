@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Nav from '../../../components/Nav.astro';
+import Footer from '../../../components/Footer.astro';
+import CtaBanner from '../../../components/CtaBanner.astro';
+import Section from '../../../components/ui/Section.astro';
+import PageHeader from '../../../components/ui/PageHeader.astro';
+import MediaCard from '../../../components/ui/MediaCard.astro';
+import { categoryList, categoryPath, projectPath } from '../../../config/tracks';
+import { breadcrumbLd, collectionPageLd } from '../../../config/seo';
+import { categoryAccent } from '../../../config/accents';
+
+export async function getStaticPaths() {
+  return categoryList('media').map(([category, meta]) => ({
+    params: { category },
+    props: { category, meta },
+  }));
+}
+
+const { category, meta } = Astro.props;
+
+const products = (await getCollection(
+  'projects',
+  ({ data }) => !data.draft && data.track === 'media' && data.category === category
+)).sort((a, b) => a.data.order - b.data.order);
+const productIds = products.map((p) => p.id);
+
+const description = `${meta.label} by Foxe Labs — ${meta.description.charAt(0).toLowerCase()}${meta.description.slice(1)}`;
+---
+<BaseLayout
+  title={`${meta.label} — Fact-Checked Story Channels | Foxe Labs`}
+  description={description}
+  jsonLd={[
+    breadcrumbLd([
+      { name: 'Home', path: '/' },
+      { name: 'Media', path: '/media' },
+      { name: meta.label, path: categoryPath('media', category) },
+    ]),
+    collectionPageLd({
+      name: `Foxe Labs ${meta.label}`,
+      description,
+      url: categoryPath('media', category),
+      items: products.map((p) => ({ name: p.data.name, path: projectPath('media', p.data.category, p.id) })),
+    }),
+  ]}
+>
+  <Nav />
+  <main id="main">
+    <PageHeader
+      back={{ href: '/media/', label: 'All media' }}
+      eyebrow="Media"
+      color={categoryAccent(category).color}
+      title={meta.label}
+      lead={meta.description}
+    />
+
+    <Section>
+      {products.length > 0 ? (
+        <div class="grid-3">
+          {products.map((p) => <MediaCard product={p} siblings={productIds} as="h2" />)}
+        </div>
+      ) : (
+        <div class="card card--pad" style="max-width:640px;margin-inline:auto;text-align:center;align-items:center;gap:var(--space-150)">
+          <h2 style="font-size:var(--text-h3)">In production.</h2>
+          <p style="margin:0;font-size:var(--text-ui);color:var(--text-subtle)">
+            {meta.label} are on the way.
+          </p>
+        </div>
+      )}
+    </Section>
+
+    <CtaBanner subtle secondary={{ href: '/media/', label: 'Browse all media' }} />
+  </main>
+  <Footer />
+</BaseLayout>

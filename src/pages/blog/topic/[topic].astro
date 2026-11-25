@@ -18,20 +18,22 @@ export async function getStaticPaths() {
     (a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime()
   );
   // Only topics that actually have posts — an empty archive is a thin page.
-  return TOPICS.filter((topic) => posts.some((p) => postTopic(p) === topic)).map((topic) => ({
+  const live = TOPICS.filter((topic) => posts.some((p) => postTopic(p) === topic));
+  return live.map((topic) => ({
     params: { topic: TOPIC_META[topic].slug },
-    props: { topic, posts: posts.filter((p) => postTopic(p) === topic) },
+    props: { topic, posts: posts.filter((p) => postTopic(p) === topic), live },
   }));
 }
 
-const { topic, posts } = Astro.props;
+const { topic, posts, live } = Astro.props;
 const meta = TOPIC_META[topic];
 const path = topicPath(topic);
 
 // Tags used by posts in this topic — the cross-link between the two taxonomies.
 const tags = tagIndex(posts).slice(0, 12);
 
-const others = TOPICS.filter((t) => t !== topic);
+// Only topics that have an archive page, so a section with no posts yet is not linked.
+const others = live.filter((t) => t !== topic);
 ---
 <BaseLayout
   title={`${meta.seoTitle} | Foxe Labs`}
