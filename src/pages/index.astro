@@ -117,8 +117,9 @@ const faq = [
     <!-- Hero -->
     <section class="hero">
       <div class="cellgrid" aria-hidden="true"></div>
-      <div class="hero-glow hero-glow--amber" aria-hidden="true"></div>
-      <div class="hero-glow hero-glow--emerald" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--a" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--b" aria-hidden="true"></div>
+      <div class="hero-glow hero-glow--c" aria-hidden="true"></div>
       <div class="container-x hero__inner">
         <div class="hero__copy">
           <span class="chip chip--muted chip--solid" style="align-self:flex-start">
@@ -159,10 +160,10 @@ const faq = [
             <line x1="335" y1="245" x2="450" y2="320" stroke="var(--border)" stroke-width="1" stroke-dasharray="4 4" />
           </svg>
           <div class="constellation__quad">
-            <span class="tint" style="--hue:var(--hue-blue)"><Icon name="mingcute:code-line" size={24} /></span>
-            <span class="tint" style="--hue:var(--hue-emerald)"><Icon name="mingcute:package-2-line" size={24} /></span>
-            <span class="tint" style="--hue:var(--hue-amber)"><Icon name="mingcute:chart-line-line" size={24} /></span>
-            <span class="tint" style="--hue:var(--hue-purple)"><Icon name="mingcute:book-2-line" size={24} /></span>
+            <span class="tint" style="--hue:var(--quad-1)"><Icon name="mingcute:code-line" size={24} /></span>
+            <span class="tint" style="--hue:var(--quad-2)"><Icon name="mingcute:package-2-line" size={24} /></span>
+            <span class="tint" style="--hue:var(--quad-3)"><Icon name="mingcute:chart-line-line" size={24} /></span>
+            <span class="tint" style="--hue:var(--quad-4)"><Icon name="mingcute:book-2-line" size={24} /></span>
           </div>
           {orbit.map((o) => (
             <span class={`constellation__chip constellation__chip--${o.pos} mono`}>
@@ -295,6 +296,17 @@ const faq = [
   .hero {
     position: relative;
     overflow: hidden;
+    /* White on the light theme, so the glows read as colour, not grey. */
+    background: var(--hero-bg);
+  }
+  /* The dot grid fades out toward the edges instead of ending in a hard box. */
+  .hero .cellgrid {
+    mask-image: radial-gradient(ellipse 80% 75% at 60% 40%, #000 35%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 75% at 60% 40%, #000 35%, transparent 80%);
+  }
+  :global([data-theme='light']) .hero .cellgrid {
+    background-image: radial-gradient(#d4d4d8 1px, transparent 1px);
+    opacity: 0.9;
   }
   .hero__inner {
     position: relative;
@@ -310,6 +322,18 @@ const faq = [
     gap: var(--space-300);
   }
   /* ---- Constellation ---- */
+  /* The four tiles. Dark keeps the brand quad; on white, the amber and emerald
+     tints read as beige and sage, so light swaps them for cyan and pink. */
+  .hero {
+    --quad-1: var(--hue-blue);
+    --quad-2: var(--hue-emerald);
+    --quad-3: var(--hue-amber);
+    --quad-4: var(--hue-purple);
+  }
+  :global([data-theme='light']) .hero {
+    --quad-2: var(--hue-cyan);
+    --quad-3: #db2777;
+  }
   .hero__side {
     display: flex;
     flex-direction: column;
