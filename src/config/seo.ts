@@ -13,6 +13,8 @@ export const SOCIALS = [
 
 export const SITE = {
   name: 'Foxe Labs',
+  /** Other names for the site, most preferred first (see websiteLd). */
+  alternateNames: ['FoxeLabs', 'Foxe Labs LLP'],
   url: 'https://foxelabs.com',
   // Square logo for Organization markup.
   logo: 'https://foxelabs.com/favicon/web-app-manifest-512x512.png',
@@ -44,8 +46,8 @@ export function organizationLd() {
     '@id': `${SITE.url}/#organization`,
     name: SITE.name,
     legalName: 'Foxe Labs LLP',
-    alternateName: 'FoxeLabs',
-    url: SITE.url,
+    alternateName: SITE.alternateNames,
+    url: `${SITE.url}/`,
     logo: SITE.logo,
     email: 'support@foxelabs.com',
     address: {
@@ -66,11 +68,14 @@ export function websiteLd() {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     '@id': `${SITE.url}/#website`,
-    // `name` is the site name Google shows above the SERP title. Keep the
-    // domain out of alternateName (it invites Google to show the domain) and
-    // make `url` match the homepage canonical exactly, trailing slash included.
+    // `name` is the site name Google shows above the SERP title. When Google
+    // isn't confident in it, it picks from alternateName (most preferred first)
+    // and only then falls back to the domain. Keep the domain out of the list:
+    // a lowercase domain there tells Google the domain is a preferred name.
+    // `url` must match the homepage canonical exactly, trailing slash included.
+    // https://developers.google.com/search/docs/appearance/site-names
     name: SITE.name,
-    alternateName: 'FoxeLabs',
+    alternateName: SITE.alternateNames,
     url: `${SITE.url}/`,
     publisher: { '@id': `${SITE.url}/#organization` },
     inLanguage: 'en',

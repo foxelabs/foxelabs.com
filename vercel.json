@@ -3,6 +3,12 @@
   "trailingSlash": true,
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "foxelabs-com.vercel.app" }],
+      "destination": "https://foxelabs.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/software/plugins/loggedin/auto-logout",
       "destination": "/software/plugins/loggedin/",
       "permanent": true
